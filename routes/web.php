@@ -147,6 +147,34 @@ Route::get('/map-jqvmap', function () {
     return view('pages/map-jqvmap');
 })->middleware(['auth', 'verified'])->name('map-jqvmap');
 
+Route::get('/ui-accordion', function () {
+    return view('pages/ui-accordion');
+})->middleware(['auth', 'verified'])->name('ui-accordion');
+
+Route::get('/ui-alert', function () {
+    return view('pages/ui-alert');
+})->middleware(['auth', 'verified'])->name('ui-alert');
+
+Route::get('/ui-badge', function () {
+    return view('pages/ui-badge');
+})->middleware(['auth', 'verified'])->name('ui-badge');
+
+Route::get('/ui-button', function () {
+    return view('pages/ui-button');
+})->middleware(['auth', 'verified'])->name('ui-button');
+
+Route::get('/ui-button-group', function () {
+    return view('pages/ui-button-group');
+})->middleware(['auth', 'verified'])->name('ui-button-group');
+
+Route::get('/ui-modal', function () {
+    return view('pages/ui-modal');
+})->middleware(['auth', 'verified'])->name('ui-modal');
+
+Route::get('/ui-list-group', function () {
+    return view('pages/ui-list-group');
+})->middleware(['auth', 'verified'])->name('ui-list-group');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

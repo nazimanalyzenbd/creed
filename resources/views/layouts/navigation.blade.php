@@ -40,13 +40,13 @@
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
                                 class="icon icon-world-2"></i><span class="nav-text">Bootstrap</span></a>
                         <ul aria-expanded="false">
-                            <li><a href="./ui-accordion.html">Accordion</a></li>
-                            <li><a href="./ui-alert.html">Alert</a></li>
-                            <li><a href="./ui-badge.html">Badge</a></li>
-                            <li><a href="./ui-button.html">Button</a></li>
-                            <li><a href="./ui-modal.html">Modal</a></li>
-                            <li><a href="./ui-button-group.html">Button Group</a></li>
-                            <li><a href="./ui-list-group.html">List Group</a></li>
+                            <li><a href="{{route('ui-accordion')}}">Accordion</a></li>
+                            <li><a href="{{route('ui-alert')}}">Alert</a></li>
+                            <li><a href="{{route('ui-badge')}}">Badge</a></li>
+                            <li><a href="{{route('ui-button')}}">Button</a></li>
+                            <li><a href="{{route('ui-modal')}}">Modal</a></li>
+                            <li><a href="{{route('ui-button-group')}}">Button Group</a></li>
+                            <li><a href="{{route('ui-list-group')}}">List Group</a></li>
                             <li><a href="./ui-media-object.html">Media Object</a></li>
                             <li><a href="./ui-card.html">Cards</a></li>
                             <li><a href="./ui-carousel.html">Carousel</a></li>
