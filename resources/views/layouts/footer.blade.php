@@ -133,6 +133,17 @@
     <script src="{{asset('assets/vendor/jqvmap/js/jquery.vmap.usa.js')}}"></script>
     <!-- All init script -->
     <script src="{{asset('assets/js/plugins-init/jqvmap-init.js')}}"></script>
+    <script>
+        @if (session('success'))
+            toastr.success("{{ session('success') }}");
+        @elseif (session('error'))
+            toastr.error("{{ session('error') }}");
+        @elseif (session('info'))
+            toastr.info("{{ session('info') }}");
+        @elseif (session('warning'))
+            toastr.warning("{{ session('warning') }}");
+        @endif
+    </script>
 </body>
 
 </html>

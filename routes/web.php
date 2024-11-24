@@ -1,15 +1,28 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminUserCo;
+use App\Http\Controllers\Admin\AdminBusinessTypeCo;
+use App\Http\Controllers\Admin\AdminBusinessCategoryCo;
+use App\Http\Controllers\Admin\AdminBusinessSubCategoryCo;
+use App\Http\Controllers\Admin\AdminBusinessTagsCo;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+// ->middleware(['auth', 'verified'])
+
+Route::resource('/businss/business-type', AdminBusinessTypeCo::class);
+Route::resource('/businss/business-category', AdminBusinessCategoryCo::class);
+Route::resource('/businss/business-subcategory', AdminBusinessSubCategoryCo::class);
+Route::resource('/businss/business-tags', AdminBusinessTagsCo::class);
 
 Route::get('/pages/dashboard2', function () {
     return view('pages/index2');

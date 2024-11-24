@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\Admin\TAdminUser;
+use Hash;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -24,11 +26,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        // $request->authenticate();
+        $admin = TAdminUser::where('email', $request->email)->first();
 
-        $request->session()->regenerate();
+        if ($admin && Hash::check($request->password, $admin->password)) {
 
-        return redirect()->intended(route('dashboard', absolute: false));
+            // dd('hi');
+            Auth::guard('t_admin_users')->login($admin);
+
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
+        // Failed login attempt
+        return back()->withErrors(['email' => 'These credentials do not match our records.']);
+
+        // $request->session()->regenerate();
     }
 
     /**

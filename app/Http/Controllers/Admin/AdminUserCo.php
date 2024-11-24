@@ -1,33 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\TAdminUser;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
-use Illuminate\View\View;
+use App\Models\TAdminUser;
 
-class RegisteredUserController extends Controller
+class AdminUserCo extends Controller
 {
     /**
-     * Display the registration view.
+     * Display a listing of the resource.
      */
-    public function create(): View
+    public function index()
     {
-        return view('auth.register');
+        //
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Show the form for creating a new resource.
      */
-    public function store(Request $request): RedirectResponse
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
         $request->validate([
             'name'  => ['required', 'string', 'max:100'],
@@ -54,10 +54,38 @@ class RegisteredUserController extends Controller
 
         ]);
 
-        event(new Registered($tAdminUser));
+        return redirect()->route('dashboard')->with('success', 'Successful');
+    }
 
-        Auth::login($tAdminUser);
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
 
-        return redirect(route('dashboard', absolute: false));
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
     }
 }

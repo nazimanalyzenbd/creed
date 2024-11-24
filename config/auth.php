@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        't_admin_users' => [
+            'driver' => 'session',
+            'provider' => 't_admin_users',
+        ],
     ],
 
     /*
@@ -63,6 +68,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        't_admin_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin\TAdminUser::class,
         ],
 
         // 'users' => [
