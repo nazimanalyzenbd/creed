@@ -14,15 +14,20 @@ Route::get('/', function () {
 
 
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+    Route::resource('/businss/business-type', AdminBusinessTypeCo::class);
+    Route::resource('/businss/business-category', AdminBusinessCategoryCo::class);
+    Route::resource('/businss/business-subcategory', AdminBusinessSubCategoryCo::class);
+    Route::resource('/businss/business-tags', AdminBusinessTagsCo::class);
 
-Route::resource('/businss/business-type', AdminBusinessTypeCo::class);
-Route::resource('/businss/business-category', AdminBusinessCategoryCo::class);
-Route::resource('/businss/business-subcategory', AdminBusinessSubCategoryCo::class);
-Route::resource('/businss/business-tags', AdminBusinessTagsCo::class);
+});
 
 Route::get('/pages/dashboard2', function () {
     return view('pages/index2');
