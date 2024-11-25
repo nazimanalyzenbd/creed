@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\TBusinessSubCategory;
 use App\Models\Admin\TBusinessCategory;
+use App\Http\Requests\TBusinessSubCategoryRequest;
 use Auth;
 
 class AdminBusinessSubCategoryCo extends Controller
@@ -15,7 +16,7 @@ class AdminBusinessSubCategoryCo extends Controller
      */
     public function index()
     {
-        $datas = TBusinessSubCategory::get();
+        $datas = TBusinessSubCategory::latest()->get();
         return view('admin.businessSubCategory.index', compact('datas'));
     }
 
@@ -31,14 +32,10 @@ class AdminBusinessSubCategoryCo extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TBusinessSubCategoryRequest $request)
     {
         // Validate the form data
-        $validated = $request->validate([
-            'category_id' => 'required|numeric',
-            'name' => 'required|string',
-            'status' => 'nullable',
-        ]);
+        $validated = $request->validated();
 
         if($request->status){
             $status = $request->status;
@@ -78,13 +75,10 @@ class AdminBusinessSubCategoryCo extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(TBusinessSubCategoryRequest $request, string $id)
     {
         // Validate the form data
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'status' => 'nullable',
-        ]);
+        $validated = $request->validated();
 
         if($request->status){
             $status = $request->status;

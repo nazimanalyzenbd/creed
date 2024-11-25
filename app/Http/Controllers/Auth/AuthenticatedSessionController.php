@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         if ($admin && Hash::check($request->password, $admin->password)) {
 
             // dd('hi');
-            Auth::guard('t_admin_users')->login($admin);
+            Auth::guard('web')->login($admin);
 
             return redirect()->intended(route('dashboard', absolute: false));
         }

@@ -17,6 +17,7 @@
     <!-- Summernote -->
     <link href="{{asset('assets/vendor/summernote/summernote.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
+    <link href="{{asset('assets/css/custom.css')}}" rel="stylesheet">
     <!-- Datatable -->
     <link href="{{asset('assets/vendor/datatables/css/jquery.dataTables.min.css')}}" rel="stylesheet">
     <!-- Select2 -->

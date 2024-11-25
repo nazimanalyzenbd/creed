@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\TBusinessType;
+use App\Http\Requests\TBusinessTypeRequest;
 use Auth;
 
 class AdminBusinessTypeCo extends Controller
@@ -14,7 +15,7 @@ class AdminBusinessTypeCo extends Controller
      */
     public function index()
     {
-        $datas = TBusinessType::get();
+        $datas = TBusinessType::latest()->get();
         return view('admin.businessType.index', compact('datas'));
     }
 
@@ -29,13 +30,10 @@ class AdminBusinessTypeCo extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TBusinessTypeRequest $request)
     {
         // Validate the form data
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'status' => 'nullable',
-        ]);
+        $validated = $request->validated();
 
         if($request->status){
             $status = $request->status;
@@ -72,13 +70,10 @@ class AdminBusinessTypeCo extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(TBusinessTypeRequest $request, string $id)
     {
         // Validate the form data
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'status' => 'nullable',
-        ]);
+        $validated = $request->validated();
 
         if($request->status){
             $status = $request->status;

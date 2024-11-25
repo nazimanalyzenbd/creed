@@ -13,20 +13,26 @@
                                     <form class="color-black" method="POST" action="{{route('business-subcategory.store')}}" style="color:black">
                                         @csrf
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label">Category Name</label>
+                                            <label class="col-sm-2 col-form-label">Category Name<span class="requiredStar">*</span></label>
                                             <div class="col-sm-10">
-                                               <select class="form-control select2" name="category_id" id="category_id">
+                                               <select class="form-control select2" name="category_id" id="category_id" required>
                                                     <option value="">Select one...</option>
                                                     @foreach($categories as $value)
                                                         <option value="{{$value->id}}">{{$value->name}}</option>
                                                     @endforeach
                                                </select>
+                                               @error('category_id')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label">Name</label>
+                                            <label class="col-sm-2 col-form-label">Name<span class="requiredStar">*</span></label>
                                             <div class="col-sm-10">
-                                                <input type="text" name="name" id="name" value="{{old('name')}}" class="form-control" placeholder="">
+                                                <input type="text" name="name" id="name" value="{{old('name')}}" class="form-control" placeholder="" required>
+                                                @error('name')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="form-group row">
