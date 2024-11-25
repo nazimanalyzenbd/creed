@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('t_admin_users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100); 
+            $table->string('name', 100)->index(); 
             $table->string('email', 191)->unique();
             $table->string('phone_number', 15)->unique();
             $table->string('password', 255)->comment('Stores the user\'s hashed password with minimum 8length');;

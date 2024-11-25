@@ -9,7 +9,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Business Type List</h4>
-                                <a class="btn btn-primary" href="{{route('business-type.create')}}">Add</a>
+                                <a class="btn btn-info" href="{{route('business-type.create')}}">Add</a>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -29,12 +29,12 @@
                                                     <td>{{$value->name}}</td>
                                                     <td>@if($value->status==1)<span>Active</span>@else<span>Inactive</span>@endif</td>
                                                     <td>
-                                                        <a href="{{route('business-type.edit', $value->id)}}" class="btn btn-info"><i class="fa fa-edit"></i></a>
+                                                        <a href="{{route('business-type.edit', $value->id)}}" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Edit</a>
                                                         <form action="{{ route('business-type.destroy', $value->id) }}" method="POST" style="display: inline-block;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this?')">
-                                                                <i class="fa fa-trash"></i>
+                                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this?')">
+                                                                <i class="fa fa-trash"></i> Delete
                                                             </button>
                                                         </form>
                                                     </td>

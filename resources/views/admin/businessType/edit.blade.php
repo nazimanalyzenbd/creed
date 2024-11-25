@@ -6,11 +6,11 @@
             <div class="col-xl-12 col-xxl-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Edit</h4>
+                                <h4 class="card-title">Edit Business Type</h4>
                             </div>
                             <div class="card-body">
                                 <div class="basic-form">
-                                    <form class="color-black" method="POST" action="{{route('business-type.update', $data->id)}}" style="color:black">
+                                    <form class="text-black" method="POST" action="{{route('business-type.update', $data->id)}}">
                                         @csrf
                                         @method('PUT')
                                         <div class="form-group row">
@@ -34,7 +34,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <div class="col-sm-10">
+                                            <div class="col-sm-10 text-center">
                                                 <button type="submit" class="btn btn-primary">Update</button>
                                                 <a href="{{url()->previous()}}" class="btn btn-secondary">Cancel</a>
                                             </div>

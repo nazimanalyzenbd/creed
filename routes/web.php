@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\AdminBusinessTypeCo;
 use App\Http\Controllers\Admin\AdminBusinessCategoryCo;
 use App\Http\Controllers\Admin\AdminBusinessSubCategoryCo;
 use App\Http\Controllers\Admin\AdminBusinessTagsCo;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\AdminLocationCo;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,14 +21,24 @@ Route::get('/', function () {
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // Business Settings
     Route::resource('/businss/business-type', AdminBusinessTypeCo::class);
     Route::resource('/businss/business-category', AdminBusinessCategoryCo::class);
     Route::resource('/businss/business-subcategory', AdminBusinessSubCategoryCo::class);
     Route::resource('/businss/business-tags', AdminBusinessTagsCo::class);
 
+    // Usermanagement with Role&Permission
+    Route::resource('/user-management/users', AdminUserCo::class);
+    Route::resource('/user-management/roles', RoleController::class);
+    // Route::resource('products', ProductController::class);
+    // Location
+    Route::get('/states/{country_id}', [AdminLocationCo::class, 'getStates']);
+    Route::get('/cities/{state_id}', [AdminLocationCo::class, 'getCities']);
 });
 
 Route::get('/pages/dashboard2', function () {

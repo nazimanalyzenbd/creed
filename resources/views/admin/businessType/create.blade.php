@@ -4,13 +4,13 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12 col-xxl-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Add</h4>
-                            </div>
-                            <div class="card-body">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Add Business Type</h4>
+                    </div>
+                    <div class="card-body">
                                 <div class="basic-form">
-                                    <form class="color-black" method="POST" action="{{route('business-type.store')}}" style="color:black">
+                                    <form class="text-black" method="POST" action="{{route('business-type.store')}}">
                                         @csrf
                                         <div class="form-group row">
                                             <label class="col-sm-2 col-form-label">Name<span class="requiredStar">*</span></label>
@@ -33,15 +33,15 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <div class="col-sm-10">
+                                            <div class="col-sm-10 text-center">
                                                 <button type="submit" class="btn btn-primary">Submit</button>
                                                 <a href="{{url()->previous()}}" class="btn btn-secondary">Cancel</a>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
-                            </div>
-                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -33,7 +33,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <div class="col-sm-10">
+                                            <div class="col-sm-10 text-center">
                                                 <button type="submit" class="btn btn-primary">Submit</button>
                                                 <a href="{{url()->previous()}}" class="btn btn-secondary">Cancel</a>
                                             </div>
