@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\AdminUserCo;
+use App\Http\Controllers\Admin\UserManagement\AdminUserCo;
 use App\Http\Controllers\Admin\AdminBusinessTypeCo;
 use App\Http\Controllers\Admin\AdminBusinessCategoryCo;
 use App\Http\Controllers\Admin\AdminBusinessSubCategoryCo;
 use App\Http\Controllers\Admin\AdminBusinessTagsCo;
-use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserManagement\AdminRoleCo;
 use App\Http\Controllers\Admin\AdminLocationCo;
 use Illuminate\Support\Facades\Route;
 
@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Usermanagement with Role&Permission
     Route::resource('/user-management/users', AdminUserCo::class);
-    Route::resource('/user-management/roles', RoleController::class);
+    Route::resource('/user-management/roles', AdminRoleCo::class);
     // Route::resource('products', ProductController::class);
     // Location
     Route::get('/states/{country_id}', [AdminLocationCo::class, 'getStates']);

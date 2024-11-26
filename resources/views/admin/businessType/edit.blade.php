@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('content')
-<div class="content-body">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xl-12 col-xxl-12">
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-12 col-xxl-12">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Edit Business Type</h4>
@@ -43,8 +43,8 @@
                                 </div>
                             </div>
                         </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection

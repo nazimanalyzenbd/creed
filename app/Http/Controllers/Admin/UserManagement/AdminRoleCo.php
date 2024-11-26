@@ -1,6 +1,6 @@
 <?php
     
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\UserManagement;
 
 
 use Illuminate\Http\Request;
@@ -11,19 +11,17 @@ use DB;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
     
-class RoleController extends Controller
+class AdminRoleCo extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    function __construct()
-    {
-        //  $this->middleware('permission:role-list|role-create|role-edit|role-delete', ['only' => ['index','store']]);
-        //  $this->middleware('permission:role-create', ['only' => ['create','store']]);
-        //  $this->middleware('permission:role-edit', ['only' => ['edit','update']]);
-        //  $this->middleware('permission:role-delete', ['only' => ['destroy']]);
+    public function __construct()
+    {   
+        // $this->authorizeResource(Role::class, 'role');
+        // $this->middleware(['permission:role-list'])->only(['index']);
     }
     
     /**
@@ -46,7 +44,7 @@ class RoleController extends Controller
     public function create(): View
     {
         $permission = Permission::get();
-        return view('roles.create',compact('permission'));
+        return view('admin.userManagement.roles.create',compact('permission'));
     }
     
     /**
@@ -57,7 +55,7 @@ class RoleController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->validate($request, [
+        $validated = $request->validate([
             'name' => 'required|unique:roles,name',
             'permission' => 'required',
         ]);
@@ -70,8 +68,7 @@ class RoleController extends Controller
         $role = Role::create(['name' => $request->input('name')]);
         $role->syncPermissions($permissionsID);
     
-        return redirect()->route('roles.index')
-                        ->with('success','Role created successfully');
+        return redirect()->route('roles.index')->with('success','Role created successfully');
     }
     /**
      * Display the specified resource.
@@ -86,7 +83,7 @@ class RoleController extends Controller
             ->where("role_has_permissions.role_id",$id)
             ->get();
     
-        return view('roles.show',compact('role','rolePermissions'));
+        return view('admin.userManagement.roles.show',compact('role','rolePermissions'));
     }
     
     /**
@@ -103,7 +100,7 @@ class RoleController extends Controller
             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
             ->all();
     
-        return view('roles.edit',compact('role','permission','rolePermissions'));
+        return view('admin.userManagement.roles.edit',compact('role','permission','rolePermissions'));
     }
     
     /**
@@ -115,7 +112,7 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        $this->validate($request, [
+        $validated = $request->validate([
             'name' => 'required',
             'permission' => 'required',
         ]);
@@ -131,8 +128,7 @@ class RoleController extends Controller
     
         $role->syncPermissions($permissionsID);
     
-        return redirect()->route('roles.index')
-                        ->with('success','Role updated successfully');
+        return redirect()->route('roles.index')->with('info','Role updated successfully');
     }
     /**
      * Remove the specified resource from storage.
@@ -143,7 +139,6 @@ class RoleController extends Controller
     public function destroy($id): RedirectResponse
     {
         DB::table("roles")->where('id',$id)->delete();
-        return redirect()->route('roles.index')
-                        ->with('success','Role deleted successfully');
+        return redirect()->route('roles.index')->with('danger','Role deleted successfully');
     }
 }

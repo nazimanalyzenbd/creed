@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\UserManagement;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 
 class AdminUserCo extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */

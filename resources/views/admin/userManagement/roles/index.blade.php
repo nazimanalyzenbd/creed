@@ -8,7 +8,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Roles List</h4>
-                            <a class="btn btn-info" href="{{route('business-type.create')}}">Add New Role</a>
+                            <a class="btn btn-info" href="{{route('roles.create')}}">Add New Role</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
