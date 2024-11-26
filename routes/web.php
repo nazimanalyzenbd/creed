@@ -10,11 +10,14 @@ use App\Http\Controllers\Admin\UserManagement\AdminRoleCo;
 use App\Http\Controllers\Admin\AdminLocationCo;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\API\Auth\SocialAuthController;
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-
+// Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('redirect.google');
+// Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
