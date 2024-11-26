@@ -3,7 +3,6 @@
 @section('content')
         <div class="content-body">
             <div class="container-fluid">
-                <!-- row -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
