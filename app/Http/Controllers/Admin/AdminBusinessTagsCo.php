@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\TBusinessTags;
 use App\Http\Requests\TBusinessTagsRequest;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Auth;
 
 class AdminBusinessTagsCo extends Controller
@@ -34,20 +36,25 @@ class AdminBusinessTagsCo extends Controller
     {
         // Validate the form data
         $validated = $request->validated();
+        try{
+            if($request->status){
+                $status = $request->status;
+            }else{
+                $status = 0;
+            }
+        
+            $data = New TBusinessTags();
+            $data->name = $request->name;
+            $data->status = $status;
+            $data->created_by = Auth::id();
+            $data->save();
 
-        if($request->status){
-            $status = $request->status;
-        }else{
-            $status = 0;
+            return redirect()->route('business-tags.index')->with('success','Data Save Successfully');
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'Database error: Unable to submit data.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred.');
         }
-       
-        $data = New TBusinessTags();
-        $data->name = $request->name;
-        $data->status = $status;
-        $data->created_by = Auth::id();
-        $data->save();
-
-        return redirect()->route('business-tags.index')->with('success','Data Save Successfully');
     }
 
     /**
@@ -72,22 +79,27 @@ class AdminBusinessTagsCo extends Controller
      */
     public function update(TBusinessTagsRequest $request, string $id)
     {
-        // Validate the form data
+      
         $validated = $request->validated();
+        try{
+            if($request->status){
+                $status = $request->status;
+            }else{
+                $status = 0;
+            }
+        
+            $data = TBusinessTags::find($id);
+            $data->name = $request->name;
+            $data->status = $status;
+            $data->created_by = Auth::id();
+            $data->save();
 
-        if($request->status){
-            $status = $request->status;
-        }else{
-            $status = 0;
+            return redirect()->route('business-tags.index')->with('info','Data Updated Successfully');
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'Database error: Unable to update data.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred.');
         }
-       
-        $data = TBusinessTags::find($id);
-        $data->name = $request->name;
-        $data->status = $status;
-        $data->created_by = Auth::id();
-        $data->save();
-
-        return redirect()->route('business-tags.index')->with('success','Data Updated Successfully');
     }
 
     /**
@@ -95,9 +107,14 @@ class AdminBusinessTagsCo extends Controller
      */
     public function destroy(string $id)
     {
-        $data = TBusinessTags::find($id);
-        $data->delete();
+        try{
+            $data = TBusinessTags::find($id);
+            $data->delete();
 
-        return redirect()->route('business-tags.index')->with('success','Data Deleted Successfully');
+            return redirect()->route('business-tags.index')->with('danger','Data Deleted Successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Unable to delete the user.');
+        }
     }
 }

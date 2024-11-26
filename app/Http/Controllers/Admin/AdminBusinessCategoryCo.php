@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\TBusinessCategory;
 use App\Http\Requests\TBusinessCategoryRequest;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Auth;
 
 class AdminBusinessCategoryCo extends Controller
@@ -32,22 +34,27 @@ class AdminBusinessCategoryCo extends Controller
      */
     public function store(TBusinessCategoryRequest $request)
     {
-        // Validate the form data
+
         $validated = $request->validated();
+        try{
+            if($request->status){
+                $status = $request->status;
+            }else{
+                $status = 0;
+            }
+        
+            $data = New TBusinessCategory();
+            $data->name = $request->name;
+            $data->status = $status;
+            $data->created_by = Auth::id();
+            $data->save();
 
-        if($request->status){
-            $status = $request->status;
-        }else{
-            $status = 0;
+            return redirect()->route('business-category.index')->with('success','Data Save Successfully');
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'Database error: Unable to submit data.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred.');
         }
-       
-        $data = New TBusinessCategory();
-        $data->name = $request->name;
-        $data->status = $status;
-        $data->created_by = Auth::id();
-        $data->save();
-
-        return redirect()->route('business-category.index')->with('success','Data Save Successfully');
     }
 
     /**
@@ -72,22 +79,27 @@ class AdminBusinessCategoryCo extends Controller
      */
     public function update(TBusinessCategoryRequest $request, string $id)
     {
-        // Validate the form data
+
         $validated = $request->validated();
+        try{
+            if($request->status){
+                $status = $request->status;
+            }else{
+                $status = 0;
+            }
+        
+            $data = TBusinessCategory::find($id);
+            $data->name = $request->name;
+            $data->status = $status;
+            $data->created_by = Auth::id();
+            $data->save();
 
-        if($request->status){
-            $status = $request->status;
-        }else{
-            $status = 0;
+            return redirect()->route('business-category.index')->with('info','Data Updated Successfully');
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'Database error: Unable to update data.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred.');
         }
-       
-        $data = TBusinessCategory::find($id);
-        $data->name = $request->name;
-        $data->status = $status;
-        $data->created_by = Auth::id();
-        $data->save();
-
-        return redirect()->route('business-category.index')->with('success','Data Updated Successfully');
     }
 
     /**
@@ -95,9 +107,14 @@ class AdminBusinessCategoryCo extends Controller
      */
     public function destroy(string $id)
     {
-        $data = TBusinessCategory::find($id);
-        $data->delete();
+        try{
+            $data = TBusinessCategory::find($id);
+            $data->delete();
 
-        return redirect()->route('business-category.index')->with('success','Data Deleted Successfully');
+            return redirect()->route('business-category.index')->with('danger','Data Deleted Successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Unable to delete the user.');
+        }
     }
 }

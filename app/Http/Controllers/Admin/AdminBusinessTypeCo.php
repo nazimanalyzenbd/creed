@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\TBusinessType;
 use App\Http\Requests\TBusinessTypeRequest;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Auth;
 
 class AdminBusinessTypeCo extends Controller
@@ -32,22 +34,27 @@ class AdminBusinessTypeCo extends Controller
      */
     public function store(TBusinessTypeRequest $request)
     {
-        // Validate the form data
+
         $validated = $request->validated();
+        try {
+            if($request->status){
+                $status = $request->status;
+            }else{
+                $status = 0;
+            }
+        
+            $data = New TBusinessType();
+            $data->name = $request->name;
+            $data->status = $status;
+            $data->created_by = Auth::id();
+            $data->save();
 
-        if($request->status){
-            $status = $request->status;
-        }else{
-            $status = 0;
+            return redirect()->route('business-type.index')->with('success','Data Save Successfully');
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'Database error: Unable to submit data.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred.');
         }
-       
-        $data = New TBusinessType();
-        $data->name = $request->name;
-        $data->status = $status;
-        $data->created_by = Auth::id();
-        $data->save();
-
-        return redirect()->route('business-type.index')->with('success','Data Save Successfully');
     }
 
     /**
@@ -72,22 +79,27 @@ class AdminBusinessTypeCo extends Controller
      */
     public function update(TBusinessTypeRequest $request, string $id)
     {
-        // Validate the form data
+
         $validated = $request->validated();
+        try{
+            if($request->status){
+                $status = $request->status;
+            }else{
+                $status = 0;
+            }
+        
+            $data = TBusinessType::find($id);
+            $data->name = $request->name;
+            $data->status = $status;
+            $data->created_by = Auth::id();
+            $data->save();
 
-        if($request->status){
-            $status = $request->status;
-        }else{
-            $status = 0;
+            return redirect()->route('business-type.index')->with('info','Data Updated Successfully');
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'Database error: Unable to update data.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred.');
         }
-       
-        $data = TBusinessType::find($id);
-        $data->name = $request->name;
-        $data->status = $status;
-        $data->created_by = Auth::id();
-        $data->save();
-
-        return redirect()->route('business-type.index')->with('success','Data Updated Successfully');
     }
 
     /**
@@ -95,9 +107,14 @@ class AdminBusinessTypeCo extends Controller
      */
     public function destroy(string $id)
     {
-        $data = TBusinessType::find($id);
-        $data->delete();
+        try{
+            $data = TBusinessType::find($id);
+            $data->delete();
 
-        return redirect()->route('business-type.index')->with('success','Data Deleted Successfully');
+            return redirect()->route('business-type.index')->with('danger','Data Deleted Successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Unable to delete the user.');
+        }
     }
 }

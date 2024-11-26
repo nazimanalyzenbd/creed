@@ -142,6 +142,8 @@
             toastr.info("{{ session('info') }}");
         @elseif (session('warning'))
             toastr.warning("{{ session('warning') }}");
+        @elseif (session('danger'))
+            toastr.warning("{{ session('danger') }}");
         @endif
     </script>
 </body>
