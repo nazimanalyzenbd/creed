@@ -10,6 +10,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\AppleProvider;
 use Laravel\Sanctum\PersonalAccessToken;
 use Laravel\Sanctum\Sanctum;
+use Auth;
 
 class SocialAuthController extends Controller
 {
@@ -30,25 +31,27 @@ class SocialAuthController extends Controller
      */
     public function handleGoogleCallback(Request $request)
     { 
-
+// return response()->json('hi');
         try {
 
             $googleUser = Socialite::driver('google')->stateless()->user();
+            // return response()->json($googleUser);
             $users = User::where('google_id', $googleUser->getId())->first();
-
+            
             if(!$users){
-
+                
                 $user = User::firstOrCreate([
                     'google_id' => $googleUser->getId(),
                 ], [
                     'name' => $googleUser->getName(),
+                    'first_name' => $googleUser->given_name(),
+                    'last_name' => $googleUser->family_name(),
                     'email' => $googleUser->getEmail(),
                     'avatar' => $googleUser->getAvatar(),
                 ]);
-
+               
                 // Generate a token for API access
-                $token = $user->createToken('API Token')->plainTextToken;
-                
+                $token = $user->createToken('google-auth-token')->plainTextToken;
                 // Auth::login($user);
                 // return redirect()->intended('dashboard');
 
@@ -59,9 +62,11 @@ class SocialAuthController extends Controller
                 ]);
 
             }else{
-                
-                Auth::login($user);
-                return redirect()->intended('dashboard');
+
+                return response()->json([
+                    'status' => 'success',
+                    'user' => $users,
+                ]);
             }
             
         } catch (\Exception $e) {
@@ -87,17 +92,35 @@ class SocialAuthController extends Controller
     public function handleAppleCallback()
     {
         try {
-            $appleUser = Socialite::driver('apple')->user();
-            $user = User::firstOrCreate([
-                'apple_id' => $appleUser->getId(),
-            ], [
-                'name' => $appleUser->getName(),
-                'email' => $appleUser->getEmail(),
-                // Add any other user data you want to store
-            ]);
 
-            // Create a JWT or session for the user and return it (if using API)
-            return response()->json($user);
+            $appleUser = Socialite::driver('apple')->stateless()->user();
+            $users = User::where('google_id', $googleUser->getId())->first();
+            
+            if(!$users){
+                $user = User::firstOrCreate([
+                    'apple_id' => $appleUser->getId(),
+                ], [
+                    'name' => $appleUser->getName(),
+                    'first_name' => $googleUser->given_name(),
+                    'last_name' => $googleUser->family_name(),
+                    'email' => $appleUser->getEmail(),
+                ]);
+
+                $token = $user->createToken('google-auth-token')->plainTextToken;
+                
+                return response()->json([
+                    'status' => 'success',
+                    'user' => $user,
+                    'token' => $token,
+                ]);
+
+            }else{
+
+                return response()->json([
+                    'status' => 'success',
+                    'user' => $users,
+                ]);
+            }
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to authenticate with Apple'], 500);
         }

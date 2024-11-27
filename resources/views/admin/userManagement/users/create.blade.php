@@ -34,7 +34,8 @@
                                     <div class="form-group row">
                                         <label class="col-sm-2 col-form-label">Phone Number<span class="requiredStar">*</span></label>
                                         <div class="col-sm-10">
-                                            <input type="text" name="phone_number" id="phone_number" value="{{old('phone_number')}}" class="form-control" placeholder="" required>
+                                            <input type="text" name="phone_number" id="phone_number" value="{{old('phone_number')}}" pattern="[0-9]" class="form-control" placeholder="" required>
+                                            <span class="mb-12 col-md-12 badge bg-info" id="mobileValidation" style="text-align: left;"></span>
                                             @error('phone_number')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
@@ -121,6 +122,22 @@
         </div>
     </div>
 </div>
+<!-- Mobile number validation -->
+<script>
+    $(document).ready(function() {
+        $("#phone_number").on("input", function() {
+            var mobileNumber = $(this).val();
+
+            if (this.validity.valid) {
+                $("#mobileValidation").text("");
+                $("#submit").attr('disabled',false);
+            } else {
+                $("#mobileValidation").text("Invalid mobile number.");
+                $("#submit").attr('disabled',true);
+            }
+        });
+    });
+</script>
 <script>
     document.getElementById('country').addEventListener('change', function () {
         const countryId = this.value;

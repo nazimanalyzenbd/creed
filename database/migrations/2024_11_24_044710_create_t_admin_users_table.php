@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name', 100)->index(); 
             $table->string('email', 191)->unique();
             $table->string('phone_number', 15)->unique();
-            $table->string('password', 255)->comment('Stores the user\'s hashed password with minimum 8length');;
+            $table->string('password', 255)->comment('Stores the user\'s hashed password with minimum 8length');
             $table->mediumText('address'); 
             $table->string('country', 100); 
             $table->string('state', 100)->nullable(); 
