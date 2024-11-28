@@ -16,9 +16,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('redirect.google');
-// Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
-
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {

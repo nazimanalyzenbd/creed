@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->index()->comment('name means fullname');
+            $table->string('name', 100)->comment('name means fullname');
             $table->string('first_name', 100);
             $table->string('last_name', 100);
             $table->string('email')->unique();
@@ -32,6 +32,15 @@ return new class extends Migration
             $table->boolean('status')->default(0)->comment('1=Active, 0=Inactive');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
+            
+            // Indexes
+            $table->index('name');
+            $table->index('email');
+            $table->index('phone_number');
+            $table->index('account_type');
+            $table->index('status');
+            $table->index('created_at');
+            $table->index('updated_at');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
