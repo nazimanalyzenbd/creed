@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('t_businesses', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('business_owner_id');
+            $table->unsignedBigInteger('business_owner_id');
             $table->unsignedInteger('payment_id')->nullable();
             $table->string('business_name', 191);
             $table->unsignedInteger('business_type_id');
@@ -35,7 +35,7 @@ return new class extends Migration
             
             // Foreign_key
             $table->foreign('business_owner_id')->references('id')->on('t_business_owner_infos')->onDelete('cascade');
-            $table->foreign('payment_id')->references('id')->on('t_payments')->onDelete('cascade');
+            // $table->foreign('payment_id')->references('id')->on('t_payments')->onDelete('cascade');
 
             // Indexes
             $table->index('business_owner_id');

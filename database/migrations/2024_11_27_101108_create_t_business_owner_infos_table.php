@@ -13,20 +13,20 @@ return new class extends Migration
     {
         Schema::create('t_business_owner_infos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('first_name', 100);
             $table->string('last_name', 100);
             $table->string('email')->unique();
             $table->string('phone_number', 15)->nullable();
             $table->mediumText('address'); 
-            $table->unsignedInteger('business_id')->nullable(); 
+            // $table->unsignedBigInteger('business_id')->nullable(); 
             $table->unsignedInteger('status')->default(1)->comment('1=business_owner_info_complete, 2=business_info_complete, 3=payment_failed, 4=payment_success');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
             
             // Foreign_key
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('cascade');
+            // $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('cascade');
 
             // Indexes
             $table->index('first_name');
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->index('email');
             $table->index('phone_number');
             $table->index('user_id');
-            $table->index('business_id');
+            // $table->index('business_id');
             $table->index('status');
             $table->index('created_at');
             $table->index('updated_at');
