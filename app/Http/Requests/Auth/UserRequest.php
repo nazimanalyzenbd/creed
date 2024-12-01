@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TAdminUserRequest extends FormRequest
+class UserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,19 +22,19 @@ class TAdminUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'address' => 'required',
-            'country' => 'required',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'address' => 'nullable',
+            'country' => 'nullable',
             'state' => 'nullable',
-            'city' => 'required',
-            'zip_code' => 'required|numeric',
-            'roles' => 'required',
+            'city' => 'nullable',
+            'zip_code' => 'nullable|numeric',
             'status' => 'nullable',
         ];
 
         if ($this->isMethod('POST')) {
-            $rules['email'] = ['required', 'email', 'unique:t_admin_users,email'];
-            $rules['phone_number'] = ['required', 'numeric', 'unique:t_admin_users,phone_number'];
+            $rules['email'] = ['required', 'email', 'unique:users,email'];
+            $rules['phone_number'] = ['required', 'numeric', 'unique:users,phone_number'];
             $rules['password'] = ['required', 'string', 'min:8'];
         } elseif ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
             $rules['email'] = ['required', 'email'];
@@ -46,16 +46,12 @@ class TAdminUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The name field is required.',
+            'first_name.required' => 'The first name field is required.',
+            'last_name.required' => 'The last name field is required.',
             'email.required' => 'The email field is required.',
             'phone_number.required' => 'The phone number field is required.',
             'password.required' => 'The password field is required.',
             'password.min' => 'The password at least 8 length.',
-            'address.required' => 'The address field is required.',
-            'country.required' => 'The country field is required.',
-            'city.required' => 'The city field is required.',
-            'zip_code.required' => 'The zip code field is required.',
-            'roles.required' => 'The country field is required.',
         ];
     }
 }

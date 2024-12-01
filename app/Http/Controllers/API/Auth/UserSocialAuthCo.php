@@ -9,8 +9,11 @@ use Laravel\Socialite\Facades\Socialite;
 // use Laravel\Socialite\Two\GoogleProvider;
 use Laravel\Socialite\Two\AppleProvider;
 use Laravel\Sanctum\PersonalAccessToken;
+use App\Http\Requests\Auth\UserRequest;
+use App\Http\Requests\Auth\LoginRequest;
 use Laravel\Sanctum\Sanctum;
 use Auth;
+use Hash;
 
 class UserSocialAuthCo extends Controller
 {
@@ -19,6 +22,67 @@ class UserSocialAuthCo extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function manualLogin(LoginRequest $request)
+    {
+        $credentials = $request->validated();
+       
+        if (Auth::attempt($credentials)) {
+            
+            $user = Auth::user();
+            $token = $user->createToken('API Token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successful',
+                'token' => $token,
+                'user' => $user,
+            ], 200);
+        } else {
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid email or password',
+            ], 401);
+        }
+    }
+
+    public function manualsignUp(UserRequest $request)
+    {
+        $validator = $request->validated();
+
+        try {    
+            $input = $request->all();
+            $input['name'] = $request->first_name .' '. $request->last_name;
+            $input['password'] = Hash::make($input['password']);
+            $users = User::create($input);
+
+            // Generate a token for API access
+            $token = $users->createToken('manual-auth-token')->plainTextToken;
+
+            return response()->json([
+                'status' => 'success',
+                'user' => $users->makeHidden('id'),
+                'token' => $token,
+            ], 201);
+
+        } catch (ValidationException $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors occurred.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during registration.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
@@ -67,7 +131,12 @@ class UserSocialAuthCo extends Controller
             }
             
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to authenticate with Google'], 500);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to authenticate with Google.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -119,7 +188,12 @@ class UserSocialAuthCo extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to authenticate with Apple'], 500);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to authenticate with Apple.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 }

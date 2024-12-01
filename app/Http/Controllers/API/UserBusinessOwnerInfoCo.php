@@ -21,15 +21,10 @@ class UserBusinessOwnerInfoCo extends Controller
        
         $validator = $request->validated();
         try{
-            $data = new TBusinessOwnerInfo();
-            $data->user_id = $request->user()->id;
-            $data->first_name = $request->first_name;
-            $data->last_name = $request->last_name;
-            $data->email = $request->email;
-            $data->phone_number = $request->phone_number;
-            $data->address = $request->address;
-            $data->save();
-            // return response()->json($data);
+            
+            $input = $request->all();
+            $input['user_id'] = $request->user()->id;
+            $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::create($input);
 
             return response()->json([
                 'status' => 'success',
