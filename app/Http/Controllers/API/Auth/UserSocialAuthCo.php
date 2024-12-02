@@ -26,17 +26,19 @@ class UserSocialAuthCo extends Controller
     public function manualLogin(LoginRequest $request)
     {
         $credentials = $request->validated();
-       
-        if (Auth::attempt($credentials)) {
-            
-            $user = Auth::user();
+        $admin = User::where('email', $credentials['email'])->first();
+
+        if ($admin && Hash::check($request->password, $admin->password)){ 
+        // if (Auth::attempt($credentials)) {
+            $user = $admin; 
+            // $user = Auth::user();
             $token = $user->createToken('API Token')->plainTextToken;
 
             return response()->json([
                 'success' => true,
                 'message' => 'Login successful',
                 'token' => $token,
-                'user' => $user,
+                'user' => $user->makeHidden('id'),
             ], 200);
         } else {
             

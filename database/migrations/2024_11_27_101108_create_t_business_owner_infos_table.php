@@ -19,14 +19,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone_number', 15)->nullable();
             $table->mediumText('address'); 
-            // $table->unsignedBigInteger('business_id')->nullable(); 
             $table->unsignedInteger('status')->default(1)->comment('1=business_owner_info_complete, 2=business_info_complete, 3=payment_failed, 4=payment_success');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
             
             // Foreign_key
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            // $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('cascade');
 
             // Indexes
             $table->index('first_name');

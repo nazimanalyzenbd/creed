@@ -18,17 +18,18 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function businessOwnerInfoStore(TBusinessOwnerInfoRequest $request)
     {
+        // return response()->json($request->user()->id);
        
         $validator = $request->validated();
         try{
             
             $input = $request->all();
-            $input['user_id'] = $request->user()->id;
+            $input['user_id'] = '1';
             $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::create($input);
 
             return response()->json([
                 'status' => 'success',
-                'data' => $data->makeHidden('id')
+                'tUserTBusinessOwnerInfo' => $tUserTBusinessOwnerInfo->makeHidden('id')
             ],200);
 
         } catch (QueryException $e) {
@@ -37,7 +38,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 'status' => 'failed',
                 'message' => $errorMessage,
             ],500);
-            return redirect()->back()->with('error', '');
+            
         } catch (\Exception $e) {
          
             return response()->json([

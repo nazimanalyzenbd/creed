@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminBusinessCategoryCo;
 use App\Http\Controllers\Admin\AdminBusinessSubCategoryCo;
 use App\Http\Controllers\Admin\AdminBusinessTagsCo;
 use App\Http\Controllers\Admin\UserManagement\AdminRoleCo;
+use App\Http\Controllers\Admin\AdminCompanyInfoCo;
 use App\Http\Controllers\Admin\AdminLocationCo;
 use Illuminate\Support\Facades\Route;
 
@@ -35,10 +36,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Usermanagement with Role&Permission
     Route::resource('/user-management/users', AdminUserCo::class);
     Route::resource('/user-management/roles', AdminRoleCo::class);
-    // Route::resource('products', ProductController::class);
     // Location
     Route::get('/states/{country_id}', [AdminLocationCo::class, 'getStates']);
     Route::get('/cities/{state_id}', [AdminLocationCo::class, 'getCities']);
+    // Company Info
+    Route::resource('/company-info', AdminCompanyInfoCo::class);
 });
 
 Route::get('/pages/dashboard2', function () {

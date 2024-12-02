@@ -41,7 +41,7 @@ return [
             'provider' => 't_admin_users',
         ],
 
-        't_admin_users' => [
+        't_admin_user' => [
             'driver' => 'session',
             'provider' => 't_admin_users',
         ],
@@ -77,7 +77,7 @@ return [
 
         't_admin_users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin\TAdminUser::class,
+            'model' => env('AUTH_MODEL', App\Models\Admin\TAdminUser::class),
         ],
 
         // 'users' => [
