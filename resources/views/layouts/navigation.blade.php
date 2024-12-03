@@ -27,7 +27,10 @@
                         </ul>
                     </li>
                     <li><a href="{{route('company-info.index')}}" aria-expanded="false">
-                        <i class="icon icon-globe-2"></i><span class="nav-text">Company Info</span></a>
+                        <i class="icon icon-settings"></i><span class="nav-text">Company Info</span></a>
+                    </li>
+                    <li><a href="{{route('csv.form')}}" aria-expanded="false">
+                        <i class="icon icon-globe-2"></i><span class="nav-text">Import CSV</span></a>
                     </li>
                     <li class="nav-label">Apps</li>
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i

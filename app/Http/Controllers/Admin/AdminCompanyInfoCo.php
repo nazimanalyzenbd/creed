@@ -4,51 +4,76 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TCompanyInfoRequest;
+use Intervention\Image\Facades\Image;
 use App\Models\Admin\TCompanyInfo;
+use App\Models\Admin\TAdminCountry;
 use Illuminate\Http\Request;
 use DB;
+use Auth;
 
 class AdminCompanyInfoCo extends Controller
 {
     public function index(TCompanyInfo $tCompanyInfo=null){
 
-        $country = DB::table('countries')->get();
+        $country = TAdminCountry::get();
+        $tCompanyInfo = TCompanyInfo::get()->first();
 
-        return view('admin.company_info.index', compact('country'));
+        return view('admin.company_info.index', compact('country', 'tCompanyInfo'));
         
     }
 
-    public function store(TCompanyInfoRequest $request, TCompanyInfo $tCompanyInfo = null)
+    public function store(TCompanyInfoRequest $request)
     {
         $validator = $request->validated();
-dd($validator);
-        $tCompanyInfo = $tCompanyInfo ? $tCompanyInfo : new TCompanyInfo;
-        
-        $logo = 'default.jpg';
-        if ($request->hasFile('logo')) {
-            $file = request()->file('logo');
-            $logo = time() . "-" . request('logo')->getClientOriginalName();
-            $logo = str_replace(' ', '-', $logo);
-            Image::make($file)->fit(370, 253, function ($constraint) {
-            $constraint->aspectRatio();
-            })->encode()->save(storage_path('/app/public/uploads/coompanyInfo/') . $logo);           
+        try{
+            $tCompanyInfo = TCompanyInfo::get();
+            if($tCompanyInfo->isNotEmpty()){
+                $id = TCompanyInfo::get()->pluck('id')->first();
+                $tCompanyInfo = TCompanyInfo::find($id);
+                if ($request->hasFile('logo')) {
+                    $file = $request->file('logo');
+                    $fileName = time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('images/companyInfo'), $fileName);
+                    $imagePath = 'images/companyInfo/' . $fileName;
+                    $tCompanyInfo['logo'] = $fileName;
+                }
+                if ($request->hasFile('favicon_icon')) {
+                    $file = $request->file('favicon_icon');
+                    $fileName2 = time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('images/companyInfo'), $fileName2);
+                    $imagePath = 'images/companyInfo/' . $fileName2;
+                    $tCompanyInfo['favicon_icon'] = $fileName2;
+                }
+                  
+                $tCompanyInfo['updated_by'] = Auth::id(); 
+            }else{
+                $tCompanyInfo = new TCompanyInfo();
+                if ($request->hasFile('logo')) {
+                    $file = $request->file('logo');
+                    $fileName = time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('images/companyInfo'), $fileName);
+                    $imagePath = 'images/companyInfo/' . $fileName;
+                }
+                if ($request->hasFile('favicon_icon')) {
+                    $file = $request->file('favicon_icon');
+                    $fileName2 = time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('images/companyInfo'), $fileName2);
+                    $imagePath = 'images/companyInfo/' . $fileName2;
+                }
+
+                $tCompanyInfo['logo'] = $fileName;
+                $tCompanyInfo['favicon_icon'] = $fileName2;
+                $tCompanyInfo['created_by'] = Auth::id();  
+            }
+            
+            $tCompanyInfo->fill($validator);   
+            $tCompanyInfo->save();
+
+            return redirect()->route('company-info.index')->with('success', 'Company Info saved successfully!');
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'Database error: Unable to submit data.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred.');
         }
-
-        $favicon_icon = 'default.jpg';
-        if ($request->hasFile('favicon_icon')) {
-            $file = request()->file('favicon_icon');
-            $favicon_icon = time() . "-" . request('favicon_icon')->getClientOriginalName();
-            $favicon_icon = str_replace(' ', '-', $favicon_icon);
-            Image::make($file)->fit(370, 253, function ($constraint) {
-            $constraint->aspectRatio();
-            })->encode()->save(storage_path('/app/public/uploads/coompanyInfo/') . $favicon_icon);           
-        }
-
-        $tCompanyInfo['favicon_icon'] = $favicon_icon;
-
-        $tCompanyInfo->fill($validator);
-        $tCompanyInfo->save();
-
-        return redirect()->route('company-info.index')->with('success', 'Company Info saved successfully!');
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminBusinessTagsCo;
 use App\Http\Controllers\Admin\UserManagement\AdminRoleCo;
 use App\Http\Controllers\Admin\AdminCompanyInfoCo;
 use App\Http\Controllers\Admin\AdminLocationCo;
+use App\Http\Controllers\Admin\AdminCsvImportCo;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\Auth\SocialAuthController;
@@ -26,6 +27,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // ImportCSV
+    Route::get('/import-csv', [AdminCsvImportCo::class, 'showForm'])->name('csv.form');
+    Route::post('/import-csv', [AdminCsvImportCo::class, 'importCsv'])->name('csv.import');
 
     // Business Settings
     Route::resource('/businss/business-type', AdminBusinessTypeCo::class);

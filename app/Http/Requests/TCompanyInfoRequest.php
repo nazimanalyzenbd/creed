@@ -26,6 +26,8 @@ class TCompanyInfoRequest extends FormRequest
             'owner_name' => 'required|string',
             'email' => 'required|email',
             'phone_number' => 'required|numeric',
+            // 'logo' => 'required|image|mimes:jpg,png,jpeg,gif',
+            // 'favicon_icon' => 'required|image|mimes:jpg,png,jpeg,gif',
             'business_identification_no' => 'nullable|string',
             'address' => 'nullable|string',
             'country' => 'nullable|string',
