@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserManagement\AdminUserCo;
+use App\Http\Controllers\Admin\AdminCreedTagsCo;
 use App\Http\Controllers\Admin\AdminBusinessTypeCo;
 use App\Http\Controllers\Admin\AdminBusinessCategoryCo;
 use App\Http\Controllers\Admin\AdminBusinessSubCategoryCo;
@@ -33,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/import-csv', [AdminCsvImportCo::class, 'importCsv'])->name('csv.import');
 
     // Business Settings
+    Route::resource('/businss/creed-tags', AdminCreedTagsCo::class);
     Route::resource('/businss/business-type', AdminBusinessTypeCo::class);
     Route::resource('/businss/business-category', AdminBusinessCategoryCo::class);
     Route::resource('/businss/business-subcategory', AdminBusinessSubCategoryCo::class);

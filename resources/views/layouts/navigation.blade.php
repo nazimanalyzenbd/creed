@@ -13,6 +13,7 @@
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
                                 class="icon icon-app-store"></i><span class="nav-text">Business Settings</span></a>
                         <ul aria-expanded="false">
+                            <li><a href="{{route('creed-tags.index')}}">Creed Tags</a></li>
                             <li><a href="{{route('business-type.index')}}">Business Type</a></li>
                             <li><a href="{{route('business-category.index')}}">Business Category</a></li>
                             <li><a href="{{route('business-subcategory.index')}}">Business SubCategory</a></li>
