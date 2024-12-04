@@ -11,19 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('t_business_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 100)->comment('Online Retail, Local Service'); 
+        Schema::create('t_opertion_hours', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('business_id')->nullable();
+            $table->string('day', 60)->nullable();
+            $table->time('open_time')->nullable();
+            $table->time('closed_time')->nullable();
             $table->boolean('status')->default(1)->comment('1=Active, 0=Inactive');
             $table->unsignedBigInteger('created_by')->nullable()->comment('Admin user who created the record');
             $table->unsignedBigInteger('updated_by')->nullable()->comment('Admin user who last updated the record');
+            $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('SET NULL');
             $table->foreign('created_by')->references('id')->on('t_admin_users')->onDelete('SET NULL');
             $table->foreign('updated_by')->references('id')->on('t_admin_users')->onDelete('SET NULL');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
 
             // Indexes
-            $table->index('name');
+            $table->index('business_id');
+            $table->index('day');
+            $table->index('open_time');
+            $table->index('closed_time');
             $table->index('status');
             $table->index('created_by');
             $table->index('updated_by');
@@ -37,9 +44,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Drop the foreign key constraints first
-        $table->dropForeign(['created_by']);
-        $table->dropForeign(['updated_by']);
-        Schema::dropIfExists('t_business_types');
+        Schema::dropIfExists('t_opertion_hours');
+        $table->dropForeign(['business_id']);
     }
 };

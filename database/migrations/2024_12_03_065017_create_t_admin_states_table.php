@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('t_admin_states', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable(); 
-            $table->string('country_id')->nullable();
+            $table->unsignedBigInteger('country_id')->nullable();
             $table->string('country_code')->nullable();
             $table->string('country_name')->nullable();
             $table->string('state_code')->nullable();

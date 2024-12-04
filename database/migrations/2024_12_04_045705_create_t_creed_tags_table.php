@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('t_business_types', function (Blueprint $table) {
+        Schema::create('t_creed_tags', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->comment('Online Retail, Local Service'); 
+            $table->string('name', 100)->comment('Muslim Owned,Muslim Operated,Serving Muslim Community'); 
             $table->boolean('status')->default(1)->comment('1=Active, 0=Inactive');
             $table->unsignedBigInteger('created_by')->nullable()->comment('Admin user who created the record');
             $table->unsignedBigInteger('updated_by')->nullable()->comment('Admin user who last updated the record');
@@ -37,9 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Drop the foreign key constraints first
-        $table->dropForeign(['created_by']);
-        $table->dropForeign(['updated_by']);
-        Schema::dropIfExists('t_business_types');
+        Schema::dropIfExists('t_creed_tags');
     }
 };

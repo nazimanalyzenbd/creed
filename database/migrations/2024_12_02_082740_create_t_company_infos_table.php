@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('t_company_infos', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('system_name', 100); 
             $table->string('owner_name', 100);
             $table->string('email')->unique();
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('country', 100)->nullable(); 
             $table->string('state', 100)->nullable(); 
             $table->string('city', 100)->nullable(); 
-            $table->unsignedBigInteger('zip_code', 20)->nullable(); 
+            $table->unsignedBigInteger('zip_code')->nullable(); 
             $table->string('lat')->nullable()->comment('address latitude'); 
             $table->string('long')->nullable()->comment('address longitude');
             $table->string('logo')->nullable(); 
