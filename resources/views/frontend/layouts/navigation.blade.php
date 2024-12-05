@@ -44,7 +44,7 @@
                                                             Individual User
                                                     </a>
                         <ul class="dropdown-menu radius-sm text-transform-normal">
-                                                            <li><a class="dropdown-item" href="{{route('login')}}">Login</a></li>
+                                                            <li><a class="dropdown-item" href="{{route('login')}}">SignIn</a></li>
                                 <li><a class="dropdown-item" href="{{route('register')}}">Signup</a></li>
                                                     </ul>
                     </li>
@@ -53,7 +53,7 @@
                                                             Business User
                                                     </a>
                         <ul class="dropdown-menu radius-sm text-transform-normal">
-                                                            <li><a class="dropdown-item" href="{{route('login')}}">Login</a></li>
+                                                            <li><a class="dropdown-item" href="{{route('login')}}">SignIn</a></li>
                                 <li><a class="dropdown-item" href="{{route('register')}}">Signup</a></li>
                                                     </ul>
                     </li>

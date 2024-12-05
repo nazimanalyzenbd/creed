@@ -29,6 +29,11 @@ class TGenericCodeSeeder extends Seeder
                 'field_name' => 'status',
                 'description' => '1=Business Owner Info Complete, 2=Business Info Complete, 3=Payment Failed, 4=Payment Success',
             ],
+            [
+                'source_table_name' => 't_businesses', 
+                'field_name' => 'lat,long',
+                'description' => 'lat = Latitude, log = Longitude',
+            ],
         ]);
     }
 }

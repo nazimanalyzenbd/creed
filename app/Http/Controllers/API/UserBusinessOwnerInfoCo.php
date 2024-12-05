@@ -8,8 +8,11 @@ use App\Models\User;
 use App\Models\Admin\TAdminCountry;
 use App\Models\Admin\TAdminState;
 use App\Models\Admin\TAdminCity;
+use App\Models\Admin\TCreedTags;
 use App\Models\Api\TBusinessOwnerInfo;
 use App\Models\Api\TBusiness;
+use App\Models\Admin\TDays;
+use App\Models\Api\TOperationHour;
 use App\Models\Admin\TBusinessTags;
 use App\Models\Admin\TBusinessType;
 use App\Models\Admin\TBusinessCategory;
@@ -140,6 +143,81 @@ class UserBusinessOwnerInfoCo extends Controller
     public function cityList(){
 
         $data = TAdminCity::get();
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function creedTags(){
+
+        $data = TCreedTags::get();
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function getNearByBusiness(Request $request){
+        
+        $latitude = $request->input('lat');
+        $longitude = $request->input('long');
+        $radius = 0.1; // Radius in kilometers (100 meters = 0.1 kilometers)
+
+        if (!$latitude || !$longitude) {
+            return response()->json(['error' => 'Latitude and Longitude are required'], 400);
+        }
+
+        // Haversine formula to calculate distance between two points
+        $data = TBusiness::select(
+            'id',
+            'business_owner_id',
+            'payment_id',
+            'business_name',
+            'business_type_id',
+            'business_category_id',
+            'business_subcategory_id',
+            'business_email',
+            'business_phone_number',
+            'address',
+            'country',
+            'state',
+            'city',
+            'status',
+            'lat',
+            DB::raw('`long` AS longitude'),
+            DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
+        )
+        ->having('distance', '<=', $radius)
+        ->orderBy('distance', 'asc')
+        ->get();
+
+        return response()->json(['status' => 'success', 'data' => $data], 200);
+    }
+
+    public function businessOperationHour(Request $request){
+
+        // $validated = $request->validate([
+        //     'business_id' => 'required|exists:businesses,id',
+        //     'monday.open_time' => 'required|date_format:H:i',
+        //     'monday.closed_time' => 'required|date_format:H:i',
+        // ]);
+    
+        //$businessHours = [];
+        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
+            if ($request->has($day)) {
+                $businessHours[] = [
+                    'business_id' => $request->business_id,
+                    'day' => $day,
+                    'open_time' => $request->input("{$day}.open_time"),
+                    'closed_time' => $request->input("{$day}.closed_time"),
+                ];
+            }
+        }
+    
+        // TOperationHour::insert($businessHours);
+        return $businessHours;
+    }
+
+    public function daysList(){
+
+        $data = TDays::get();
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }

@@ -4,7 +4,7 @@ namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TOpertionHour extends Model
+class TDays extends Model
 {
     protected $guarded = [];
 }

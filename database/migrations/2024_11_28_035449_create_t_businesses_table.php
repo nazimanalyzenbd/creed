@@ -27,8 +27,8 @@ return new class extends Migration
             $table->string('state', 100)->nullable(); 
             $table->string('city', 100)->nullable(); 
             $table->unsignedBigInteger('zip_code')->nullable(); 
-            $table->string('lat')->nullable()->comment('address latitude'); 
-            $table->string('long')->nullable()->comment('address longitude'); 
+            $table->decimal('lat', 10, 7)->nullable()->comment('address latitude'); 
+            $table->decimal('long', 10, 7)->nullable()->comment('address longitude'); 
             $table->unsignedInteger('status')->default(1)->comment('1=business_owner_info_complete, 2=business_info_complete, 3=payment_failed, 4=payment_success');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');

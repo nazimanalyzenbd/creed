@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('state', 100)->nullable(); 
             $table->string('city', 100)->nullable(); 
             $table->unsignedBigInteger('zip_code')->nullable(); 
-            $table->string('lat')->nullable()->comment('address latitude'); 
-            $table->string('long')->nullable()->comment('address longitude');
+            $table->decimal('lat', 10, 7)->nullable()->comment('address latitude'); 
+            $table->decimal('long', 10, 7)->nullable()->comment('address longitude');
             $table->string('logo')->nullable(); 
             $table->string('favicon_icon')->nullable(); 
             $table->string('website_link')->nullable(); 

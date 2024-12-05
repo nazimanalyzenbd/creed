@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\TAdminUser;
 use App\Models\TGenericCode;
 use App\Models\Admin\TCreedTags;
+use App\Models\Admin\TDays;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -22,6 +23,7 @@ class DatabaseSeeder extends Seeder
             CreateAdminUserSeeder::class,
             TGenericCodeSeeder::class,
             CreedTagsSeeder::class,
+            TDaysSeeder::class,
         ]);
 
         // User::factory(10)->create();

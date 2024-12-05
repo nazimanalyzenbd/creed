@@ -22,6 +22,7 @@ Route::prefix('auth')->group(function () {
 
 Route::post('/business-owner-info/store',[UserBusinessOwnerInfoCo::class, 'businessOwnerInfoStore'])->name('businessOwnerInfo.store')->middleware('auth:sanctum');
 Route::post('/business-info/store',[UserBusinessOwnerInfoCo::class, 'businessInfoStore'])->name('businessInfo.store')->middleware('auth:sanctum');
+Route::get('/business/creed-tags', [UserBusinessOwnerInfoCo::class, 'creedTags'])->name('creed.tags');
 Route::get('/business-type', [UserBusinessOwnerInfoCo::class, 'businessType'])->name('business.type');
 Route::get('/business-category', [UserBusinessOwnerInfoCo::class, 'businessCategory'])->name('business.category');
 Route::get('/business-subcategory', [UserBusinessOwnerInfoCo::class, 'businessSubCategory'])->name('business.subcategory');
@@ -29,3 +30,7 @@ Route::get('/business-tags', [UserBusinessOwnerInfoCo::class, 'businessTags'])->
 Route::get('/country-list', [UserBusinessOwnerInfoCo::class, 'countryList'])->name('country.list');
 Route::get('/state-list', [UserBusinessOwnerInfoCo::class, 'stateList'])->name('state.list');
 Route::get('/city-list', [UserBusinessOwnerInfoCo::class, 'cityList'])->name('city.list');
+Route::get('/days-list', [UserBusinessOwnerInfoCo::class, 'daysList'])->name('days.list');
+Route::get('/business/nearby', [UserBusinessOwnerInfoCo::class, 'getNearByBusiness'])->name('business.nearby');
+
+Route::post('/business-operation-hour', [UserBusinessOwnerInfoCo::class, 'businessOperationHour'])->name('business.operation');
