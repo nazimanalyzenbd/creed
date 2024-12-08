@@ -91,7 +91,7 @@ class AdminCreedTagsCo extends Controller
             $data = TCreedTags::find($id);
             $data->name = $request->name;
             $data->status = $status;
-            $data->created_by = Auth::id();
+            $data->updated_by = Auth::id();
             $data->save();
 
             return redirect()->route('creed-tags.index')->with('info','Data Updated Successfully');

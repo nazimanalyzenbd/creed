@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             TGenericCodeSeeder::class,
             CreedTagsSeeder::class,
             TDaysSeeder::class,
+            TRestaurantSeeder::class,
         ]);
 
         // User::factory(10)->create();

@@ -91,7 +91,7 @@ class AdminBusinessTypeCo extends Controller
             $data = TBusinessType::find($id);
             $data->name = $request->name;
             $data->status = $status;
-            $data->created_by = Auth::id();
+            $data->updated_by = Auth::id();
             $data->save();
 
             return redirect()->route('business-type.index')->with('info','Data Updated Successfully');

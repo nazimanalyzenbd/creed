@@ -12,6 +12,7 @@ use App\Models\Admin\TCreedTags;
 use App\Models\Api\TBusinessOwnerInfo;
 use App\Models\Api\TBusiness;
 use App\Models\Admin\TDays;
+use App\Models\Admin\TAdminRestaurant;
 use App\Models\Api\TOperationHour;
 use App\Models\Admin\TBusinessTags;
 use App\Models\Admin\TBusinessType;
@@ -220,6 +221,50 @@ class UserBusinessOwnerInfoCo extends Controller
         $data = TDays::get();
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function restaurantDataList(){
+
+        $data = TAdminRestaurant::get();
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function getMultiBusinessList(Request $request){
+
+        $validated = $request->validate([
+            'lat' => 'required|string',
+            'long' => 'required|string',
+        ]);
+
+        $latitude = $validated['lat'];
+        $longitude = $validated['long'];
+        $radius = 0.1; 
+        // Convert degrees to radians for calculations
+        $multiBusinesses = DB::table('t_businesses')
+            ->select(
+                '*',
+                DB::raw("(
+                    6371 * acos(
+                        cos(radians($latitude)) *
+                        cos(radians(lat)) *
+                        cos(radians(`long`) - radians($longitude)) +
+                        sin(radians($latitude)) *
+                        sin(radians(lat))
+                    )
+                ) AS distance")
+            )
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance', 'asc')
+            ->get();
+
+        return response()->json(['success' => true, 'data' => $multiBusinesses]);
+    }
+
+    public function getBusinessProfile(Request $request){
+
+        $business_profile = TBusiness::with('businessOwnerInfos')->find($request->id);
+        return response()->json([$business_profile]);
     }
 
 }

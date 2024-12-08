@@ -10,6 +10,6 @@ class TBusiness extends Model
 
     public function businessOwnerInfos()
     {
-        return $this->hasMany(BusinessOwnerInfo::class);
+        return $this->hasMany(TBusinessOwnerInfo::class, 'id','business_owner_id');
     }
 }

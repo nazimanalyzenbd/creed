@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserManagement\AdminRoleCo;
 use App\Http\Controllers\Admin\AdminCompanyInfoCo;
 use App\Http\Controllers\Admin\AdminLocationCo;
 use App\Http\Controllers\Admin\AdminCsvImportCo;
+use App\Http\Controllers\Admin\AdminRestaurantCo;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\Auth\SocialAuthController;
@@ -39,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/businss/business-category', AdminBusinessCategoryCo::class);
     Route::resource('/businss/business-subcategory', AdminBusinessSubCategoryCo::class);
     Route::resource('/businss/business-tags', AdminBusinessTagsCo::class);
+    Route::resource('/businss/restaurant', AdminRestaurantCo::class);
 
     // Usermanagement with Role&Permission
     Route::resource('/user-management/users', AdminUserCo::class);

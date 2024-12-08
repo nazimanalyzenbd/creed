@@ -96,7 +96,7 @@ class AdminBusinessSubCategoryCo extends Controller
             $data = TBusinessSubCategory::find($id);
             $data->name = $request->name;
             $data->status = $status;
-            $data->created_by = Auth::id();
+            $data->updated_by = Auth::id();
             $data->save();
 
             return redirect()->route('business-subcategory.index')->with('info','Data Updated Successfully');

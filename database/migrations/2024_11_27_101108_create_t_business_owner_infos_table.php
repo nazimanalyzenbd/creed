@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('first_name', 100);
             $table->string('last_name', 100);
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('phone_number', 15)->nullable();
             $table->mediumText('address'); 
             $table->unsignedInteger('status')->default(1)->comment('1=business_owner_info_complete, 2=business_info_complete, 3=payment_failed, 4=payment_success');
