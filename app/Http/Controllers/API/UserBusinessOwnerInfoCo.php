@@ -241,8 +241,7 @@ class UserBusinessOwnerInfoCo extends Controller
         $longitude = $validated['long'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $multiBusinesses = DB::table('t_businesses')
-            ->select(
+        $multiBusinesses = TBusiness::with('businessOwnerInfos')->select(
                 '*',
                 DB::raw("(
                     6371 * acos(
