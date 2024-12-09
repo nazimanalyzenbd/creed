@@ -12,6 +12,7 @@ use App\Models\Admin\TCreedTags;
 use App\Models\Api\TBusinessOwnerInfo;
 use App\Models\Api\TBusiness;
 use App\Models\Admin\TDays;
+use App\Models\Admin\TAdminAffiliation;
 use App\Models\Admin\TAdminRestaurant;
 use App\Models\Api\TOperationHour;
 use App\Models\Admin\TBusinessTags;
@@ -71,6 +72,21 @@ class UserBusinessOwnerInfoCo extends Controller
             
             $input = $request->all();
             $input['business_owner_id'] = $businessOwnerId;
+            if ($request->hasFile('halal_certificate')) {
+                $file = $request->file('halal_certificate');
+                $fileName = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images/restaurant/halalCertificate'), $fileName);
+                $imagePath = 'images/restaurant/halalCertificate/' . $fileName;
+            }
+            if ($request->hasFile('handcut_certificate')) {
+                $file = $request->file('handcut_certificate');
+                $fileName2 = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images/restaurant/handcutCertificate'), $fileName2);
+                $imagePath = 'images/restaurant/handcutCertificate/' . $fileName2;
+            }
+            $tUserBusinessInfo['halal_certificate'] = $fileName;
+            $tUserBusinessInfo['handcut_certificate'] = $fileName2;
+
             $tUserBusinessInfo = TBusiness::create($input);
 
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId);
@@ -151,6 +167,13 @@ class UserBusinessOwnerInfoCo extends Controller
     public function creedTags(){
 
         $data = TCreedTags::get();
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function affiliationList(){
+
+        $data = TAdminAffiliation::get();
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -264,6 +287,13 @@ class UserBusinessOwnerInfoCo extends Controller
 
         $business_profile = TBusiness::with('businessOwnerInfos')->find($request->id);
         return response()->json([$business_profile]);
+    }
+
+    public function userList(){
+
+        $data = User::get();
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
 }

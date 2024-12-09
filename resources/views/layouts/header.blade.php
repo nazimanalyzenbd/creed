@@ -32,6 +32,8 @@
     <link rel="stylesheet" href="{{asset('assets/vendor/toastr/css/toastr.min.css')}}">
     <!-- Vectormap -->
     <link href="{{asset('assets/vendor/jqvmap/css/jqvmap.min.css')}}" rel="stylesheet">
+    <!-- Load style form view css -->
+    @stack('style')
 </head>
 
 <body>

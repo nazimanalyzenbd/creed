@@ -133,6 +133,8 @@
     <script src="{{asset('assets/vendor/jqvmap/js/jquery.vmap.usa.js')}}"></script>
     <!-- All init script -->
     <script src="{{asset('assets/js/plugins-init/jqvmap-init.js')}}"></script>
+    <!-- Load script form view  -->
+    @stack('script')
     <script>
         @if (session('success'))
             toastr.success("{{ session('success') }}");

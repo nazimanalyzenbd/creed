@@ -33,10 +33,12 @@ Route::get('/country-list', [UserBusinessOwnerInfoCo::class, 'countryList'])->na
 Route::get('/state-list', [UserBusinessOwnerInfoCo::class, 'stateList'])->name('state.list');
 Route::get('/city-list', [UserBusinessOwnerInfoCo::class, 'cityList'])->name('city.list');
 Route::get('/days-list', [UserBusinessOwnerInfoCo::class, 'daysList'])->name('days.list');
+Route::get('/affiliations-list', [UserBusinessOwnerInfoCo::class, 'affiliationList'])->name('affiliations.list');
 Route::get('/business/nearby', [UserBusinessOwnerInfoCo::class, 'getNearByBusiness'])->name('business.nearby');
 Route::get('/business/multi-list', [UserBusinessOwnerInfoCo::class, 'getMultiBusinessList'])->name('business.multiList');
 Route::get('/business/single-profile', [UserBusinessOwnerInfoCo::class, 'getBusinessProfile'])->name('business.singleProfile');
+Route::get('/user-list', [UserBusinessOwnerInfoCo::class, 'userList'])->name('user.list');
 
 Route::post('/business-operation-hour', [UserBusinessOwnerInfoCo::class, 'businessOperationHour'])->name('business.operation');
 
-Route::get('/google-business/profiles', [GoogleBusinessController::class, 'listProfiles']);
+// Route::get('/google-business/profiles', [GoogleBusinessController::class, 'listProfiles']);

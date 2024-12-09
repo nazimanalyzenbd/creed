@@ -22,8 +22,9 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
+            'name' => 'nullable|string',
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
             'address' => 'nullable',
             'country' => 'nullable',
             'state' => 'nullable',
@@ -46,8 +47,8 @@ class UserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'first_name.required' => 'The first name field is required.',
-            'last_name.required' => 'The last name field is required.',
+            // 'first_name.required' => 'The first name field is required.',
+            // 'last_name.required' => 'The last name field is required.',
             'email.required' => 'The email field is required.',
             'phone_number.required' => 'The phone number field is required.',
             'password.required' => 'The password field is required.',

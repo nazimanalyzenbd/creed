@@ -19,6 +19,7 @@
                             <li><a href="{{route('business-subcategory.index')}}">Business SubCategory</a></li>
                             <li><a href="{{route('business-tags.index')}}">Business Tags</a></li>
                             <li><a href="{{route('restaurant.index')}}">Restaurant</a></li>
+                            <li><a href="{{route('affiliations.index')}}">Affiliations</a></li>
                         </ul>
                     </li>
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i

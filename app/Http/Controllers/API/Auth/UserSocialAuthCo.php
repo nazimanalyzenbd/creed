@@ -51,39 +51,43 @@ class UserSocialAuthCo extends Controller
 
     public function manualsignUp(UserRequest $request)
     {
-        $validator = $request->validated();
+    
+        $request->validated();
 
-        try {    
-            $input = $request->all();
-            $input['name'] = $request->first_name .' '. $request->last_name;
+        try {
+           
+            $input = $request->only(['email', 'password']);
             $input['password'] = Hash::make($input['password']);
-            $users = User::create($input);
+            
+            $user = User::create($input);
 
-            // Generate a token for API access
-            $token = $users->createToken('manual-auth-token')->plainTextToken;
+            // Generate the token
+            $token = $user->createToken('manual-auth-token')->plainTextToken;
+            $user['token'] = $token;
 
+            // Return the response with reduced data
             return response()->json([
                 'status' => 'success',
-                'user' => $users->makeHidden('id'),
-                'token' => $token,
+                'message' => 'User successfully signup.',
+                'user' => $user->makeHidden(['id','created_at','updated_at']),
             ], 201);
 
         } catch (ValidationException $e) {
-
             return response()->json([
-                'success' => false,
-                'message' => 'Validation errors occurred.',
-                'errors' => $e->errors(),
+                'status' => 'error',
+                'message' => 'There were validation errors.',
+                'errors' => $e->errors()
             ], 422);
+
         } catch (\Exception $e) {
-            
+            \Log::error('Signup failed: ' . $e->getMessage());
             return response()->json([
-                'success' => false,
-                'message' => 'An error occurred during registration.',
-                'error' => $e->getMessage(),
+                'status' => 'error',
+                'message' => 'Signup failed. Please try again later.'
             ], 500);
         }
     }
+
 
     public function redirectToGoogle()
     {
@@ -117,18 +121,19 @@ class UserSocialAuthCo extends Controller
 
                 // Generate a token for API access
                 $token = $user->createToken('google-auth-token')->plainTextToken;
+                $user['token'] = $token;
 
                 return response()->json([
                     'status' => 'success',
-                    'user' => $user->makeHidden('id'),
-                    'token' => $token,
+                    'user' => $user->makeHidden(['id','created_at','updated_at']),
+                    // 'token' => $token,
                 ]);
 
             }else{
 
                 return response()->json([
                     'status' => 'success',
-                    'user' => $users->makeHidden('id'),
+                    'user' => $users->makeHidden(['id','created_at','updated_at']),
                 ]);
             }
             
