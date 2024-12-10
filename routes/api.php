@@ -28,12 +28,13 @@ Route::get('/business-type', [UserBusinessOwnerInfoCo::class, 'businessType'])->
 Route::get('/business-category', [UserBusinessOwnerInfoCo::class, 'businessCategory'])->name('business.category');
 Route::get('/business-subcategory', [UserBusinessOwnerInfoCo::class, 'businessSubCategory'])->name('business.subcategory');
 Route::get('/business-tags', [UserBusinessOwnerInfoCo::class, 'businessTags'])->name('business.tags');
-Route::get('/restaurant', [UserBusinessOwnerInfoCo::class, 'restaurantDataList'])->name('restaurant.list');
+Route::get('/restaurant-data-list', [UserBusinessOwnerInfoCo::class, 'restaurantDataList'])->name('restaurant.list');
 Route::get('/country-list', [UserBusinessOwnerInfoCo::class, 'countryList'])->name('country.list');
 Route::get('/state-list', [UserBusinessOwnerInfoCo::class, 'stateList'])->name('state.list');
 Route::get('/city-list', [UserBusinessOwnerInfoCo::class, 'cityList'])->name('city.list');
 Route::get('/days-list', [UserBusinessOwnerInfoCo::class, 'daysList'])->name('days.list');
 Route::get('/affiliations-list', [UserBusinessOwnerInfoCo::class, 'affiliationList'])->name('affiliations.list');
+Route::get('/subscription-plan-list', [UserBusinessOwnerInfoCo::class, 'subscriptionPlanList'])->name('subscriptionplan.list');
 Route::get('/business/nearby', [UserBusinessOwnerInfoCo::class, 'getNearByBusiness'])->name('business.nearby');
 Route::get('/business/multi-list', [UserBusinessOwnerInfoCo::class, 'getMultiBusinessList'])->name('business.multiList');
 Route::get('/business/single-profile', [UserBusinessOwnerInfoCo::class, 'getBusinessProfile'])->name('business.singleProfile');

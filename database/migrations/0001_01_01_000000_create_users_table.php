@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('state', 100)->nullable(); 
             $table->string('city', 100)->nullable(); 
             $table->unsignedBigInteger('zip_code')->nullable(); 
-            $table->string('account_type', 10)->default('G')->comment('G=General Account, B=Business Account');
+            $table->string('account_type', 10)->default('G')->comment('G=General Account, GB=General+Business Account');
             $table->boolean('status')->default(0)->comment('1=Active, 0=Inactive');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');

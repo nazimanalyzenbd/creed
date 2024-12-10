@@ -26,24 +26,29 @@ class UserSocialAuthCo extends Controller
     public function manualLogin(LoginRequest $request)
     {
         $credentials = $request->validated();
-        $admin = User::where('email', $credentials['email'])->first();
+        $admin = User::select('id','email','password','account_type','name','first_name','last_name')->where('email', $credentials['email'])->first();
 
         if ($admin && Hash::check($request->password, $admin->password)){ 
         // if (Auth::attempt($credentials)) {
             $user = $admin; 
             // $user = Auth::user();
             $token = $user->createToken('API Token')->plainTextToken;
+            $user['token'] = $token;
 
+            $user = $user->toArray();
+            array_walk_recursive($user, function (&$item) {
+                $item = $item ?? '';
+            });
+            
             return response()->json([
-                'success' => true,
-                'message' => 'Login successful',
-                'token' => $token,
-                'user' => $user->makeHidden('id'),
+                'success' => 'success',
+                'message' => 'Signin Successful ',
+                'user' => $user,
             ], 200);
         } else {
             
             return response()->json([
-                'success' => false,
+                'success' => 'failed',
                 'message' => 'Invalid email or password',
             ], 401);
         }
@@ -68,7 +73,7 @@ class UserSocialAuthCo extends Controller
             // Return the response with reduced data
             return response()->json([
                 'status' => 'success',
-                'message' => 'User successfully signup.',
+                'message' => 'Signup successful.',
                 'user' => $user->makeHidden(['id','created_at','updated_at']),
             ], 201);
 
@@ -106,7 +111,7 @@ class UserSocialAuthCo extends Controller
 
             $googleUser = Socialite::driver('google')->stateless()->user();
             
-            $users = User::where('google_id', $googleUser->getId())->first();
+            $users = User::select('id','email','password','account_type','name','first_name','last_name')->where('google_id', $googleUser->getId())->first();
             
             if(!$users){
 
@@ -122,18 +127,19 @@ class UserSocialAuthCo extends Controller
                 // Generate a token for API access
                 $token = $user->createToken('google-auth-token')->plainTextToken;
                 $user['token'] = $token;
+                
 
                 return response()->json([
                     'status' => 'success',
+                    'message' => 'Signup Successful.',
                     'user' => $user->makeHidden(['id','created_at','updated_at']),
-                    // 'token' => $token,
                 ]);
 
             }else{
 
                 return response()->json([
                     'status' => 'success',
-                    'user' => $users->makeHidden(['id','created_at','updated_at']),
+                    'user' => $users,
                 ]);
             }
             

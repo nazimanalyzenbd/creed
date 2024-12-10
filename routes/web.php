@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\AdminLocationCo;
 use App\Http\Controllers\Admin\AdminCsvImportCo;
 use App\Http\Controllers\Admin\AdminRestaurantCo;
 use App\Http\Controllers\Admin\AdminAffiliationCo;
+use App\Http\Controllers\Admin\AdminSubscriptionPlanCo;
+use App\Http\Controllers\Admin\CustomerManagement\CustomerManagementCo;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\Auth\SocialAuthController;
@@ -43,6 +45,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/businss/business-tags', AdminBusinessTagsCo::class);
     Route::resource('/businss/restaurant', AdminRestaurantCo::class);
     Route::resource('/businss/affiliations', AdminAffiliationCo::class);
+    Route::resource('/businss/subscription-plan', AdminSubscriptionPlanCo::class);
+
+    // Customer Management
+    Route::get('/customers/list', [CustomerManagementCo::class, 'customerList'])->name('customers.list');
 
     // Usermanagement with Role&Permission
     Route::resource('/user-management/users', AdminUserCo::class);

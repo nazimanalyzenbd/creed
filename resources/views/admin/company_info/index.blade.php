@@ -60,7 +60,7 @@
                                                 <div class="col-lg-6 mb-4">
                                                     <div class="form-group">
                                                         <label class="text-label">Country</label>
-                                                        <select name="country" id="country" class="form-control select2">
+                                                        <select name="country_id" id="country" class="form-control select2">
                                                             <option>Select Country..</option>
                                                             @foreach($country as $list)
                                                                 <option value="{{$list->id}}" {{$tCompanyInfo->country??''==$list->id?'selected':''}}>{{$list->name}}</option>
@@ -71,7 +71,7 @@
                                                 <div class="col-lg-6 mb-4">
                                                     <div class="form-group">
                                                         <label class="text-label">State</label>
-                                                        <select id="state" name="state" class="form-control select2">
+                                                        <select id="state" name="state_id" class="form-control select2">
                                                             <option value="">Select State</option>
                                                         </select>
                                                     </div>
@@ -79,7 +79,7 @@
                                                 <div class="col-lg-6 mb-4">
                                                     <div class="form-group">
                                                         <label class="text-label">City</label>
-                                                        <select id="city" name="city" class="form-control select2">
+                                                        <select id="city" name="city_id" class="form-control select2">
                                                             <option value="">Select City</option>
                                                         </select>
                                                     </div>

@@ -22,7 +22,7 @@ class TGenericCodeSeeder extends Seeder
             [
                 'source_table_name' => 'users', 
                 'field_name' => 'account_type',
-                'description' => 'G=General, B=Business',
+                'description' => 'G=General, GB=General+Business',
             ],
             [
                 'source_table_name' => 't_business_owner_infos', 

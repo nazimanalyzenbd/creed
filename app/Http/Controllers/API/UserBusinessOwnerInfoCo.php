@@ -14,6 +14,7 @@ use App\Models\Api\TBusiness;
 use App\Models\Admin\TDays;
 use App\Models\Admin\TAdminAffiliation;
 use App\Models\Admin\TAdminRestaurant;
+use App\Models\Admin\TAdminSubscriptionPlan;
 use App\Models\Api\TOperationHour;
 use App\Models\Admin\TBusinessTags;
 use App\Models\Admin\TBusinessType;
@@ -117,28 +118,28 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function businessType(){
 
-        $data = TBusinessType::where('status', 1)->get();
+        $data = TBusinessType::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);;
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
     public function businessCategory(){
 
-        $data = TBusinessCategory::where('status', 1)->get();
+        $data = TBusinessCategory::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
     public function businessSubCategory(){
 
-        $data = TBusinessSubCategory::where('status', 1)->get();
+        $data = TBusinessSubCategory::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
     public function businessTags(){
 
-        $data = TBusinessTags::where('status', 1)->get();
+        $data = TBusinessTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -166,14 +167,14 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function creedTags(){
 
-        $data = TCreedTags::get();
+        $data = TCreedTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
     public function affiliationList(){
 
-        $data = TAdminAffiliation::get();
+        $data = TAdminAffiliation::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -241,14 +242,14 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function daysList(){
 
-        $data = TDays::get();
+        $data = TDays::where('status', 1)->get()->makeHidden(['created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
     public function restaurantDataList(){
 
-        $data = TAdminRestaurant::get();
+        $data = TAdminRestaurant::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -292,6 +293,13 @@ class UserBusinessOwnerInfoCo extends Controller
     public function userList(){
 
         $data = User::get();
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function subscriptionPlanList(){
+
+        $data = TAdminSubscriptionPlan::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }

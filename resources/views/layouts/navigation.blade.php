@@ -20,6 +20,13 @@
                             <li><a href="{{route('business-tags.index')}}">Business Tags</a></li>
                             <li><a href="{{route('restaurant.index')}}">Restaurant</a></li>
                             <li><a href="{{route('affiliations.index')}}">Affiliations</a></li>
+                            <li><a href="{{route('subscription-plan.index')}}">Subscription Plan</a></li>
+                        </ul>
+                    </li>
+                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
+                                class="icon icon-single-04"></i><span class="nav-text">Customer Management</span></a>
+                        <ul aria-expanded="false">
+                            <li><a href="{{route('customers.list')}}">Customers List</a></li>
                         </ul>
                     </li>
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
