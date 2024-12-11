@@ -25,6 +25,12 @@ class DatabaseSeeder extends Seeder
             CreedTagsSeeder::class,
             TDaysSeeder::class,
             TRestaurantSeeder::class,
+            TBusinessTypeSeeder::class,
+            TBusinessCategorySeeder::class,
+            TBusinessSubCategorySeeder::class,
+            TBusinessTagsSeeder::class,
+            TSubscriptionplanSeeder::class,
+            TAffiliationSeeder::class,
         ]);
 
         // User::factory(10)->create();

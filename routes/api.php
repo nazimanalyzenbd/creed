@@ -13,8 +13,9 @@ Route::get('/user', function (Request $request) {
 
 
 Route::prefix('auth')->group(function () {
-    Route::get('/google', [UserSocialAuthCo::class, 'redirectToGoogle'])->name('redirect.google');
-    Route::get('/google/callback', [UserSocialAuthCo::class, 'handleGoogleCallback']);
+    // Route::post('/google', [UserSocialAuthCo::class, 'redirectToGoogle'])->name('redirect.google');
+    // Route::get('/google/callback', [UserSocialAuthCo::class, 'handleGoogleCallback']);
+    Route::post('/google', [UserSocialAuthCo::class, 'handleGoogleCallback']);
     Route::get('apple', [UserSocialAuthCo::class, 'redirectToApple']);
     Route::get('apple/callback', [UserSocialAuthCo::class, 'handleAppleCallback']);
     Route::post('/manual/sign-up', [UserSocialAuthCo::class, 'manualsignUp']);
@@ -43,3 +44,7 @@ Route::get('/user-list', [UserBusinessOwnerInfoCo::class, 'userList'])->name('us
 Route::post('/business-operation-hour', [UserBusinessOwnerInfoCo::class, 'businessOperationHour'])->name('business.operation');
 
 // Route::get('/google-business/profiles', [GoogleBusinessController::class, 'listProfiles']);
+
+
+// businessList search by Creed Tags
+Route::get('/business/search-by-creedtags', [UserBusinessOwnerInfoCo::class, 'searchByCreedTags'])->name('business.search-by-creedtags');

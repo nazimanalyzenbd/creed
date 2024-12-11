@@ -32,7 +32,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function businessOwnerInfoStore(TBusinessOwnerInfoRequest $request)
     {
-        // return response()->json($request->user()->id);
+        // return response()->json($request);
        
         $validator = $request->validated();
         try{
@@ -71,22 +71,22 @@ class UserBusinessOwnerInfoCo extends Controller
             
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
             
-            $input = $request->all();
+            $input = $validator;
             $input['business_owner_id'] = $businessOwnerId;
-            if ($request->hasFile('halal_certificate')) {
-                $file = $request->file('halal_certificate');
-                $fileName = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/restaurant/halalCertificate'), $fileName);
-                $imagePath = 'images/restaurant/halalCertificate/' . $fileName;
-            }
-            if ($request->hasFile('handcut_certificate')) {
-                $file = $request->file('handcut_certificate');
-                $fileName2 = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/restaurant/handcutCertificate'), $fileName2);
-                $imagePath = 'images/restaurant/handcutCertificate/' . $fileName2;
-            }
-            $tUserBusinessInfo['halal_certificate'] = $fileName;
-            $tUserBusinessInfo['handcut_certificate'] = $fileName2;
+            // if ($request->hasFile('halal_certificate')) {
+            //     $file = $request->file('halal_certificate');
+            //     $fileName = time() . '.' . $file->getClientOriginalExtension();
+            //     $file->move(public_path('images/restaurant/halalCertificate'), $fileName);
+            //     $imagePath = 'images/restaurant/halalCertificate/' . $fileName;
+            // }
+            // if ($request->hasFile('handcut_certificate')) {
+            //     $file = $request->file('handcut_certificate');
+            //     $fileName2 = time() . '.' . $file->getClientOriginalExtension();
+            //     $file->move(public_path('images/restaurant/handcutCertificate'), $fileName2);
+            //     $imagePath = 'images/restaurant/handcutCertificate/' . $fileName2;
+            // }
+            // $tUserBusinessInfo['halal_certificate'] = $fileName;
+            // $tUserBusinessInfo['handcut_certificate'] = $fileName2;
 
             $tUserBusinessInfo = TBusiness::create($input);
 
@@ -96,7 +96,8 @@ class UserBusinessOwnerInfoCo extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'tUserBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden('id')
+                'userBusinessInfo' => $tUserBusinessInfo->makeHidden(['id','created_at','updated_at']),
+                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['id','created_at','updated_at'])
             ],200);
 
         } catch (QueryException $e) {
@@ -303,5 +304,62 @@ class UserBusinessOwnerInfoCo extends Controller
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
+
+    // Business Filter using Creed Tags
+    public function searchByCreedTags(Request $request){
+
+        $validated = $request->validate([
+            'lat' => 'required|string',
+            'long' => 'required|string',
+            'creed_id' => 'required',
+        ]);
+
+        $latitude = $validated['lat'];
+        $longitude = $validated['long'];
+        $creed_id = $validated['creed_id'];
+        $radius = 0.1; 
+        // Convert degrees to radians for calculations
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+                '*',
+                DB::raw("(
+                    6371 * acos(
+                        cos(radians($latitude)) *
+                        cos(radians(lat)) *
+                        cos(radians(`long`) - radians($longitude)) +
+                        sin(radians($latitude)) *
+                        sin(radians(lat))
+                    )
+                ) AS distance")
+            )
+            ->where('creed_tags_id', $creed_id)
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance', 'asc')
+            ->get();
+
+            $filterBusinesses = $filterBusinesses->map(function ($business) {
+
+                $business->business_type_name = $business->businessType->name ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_tags_name = $business->businessTags->name ?? '';
+                $business->creed_tags_name = $business->creedTags->name ?? '';
+                $business->country_name = $business->country->name ?? '';
+                $business->state_name = $business->state->name ?? '';
+                $business->city_name = $business->city->name ?? '';
+
+                unset($business->businessType);
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->businessTags);
+                unset($business->creedTags);
+                unset($business->country);
+                unset($business->state);
+                unset($business->city);
+                return $business;
+            });
+
+        return response()->json(['success' => true, 'data' => $filterBusinesses]);
+    }
+    
 
 }

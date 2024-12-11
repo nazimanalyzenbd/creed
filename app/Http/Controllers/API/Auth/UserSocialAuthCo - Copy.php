@@ -109,9 +109,21 @@ class UserSocialAuthCo extends Controller
 
         try {
 
+            // $googleUser = Socialite::driver('google')->stateless()->user();
+            
+            // $users = User::select('id','email','password','account_type','name','first_name','last_name')->where('google_id', $googleUser->getId())->first();
             $users = User::select('id','email','password','account_type','name','first_name','last_name')->where('google_id', $request->google_id)->first();
             
             if(!$users){
+
+                // $user = new User();
+                // $user->google_id = $googleUser->getId();
+                // $user->name = $googleUser->getName();
+                // $user->first_name = $googleUser->user['given_name'];
+                // $user->last_name = $googleUser->user['family_name'];
+                // $user->email = $googleUser->getEmail();
+                // $user->avatar = $googleUser->getAvatar();
+                // $user->save();
                 $input = $request->all();
                 $input['avatar'] = $request->photo;
                 $user = User::create($input);
@@ -120,6 +132,7 @@ class UserSocialAuthCo extends Controller
                 $token = $user->createToken('google-auth-token')->plainTextToken;
                 $user['token'] = $token;
                 
+
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Signup Successful.',
@@ -130,7 +143,7 @@ class UserSocialAuthCo extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'user' => $users->makeHidden(['created_at','updated_at']),
+                    'user' => $users,
                 ]);
             }
             

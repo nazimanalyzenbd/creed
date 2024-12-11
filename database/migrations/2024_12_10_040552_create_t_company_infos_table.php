@@ -34,9 +34,9 @@ return new class extends Migration
             $table->boolean('status')->default(1)->comment('1=Active, 0=Inactive');
             $table->unsignedBigInteger('created_by')->nullable()->comment('Admin user who created the record');
             $table->unsignedBigInteger('updated_by')->nullable()->comment('Admin user who last updated the record');
-            $table->foreign('country_id')->references('id')->on('t_admin_countries')->onDelete('cascade');
-            $table->foreign('state_id')->references('id')->on('t_admin_states')->onDelete('cascade');
-            $table->foreign('city_id')->references('id')->on('t_admin_cities')->onDelete('cascade');
+            // $table->foreign('country_id')->references('id')->on('t_admin_countries')->onDelete('cascade');
+            // $table->foreign('state_id')->references('id')->on('t_admin_states')->onDelete('cascade');
+            // $table->foreign('city_id')->references('id')->on('t_admin_cities')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('t_admin_users')->onDelete('SET NULL');
             $table->foreign('updated_by')->references('id')->on('t_admin_users')->onDelete('SET NULL');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
@@ -50,8 +50,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('t_company_infos');
-        $table->index('country_id');
-        $table->index('state_id');
-        $table->index('city_id');
+        // $table->index('country_id');
+        // $table->index('state_id');
+        // $table->index('city_id');
     }
 };
