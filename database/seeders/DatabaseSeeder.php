@@ -3,10 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\TAdminUser;
-use App\Models\TGenericCode;
-use App\Models\Admin\TCreedTags;
-use App\Models\Admin\TDays;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -29,7 +25,8 @@ class DatabaseSeeder extends Seeder
             TBusinessCategorySeeder::class,
             TBusinessSubCategorySeeder::class,
             TBusinessTagsSeeder::class,
-            TSubscriptionplanSeeder::class,
+            TCountrySeeder::class,
+            // TSubscriptionplanSeeder::class,
             TAffiliationSeeder::class,
         ]);
 

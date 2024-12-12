@@ -20,6 +20,9 @@ Route::prefix('auth')->group(function () {
     Route::get('apple/callback', [UserSocialAuthCo::class, 'handleAppleCallback']);
     Route::post('/manual/sign-up', [UserSocialAuthCo::class, 'manualsignUp']);
     Route::post('/manual/sign-in', [UserSocialAuthCo::class, 'manualLogin']);
+    Route::post('/send-otp', [UserSocialAuthCo::class, 'sendOtp']);
+    Route::post('/verify-otp', [UserSocialAuthCo::class, 'verifyOtp']);
+    Route::post('/reset-password', [UserSocialAuthCo::class, 'resetPassword']);
 });
 
 Route::post('/business-owner-info/store',[UserBusinessOwnerInfoCo::class, 'businessOwnerInfoStore'])->name('businessOwnerInfo.store')->middleware('auth:sanctum');

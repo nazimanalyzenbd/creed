@@ -11,6 +11,9 @@ use Laravel\Socialite\Two\AppleProvider;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Http\Requests\Auth\UserRequest;
 use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Auth;
 use Hash;
@@ -200,4 +203,90 @@ class UserSocialAuthCo extends Controller
             ], 500);
         }
     }
+
+    public function sendOtp(Request $request){
+          
+        $request->validate([
+            'email' => 'required|email',        //|exists:users,email
+        ]);
+
+        $user = User::select('id','email','password','account_type','name','first_name','last_name')->where('email', $request['email'])->first();
+
+        if ($user){ 
+            
+            $otp = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
+
+            $user = User::where('email', $request->email)->first();
+            $user->otp = $otp;
+            $user->otp_expires_at = now()->addMinutes(10); // OTP expires in 10 minutes
+            $user->otp_status = 0;
+            $user->save();
+    
+            // Send OTP to the user's email
+            Mail::send('emails.otp', ['otp' => $otp], function ($message) use ($request) {
+                $message->to($request->email)
+                        ->subject('Your OTP for password reset');
+            });
+
+            $data['otp'] =$otp;
+            $data['otp_expires_at'] = $user->otp_expires_at;
+            $data['otp_status'] = $user->otp_status;
+            
+            return response()->json([
+                'success' => 'success',
+                'message' => 'OTP sent Successful ',
+                'data' => $data,
+            ], 200);
+        } else {
+            
+            return response()->json([
+                'success' => 'failed',
+                'message' => 'Invalid email',
+            ], 401);
+        }
+    }
+
+    public function verifyOtp(Request $request){
+          
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|digits:5',
+        ]);
+    
+        $user = User::where('email', $request->email)->first();
+    
+        if ($user && $user->otp === $request->otp && now()->lessThanOrEqualTo($user->otp_expires_at)) {
+
+            $user->otp = null; 
+            $user->otp_expires_at = null; 
+            $user->otp_status = 1; 
+            $user->save();
+    
+            return response()->json(['message' => 'OTP Matched Successful.'], 200);
+        }
+    
+        return response()->json(['message' => 'Invalid or expired OTP.'], 400);
+    }
+
+    public function resetPassword(Request $request){
+          
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:8',
+        ]);
+    
+            $user = User::where('email', $request->email)->first();
+            if($user){
+        
+            $user->password = Hash::make($request->password);
+            $user->save();
+            
+            return response()->json(['message' => 'Password has been successfully reset.'], 200);
+
+        }else{
+            return response()->json(['message' => 'Invalid Password or Email.'], 400);
+        }
+        
+    }
+
 }

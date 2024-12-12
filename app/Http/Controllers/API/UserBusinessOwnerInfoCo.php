@@ -43,7 +43,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'tUserTBusinessOwnerInfo' => $tUserTBusinessOwnerInfo->makeHidden('id')
+                'tUserTBusinessOwnerInfo' => $tUserTBusinessOwnerInfo
             ],200);
 
         } catch (QueryException $e) {
@@ -65,13 +65,13 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function businessInfoStore(TBusinessRequest $request)
     {
-       
+   
         $validator = $request->validated();
         try{
             
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
             
-            $input = $validator;
+            $input = $request->all();
             $input['business_owner_id'] = $businessOwnerId;
             // if ($request->hasFile('halal_certificate')) {
             //     $file = $request->file('halal_certificate');
@@ -94,10 +94,14 @@ class UserBusinessOwnerInfoCo extends Controller
             $tUserBusinessOwnerInfo->business_id = $tUserBusinessInfo->id;
             $tUserBusinessOwnerInfo->save();
 
+            $tUsers = User::find($tUserBusinessOwnerInfo->user_id);
+            $tUsers->account_type = 'GB';
+            $tUsers->save();
+
             return response()->json([
                 'status' => 'success',
-                'userBusinessInfo' => $tUserBusinessInfo->makeHidden(['id','created_at','updated_at']),
-                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['id','created_at','updated_at'])
+                'userBusinessInfo' => $tUserBusinessInfo->makeHidden(['created_at','updated_at']),
+                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
             ],200);
 
         } catch (QueryException $e) {
@@ -184,28 +188,58 @@ class UserBusinessOwnerInfoCo extends Controller
         
         $latitude = $request->input('lat');
         $longitude = $request->input('long');
-        $radius = 0.1; // Radius in kilometers (100 meters = 0.1 kilometers)
+        $perm = $request->input('perm');
+        $radius = 0.5; // Radius in kilometers (100 meters = 0.1 kilometers)
 
-        if (!$latitude || !$longitude) {
-            return response()->json(['error' => 'Latitude and Longitude are required'], 400);
+        if (!$latitude || !$longitude & $perm == 0) {
+            $latitude = '40.12150192260742';
+            $longitude = '-100.45039367675781';
+            $data = TBusiness::select(
+                'id',
+                'business_name',
+                'business_type_id',
+                'business_category_id',
+                'business_subcategory_id',
+                'lat',
+                DB::raw('`long` AS longitude'),
+                DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
+            )
+            // ->having('distance', '<=', $radius)
+            ->orderBy('distance', 'asc')
+            ->get();
+
+            $data = $data->map(function ($business) {
+
+                $business->business_type_name = $business->businessType->name ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_tags_name = $business->businessTags->name ?? '';
+                $business->creed_tags_name = $business->creedTags->name ?? '';
+                $business->country_name = $business->country->name ?? '';
+                $business->state_name = $business->state->name ?? '';
+                $business->city_name = $business->city->name ?? '';
+    
+                unset($business->businessType);
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->businessTags);
+                unset($business->creedTags);
+                unset($business->country);
+                unset($business->state);
+                unset($business->city);
+                return $business;
+            });
+    
+            return response()->json(['status' => 'success', 'data' => $data], 200);
         }
 
         // Haversine formula to calculate distance between two points
         $data = TBusiness::select(
             'id',
-            'business_owner_id',
-            'payment_id',
             'business_name',
             'business_type_id',
             'business_category_id',
             'business_subcategory_id',
-            'business_email',
-            'business_phone_number',
-            'address',
-            'country',
-            'state',
-            'city',
-            'status',
             'lat',
             DB::raw('`long` AS longitude'),
             DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
@@ -213,6 +247,28 @@ class UserBusinessOwnerInfoCo extends Controller
         ->having('distance', '<=', $radius)
         ->orderBy('distance', 'asc')
         ->get();
+
+        $data = $data->map(function ($business) {
+
+            $business->business_type_name = $business->businessType->name ?? '';
+            $business->business_category_name = $business->businessCategory->name ?? '';
+            $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+            $business->business_tags_name = $business->businessTags->name ?? '';
+            $business->creed_tags_name = $business->creedTags->name ?? '';
+            $business->country_name = $business->country->name ?? '';
+            $business->state_name = $business->state->name ?? '';
+            $business->city_name = $business->city->name ?? '';
+
+            unset($business->businessType);
+            unset($business->businessCategory);
+            unset($business->businessSubCategory);
+            unset($business->businessTags);
+            unset($business->creedTags);
+            unset($business->country);
+            unset($business->state);
+            unset($business->city);
+            return $business;
+        });
 
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
