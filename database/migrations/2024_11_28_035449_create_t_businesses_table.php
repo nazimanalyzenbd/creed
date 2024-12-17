@@ -31,11 +31,11 @@ return new class extends Migration
             $table->decimal('long', 10, 7)->nullable()->comment('address longitude'); 
             $table->mediumText('service_area')->nullable(); 
             $table->mediumText('description')->nullable();
+            $table->string('business_profile_image')->nullable(); 
             $table->unsignedInteger('restaurant_id')->nullable();  
             $table->string('halal_certificate')->nullable();
             $table->string('handcut_text', 100)->nullable(); 
             $table->string('handcut_certificate')->nullable(); 
-            $table->unsignedInteger('affiliation_id')->nullable(); 
             $table->unsignedInteger('status')->default(1)->comment('1=business_owner_info_complete, 2=business_info_complete, 3=payment_failed, 4=payment_success');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');

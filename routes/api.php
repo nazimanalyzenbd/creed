@@ -51,3 +51,16 @@ Route::post('/business-operation-hour', [UserBusinessOwnerInfoCo::class, 'busine
 
 // businessList search by Creed Tags
 Route::get('/business/search-by-creedtags', [UserBusinessOwnerInfoCo::class, 'searchByCreedTags'])->name('business.search-by-creedtags');
+// businessList search by Business-Name
+Route::get('/business/search-by-name', [UserBusinessOwnerInfoCo::class, 'searchByBusinessName'])->name('business.search-by-name');
+// businessList search by Business-Category-SubCategory-text
+Route::get('/business/search-by-catSubCat', [UserBusinessOwnerInfoCo::class, 'searchByBusinessCatSubCategory'])->name('business.search-by-category');
+// searchBox
+Route::get('/business/search-box', [UserBusinessOwnerInfoCo::class, 'searchBox'])->name('business.search-box');
+// Get Category with relational data
+Route::get('/business/category-with-relations', [UserBusinessOwnerInfoCo::class, 'getCategoryRelation'])->name('business.category.relations');
+// Get SubCategory with relational data
+Route::get('/business/subCategory-with-relations', [UserBusinessOwnerInfoCo::class, 'getSubCategoryRelation'])->name('business.subCategory.relations');
+
+// AboutUs
+Route::get('/about-us', [UserBusinessOwnerInfoCo::class, 'aboutUs'])->name('aboutus');

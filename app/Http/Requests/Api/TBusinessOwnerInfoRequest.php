@@ -24,7 +24,7 @@ class TBusinessOwnerInfoRequest extends FormRequest
         return [
             'first_name'    => 'required|string|max:100',
             'last_name'     => 'required|string|max:100',
-            'email'         => 'required|email|unique:t_business_owner_infos,email',
+            'email'         => 'required|email',
             'phone_number'  => 'required|max:15',
             'address'       => 'required|string',
         ];

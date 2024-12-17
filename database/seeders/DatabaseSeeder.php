@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             TCountrySeeder::class,
             // TSubscriptionplanSeeder::class,
             TAffiliationSeeder::class,
+            TAboutUsSeeder::class,
         ]);
 
         // User::factory(10)->create();

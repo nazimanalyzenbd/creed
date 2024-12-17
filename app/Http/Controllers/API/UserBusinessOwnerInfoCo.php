@@ -9,6 +9,7 @@ use App\Models\Admin\TAdminCountry;
 use App\Models\Admin\TAdminState;
 use App\Models\Admin\TAdminCity;
 use App\Models\Admin\TCreedTags;
+use App\Models\Admin\TAboutUs;
 use App\Models\Api\TBusinessOwnerInfo;
 use App\Models\Api\TBusiness;
 use App\Models\Admin\TDays;
@@ -32,8 +33,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function businessOwnerInfoStore(TBusinessOwnerInfoRequest $request)
     {
-        // return response()->json($request);
-       
+
         $validator = $request->validated();
         try{
             
@@ -63,16 +63,16 @@ class UserBusinessOwnerInfoCo extends Controller
 
     }
 
-    public function businessInfoStore(TBusinessRequest $request)
+    public function businessInfoStore(Request $request)
     {
    
-        $validator = $request->validated();
+        // $validator = $request->validated();
         try{
             
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
             
             $input = $request->all();
-            $input['business_owner_id'] = $businessOwnerId;
+            // $input['business_owner_id'] = $businessOwnerId;
             // if ($request->hasFile('halal_certificate')) {
             //     $file = $request->file('halal_certificate');
             //     $fileName = time() . '.' . $file->getClientOriginalExtension();
@@ -90,7 +90,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
             $tUserBusinessInfo = TBusiness::create($input);
 
-            $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId);
+            $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($request->business_owner_id);
             $tUserBusinessOwnerInfo->business_id = $tUserBusinessInfo->id;
             $tUserBusinessOwnerInfo->save();
 
@@ -191,7 +191,7 @@ class UserBusinessOwnerInfoCo extends Controller
         $perm = $request->input('perm');
         $radius = 0.5; // Radius in kilometers (100 meters = 0.1 kilometers)
 
-        if (!$latitude || !$longitude & $perm == 0) {
+        if ($latitude == 'null' || $longitude == 'null' & $perm == 0) {
             $latitude = '40.12150192260742';
             $longitude = '-100.45039367675781';
             $data = TBusiness::select(
@@ -200,6 +200,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 'business_type_id',
                 'business_category_id',
                 'business_subcategory_id',
+                'creed_tags_id',
                 'lat',
                 DB::raw('`long` AS longitude'),
                 DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
@@ -240,6 +241,7 @@ class UserBusinessOwnerInfoCo extends Controller
             'business_type_id',
             'business_category_id',
             'business_subcategory_id',
+            'creed_tags_id',
             'lat',
             DB::raw('`long` AS longitude'),
             DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
@@ -347,6 +349,7 @@ class UserBusinessOwnerInfoCo extends Controller
         return response()->json([$business_profile]);
     }
 
+    // All User List
     public function userList(){
 
         $data = User::get();
@@ -354,6 +357,7 @@ class UserBusinessOwnerInfoCo extends Controller
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
+    // Subscription plan list
     public function subscriptionPlanList(){
 
         $data = TAdminSubscriptionPlan::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
@@ -375,8 +379,15 @@ class UserBusinessOwnerInfoCo extends Controller
         $creed_id = $validated['creed_id'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
-                '*',
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+                'id',
+                'business_name',
+                'business_type_id',
+                'business_category_id',
+                'business_subcategory_id',
+                'creed_tags_id',
+                'lat',
+                DB::raw('`long` AS longitude'),
                 DB::raw("(
                     6371 * acos(
                         cos(radians($latitude)) *
@@ -417,5 +428,170 @@ class UserBusinessOwnerInfoCo extends Controller
         return response()->json(['success' => true, 'data' => $filterBusinesses]);
     }
     
+    // Business Filter using Business Name
+    public function searchByBusinessName(Request $request){
 
+        $validated = $request->validate([
+            'lat' => 'required|string',
+            'long' => 'required|string',
+            'business_name' => 'required|string',
+        ]);
+
+        $latitude = $validated['lat'];
+        $longitude = $validated['long'];
+        $business_name = $validated['business_name'];
+        $radius = 0.1; 
+        // Convert degrees to radians for calculations
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+                'id',
+                'business_name',
+                'business_type_id',
+                'business_category_id',
+                'business_subcategory_id',
+                'creed_tags_id',
+                'lat',
+                DB::raw('`long` AS longitude'),
+                DB::raw("(
+                    6371 * acos(
+                        cos(radians($latitude)) *
+                        cos(radians(lat)) *
+                        cos(radians(`long`) - radians($longitude)) +
+                        sin(radians($latitude)) *
+                        sin(radians(lat))
+                    )
+                ) AS distance")
+            )
+            ->where('business_name', $business_name)
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance', 'asc')
+            ->get();
+
+            $filterBusinesses = $filterBusinesses->map(function ($business) {
+
+                $business->business_type_name = $business->businessType->name ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_tags_name = $business->businessTags->name ?? '';
+                $business->creed_tags_name = $business->creedTags->name ?? '';
+                $business->country_name = $business->country->name ?? '';
+                $business->state_name = $business->state->name ?? '';
+                $business->city_name = $business->city->name ?? '';
+
+                unset($business->businessType);
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->businessTags);
+                unset($business->creedTags);
+                unset($business->country);
+                unset($business->state);
+                unset($business->city);
+                return $business;
+            });
+
+        return response()->json(['success' => true, 'data' => $filterBusinesses]);
+    }
+
+    // Business Filter using Business Category,SubCategory text
+    public function searchByBusinessCatSubCategory(Request $request){
+
+        $validated = $request->validate([
+            'lat' => 'required|string',
+            'long' => 'required|string',
+            'catSubCat' => 'required|string',
+        ]);
+
+        $latitude = $validated['lat'];
+        $longitude = $validated['long'];
+        $catSubCat = $validated['catSubCat'];
+        $radius = 0.1; 
+        // Convert degrees to radians for calculations
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+                'id',
+                'business_name',
+                'business_type_id',
+                'business_category_id',
+                'business_subcategory_id',
+                'creed_tags_id',
+                'lat',
+                DB::raw('`long` AS longitude'),
+                DB::raw("(
+                    6371 * acos(
+                        cos(radians($latitude)) *
+                        cos(radians(lat)) *
+                        cos(radians(`long`) - radians($longitude)) +
+                        sin(radians($latitude)) *
+                        sin(radians(lat))
+                    )
+                ) AS distance")
+            )
+    
+            ->whereHas('businessCategory', function($query) use ($catSubCat) {
+                $query->where('name', $catSubCat);})
+            ->orWhereHas('businessSubCategory', function($query) use ($catSubCat) {
+                $query->where('name', $catSubCat);})
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance', 'asc')
+            ->get();
+
+            $filterBusinesses = $filterBusinesses->map(function ($business) {
+
+                $business->business_type_name = $business->businessType->name ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_tags_name = $business->businessTags->name ?? '';
+                $business->creed_tags_name = $business->creedTags->name ?? '';
+                $business->country_name = $business->country->name ?? '';
+                $business->state_name = $business->state->name ?? '';
+                $business->city_name = $business->city->name ?? '';
+
+                unset($business->businessType);
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->businessTags);
+                unset($business->creedTags);
+                unset($business->country);
+                unset($business->state);
+                unset($business->city);
+                return $business;
+            });
+
+        return response()->json(['success' => true, 'data' => $filterBusinesses]);
+    }
+
+    // search box
+    public function searchBox(Request $request){
+        
+        $businessName = TBusiness::get()->pluck('business_name','id'); 
+        // $businessCatSUbCat =TBusinessCategory::with('subcategories:id,name,category_id')->select(['id','name'])->where('status', 1)->get(); 
+        $category = TBusinessCategory::where('status', 1)->get()->pluck('name','id'); 
+        $subcategory = TBusinessSubcategory::where('status', 1)->get()->pluck('name','id'); 
+        $data['category'] = $category;
+        $data['subcategory'] = $subcategory;
+        $data['businessName'] = $businessName;
+
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    // get category relations
+    public function getCategoryRelation(){
+        
+        $data = TBusinessCategory::with(['businesses','subcategories'])->get();
+
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    // get subcategory relations
+    public function getSubCategoryRelation(){
+        
+        $data = TBusinessSubCategory::with(['businesses','category'])->get();
+
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    // aboutUs
+    public function aboutUs(){
+
+        $data = TAboutUs::get()->makeHidden(['status','created_by','updated_by','created_at','updated_at']);
+        return response()->json(['success' => true, 'data' => $data]);
+    }
 }

@@ -10,7 +10,7 @@ class TBusiness extends Model
 
     public function businessOwnerInfos()
     {
-        return $this->hasMany(TBusinessOwnerInfo::class, 'id','business_owner_id');
+        return $this->hasMany(TBusinessOwnerInfo::class, 'business_id');
     }
 
     public function businessType()
@@ -33,7 +33,7 @@ class TBusiness extends Model
         return $this->belongsTo(\App\Models\Admin\TBusinessTags::class, 'business_tags_id');
     }
 
-    public function creedtags()
+    public function creedTags()
     {
         return $this->belongsTo(\App\Models\Admin\TCreedTags::class, 'creed_tags_id');
     }
