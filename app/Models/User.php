@@ -58,4 +58,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function businessOwnerInfos()
+    {
+        return $this->hasMany(TBusinessOwnerInfo::class, 'user_id');
+    }
 }

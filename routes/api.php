@@ -26,7 +26,8 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::post('/business-owner-info/store',[UserBusinessOwnerInfoCo::class, 'businessOwnerInfoStore'])->name('businessOwnerInfo.store')->middleware('auth:sanctum');
-Route::post('/business-info/store',[UserBusinessOwnerInfoCo::class, 'businessInfoStore'])->name('businessInfo.store')->middleware('auth:sanctum');
+Route::post('/business-info/store/step1',[UserBusinessOwnerInfoCo::class, 'businessInfoStore1'])->name('businessInfo.store.step1')->middleware('auth:sanctum');
+Route::post('/business-info/store/step2',[UserBusinessOwnerInfoCo::class, 'businessInfoStore2'])->name('businessInfo.store.step2')->middleware('auth:sanctum');
 Route::get('/business/creed-tags', [UserBusinessOwnerInfoCo::class, 'creedTags'])->name('creed.tags');
 Route::get('/business-type', [UserBusinessOwnerInfoCo::class, 'businessType'])->name('business.type');
 Route::get('/business-category', [UserBusinessOwnerInfoCo::class, 'businessCategory'])->name('business.category');
@@ -57,6 +58,8 @@ Route::get('/business/search-by-name', [UserBusinessOwnerInfoCo::class, 'searchB
 Route::get('/business/search-by-catSubCat', [UserBusinessOwnerInfoCo::class, 'searchByBusinessCatSubCategory'])->name('business.search-by-category');
 // searchBox
 Route::get('/business/search-box', [UserBusinessOwnerInfoCo::class, 'searchBox'])->name('business.search-box');
+// businessList search by searchbox text
+Route::post('/business/search-searchbox-text', [UserBusinessOwnerInfoCo::class, 'searchBySearchBox'])->name('business.search-searchbox');
 // Get Category with relational data
 Route::get('/business/category-with-relations', [UserBusinessOwnerInfoCo::class, 'getCategoryRelation'])->name('business.category.relations');
 // Get SubCategory with relational data

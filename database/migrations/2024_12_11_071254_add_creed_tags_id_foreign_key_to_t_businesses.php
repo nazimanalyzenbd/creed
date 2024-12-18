@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('t_businesses', function (Blueprint $table) {
-            $table->string('creed_tags_id', '20')->after('business_tags_id');
+            $table->string('creed_tags_id', '20')->nullable()->after('business_tags_id');
             $table->foreign('creed_tags_id')
                 ->references('id')->on('t_creed_tags')
                 ->onDelete('cascade');
