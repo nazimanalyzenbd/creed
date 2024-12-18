@@ -151,20 +151,31 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->save();
 
             if($request->business_profile_image!='null'){
+                foreach($request->business_profile_image as $value){
+                    if ($request->hasFile('business_gallery_image')) {
+                        $file = $request->file('business_gallery_image');
+                        $gallery = time() . '.' . $file->getClientOriginalExtension();
+                        $file->move(public_path('images/business/gallery'), $gallery);
+                        $imagePath = 'images/business/gallery/' . $gallery;
+                    }else{
+                        $gallery = '';
+                    }
 
-                if ($request->hasFile('business_gallery_image')) {
-                    $file = $request->file('business_gallery_image');
-                    $gallery = time() . '.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('images/business/gallery'), $gallery);
-                    $imagePath = 'images/business/gallery/' . $gallery;
-                }else{
-                    $gallery = '';
+                    $galleryData = new TBusinessGallery();
+                    $galleryData->business_id = $businessData->id;
+                    $galleryData->business_galley_image = $gallery;
+                    $galleryData->save();
                 }
+            }
 
-                $galleryData = new TBusinessGallery();
-                $galleryData->business_id = $businessData->id;
-                $galleryData->business_galley_image = $gallery;
-                $galleryData->save();
+            foreach($request->operationData as $value){
+
+                $operationDatas = new TOperationHour();
+                $operationDatas->business_id = $businessData->id;
+                $operationDatas->day = $value['day'];
+                $operationDatas->open_time = $value['open_time'];
+                $operationDatas->closed_time = $value['closed_time'];
+                $operationDatas->save();
             }
             
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId);
