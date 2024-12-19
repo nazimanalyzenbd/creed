@@ -74,7 +74,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData = New TBusiness();
             $businessData->business_owner_id = $businessOwnerId;
             $businessData->business_name = $request->business_name;
-            $businessData->business_type_id = $request->business_type_id;
+            $businessData->business_type_id = json_encode($request->business_type_id);
             $businessData->business_category_id = $request->business_category_id;
             $businessData->business_subcategory_id = $request->business_subcategory_id;
             $businessData->address = $request->address;
@@ -90,7 +90,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->affiliation_id = json_encode($request->affiliation_id);
             $businessData->status = 2;
             $businessData->save();
-            
+            // return $businessData;
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId);
             $tUserBusinessOwnerInfo->business_id = $businessData->id;
             $tUserBusinessOwnerInfo->status = 2;
@@ -125,12 +125,20 @@ class UserBusinessOwnerInfoCo extends Controller
 
     }
 
-    // Business info store step 1
+    // Business info store step 2
     public function businessInfoStore2(Request $request)
     {
-   
         try{
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
+            
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', 2)->get()->first();
+            
+            if(empty($businessOwnerId->id)){
+                $message = "Please first fillup Business information step 1.";
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $message
+                ],500);
+            }
            
             if ($request->hasFile('business_profile_image')) {
                 $file = $request->file('business_profile_image');
@@ -141,7 +149,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $profile = '';
             }
 
-            $businessData = New TBusiness();
+            $businessData = TBusiness::find($businessOwnerId->business_id);
             $businessData->description = $request->description;
             $businessData->business_profile_image = $profile;
             $businessData->service_area = json_encode($request->service_area);
@@ -149,11 +157,11 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->customer_email_leads = $request->customer_email_leads;
             $businessData->status = 3;
             $businessData->save();
-
+            
             if($request->business_profile_image!='null'){
                 foreach($request->business_profile_image as $value){
-                    if ($request->hasFile('business_gallery_image')) {
-                        $file = $request->file('business_gallery_image');
+                    if ($request->hasFile($value)) {
+                        $file = $request->file($value);
                         $gallery = time() . '.' . $file->getClientOriginalExtension();
                         $file->move(public_path('images/business/gallery'), $gallery);
                         $imagePath = 'images/business/gallery/' . $gallery;
@@ -167,21 +175,21 @@ class UserBusinessOwnerInfoCo extends Controller
                     $galleryData->save();
                 }
             }
-
-            foreach($request->operationData as $value){
-
+            // return $request->all();
+            foreach($request->operation_data as $value){
+                
                 $operationDatas = new TOperationHour();
                 $operationDatas->business_id = $businessData->id;
                 $operationDatas->day = $value['day'];
                 $operationDatas->open_time = $value['open_time'];
-                $operationDatas->closed_time = $value['closed_time'];
+                $operationDatas->closed_time = $value['closed_time']; 
                 $operationDatas->save();
             }
             
-            $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId);
+            $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
             $tUserBusinessOwnerInfo->status = 3;
             $tUserBusinessOwnerInfo->save();
-
+          
             $message = "Business information step 2 successfully saved.";
             return response()->json([
                 'status' => 'success',
@@ -207,94 +215,131 @@ class UserBusinessOwnerInfoCo extends Controller
 
     }
 
-    // public function businessInfoStore(Request $request)
-    // {
+    // Business info store step 3
+    public function businessInfoStore3(Request $request)
+    {
    
-    //     // $validator = $request->validated();
-    //     try{
+        try{
+
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', 3)->get()->first();
+           
+            if(empty($businessOwnerId->id)){
+                $message = "Please first fillup Business information step 2.";
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $message
+                ],500);
+            }
+           
+            if ($request->hasFile('halal_certificate')) {
+                $file = $request->file('halal_certificate');
+                $halal_certificate = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images/business/halal_certificate'), $halal_certificate);
+                $imagePath = 'images/business/halal_certificate/' . $halal_certificate;
+            }else{
+                $halal_certificate = '';
+            }
+
+            if ($request->hasFile('handcut_certificate')) {
+                $file = $request->file('handcut_certificate');
+                $handcut_certificate = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images/business/handcut_certificate'), $halal_certificate);
+                $imagePath = 'images/business/handcut_certificate/' . $handcut_certificate;
+            }else{
+                $handcut_certificate = '';
+            }
+
+            $businessData = TBusiness::find($businessOwnerId->business_id);
+            $businessData->creed_tags_id = json_encode($request->creed_tags_id);
+            $businessData->restaurant_id = json_encode($request->restaurant_id);
+            $businessData->halal_certificate = $halal_certificate;
+            $businessData->handcut_text = $request->handcut_text;
+            $businessData->handcut_certificate = $handcut_certificate;
+            $businessData->status = 4;
+            $businessData->save();
             
-    //         $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
-            
-    //         $input = $request->all();
+            $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
+            $tUserBusinessOwnerInfo->status = 4;
+            $tUserBusinessOwnerInfo->save();
 
-    //         if ($request->hasFile('business_profile_image')) {
-    //             $file = $request->file('business_profile_image');
-    //             $profile = time() . '.' . $file->getClientOriginalExtension();
-    //             $file->move(public_path('images/business/profile'), $profile);
-    //             $imagePath = 'images/business/profile/' . $profile;
-    //         }else{
-    //             $profile = '';
-    //         }
+            $message = "Business information step 3 successfully saved.";
+            return response()->json([
+                'status' => 'success',
+                'message' => $message,
+                'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at']),
+                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
+            ],200);
 
-    //         // $input['business_owner_id'] = $businessOwnerId;
-    //         // if ($request->hasFile('halal_certificate')) {
-    //         //     $file = $request->file('halal_certificate');
-    //         //     $fileName = time() . '.' . $file->getClientOriginalExtension();
-    //         //     $file->move(public_path('images/restaurant/halalCertificate'), $fileName);
-    //         //     $imagePath = 'images/restaurant/halalCertificate/' . $fileName;
-    //         // }
-    //         // if ($request->hasFile('handcut_certificate')) {
-    //         //     $file = $request->file('handcut_certificate');
-    //         //     $fileName2 = time() . '.' . $file->getClientOriginalExtension();
-    //         //     $file->move(public_path('images/restaurant/handcutCertificate'), $fileName2);
-    //         //     $imagePath = 'images/restaurant/handcutCertificate/' . $fileName2;
-    //         // }
-    //         // $tUserBusinessInfo['halal_certificate'] = $fileName;
-    //         // $tUserBusinessInfo['handcut_certificate'] = $fileName2;
-
-    //         $input['creed_tags_id'] = json_encode($request->creed_tags_id);
-    //         $input['business_profile_image'] = $profile;
-    //         $input['affiliation_id'] = json_encode($request->affiliation_id);
-    //         // $tUserBusinessInfo = TBusiness::create($input);
-    //         if($request->business_profile_image!='null'){
-
-    //             if ($request->hasFile('business_gallery_image')) {
-    //                 $file = $request->file('business_gallery_image');
-    //                 $gallery = time() . '.' . $file->getClientOriginalExtension();
-    //                 $file->move(public_path('images/business/gallery'), $gallery);
-    //                 $imagePath = 'images/business/gallery/' . $gallery;
-    //             }else{
-    //                 $gallery = '';
-    //             }
-
-    //             $galleryData = new TBusinessGallery();
-    //             $galleryData->business_id = 1; //$tUserBusinessInfo->id
-    //             $galleryData->business_galley_image = $gallery;
-    //             $galleryData->save();
-    //         }
-    //         return $input;
-            
-
-    //         $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($request->business_owner_id);
-    //         $tUserBusinessOwnerInfo->business_id = $tUserBusinessInfo->id;
-    //         $tUserBusinessOwnerInfo->save();
-
-    //         $tUsers = User::find($tUserBusinessOwnerInfo->user_id);
-    //         $tUsers->account_type = 'GB';
-    //         $tUsers->save();
-
-    //         return response()->json([
-    //             'status' => 'success',
-    //             'userBusinessInfo' => $tUserBusinessInfo->makeHidden(['created_at','updated_at']),
-    //             'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
-    //         ],200);
-
-    //     } catch (QueryException $e) {
-    //         $errorMessage = "Database error: Unable to submit data.!";
-    //         return response()->json([
-    //             'status' => 'failed',
-    //             'message' => $errorMessage,
-    //         ],500);
-    //         return redirect()->back()->with('error', '');
-    //     } catch (\Exception $e) {
+        } catch (QueryException $e) {
+            $errorMessage = "Database error: Unable to submit data.!";
+            return response()->json([
+                'status' => 'failed',
+                'message' => $errorMessage,
+            ],500);
+            return redirect()->back()->with('error', '');
+        } catch (\Exception $e) {
          
-    //         return response()->json([
-    //             'status' => 'failed',
-    //             'errors' => $validator->errors(),
-    //         ],422);
-    //     }
+            return response()->json([
+                'status' => 'failed',
+                'errors' => $validator->errors(),
+            ],422);
+        }
 
-    // }
+    }
+
+    // Business info store step 4
+    public function businessInfoStore4(Request $request)
+    {
+   
+        try{
+
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', 4)->get()->first();
+            
+            if(empty($businessOwnerId->id)){
+                $message = "Please first fillup Business information step 3.";
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $message
+                ],500);
+            }
+
+            $businessData = TBusiness::find($businessOwnerId->business_id);
+            $businessData->discount_code_description = $request->discount_code_description;
+            $businessData->discount_code = $request->discount_code;
+            $businessData->status = 5;
+            $businessData->save();
+            
+            $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
+            $tUserBusinessOwnerInfo->status = 5;
+            $tUserBusinessOwnerInfo->save();
+
+            $message = "Business information step 4 successfully saved.";
+            return response()->json([
+                'status' => 'success',
+                'message' => $message,
+                'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at']),
+                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
+            ],200);
+
+        } catch (QueryException $e) {
+            $errorMessage = "Database error: Unable to submit data.!";
+            return response()->json([
+                'status' => 'failed',
+                'message' => $errorMessage,
+            ],500);
+            return redirect()->back()->with('error', '');
+        } catch (\Exception $e) {
+         
+            return response()->json([
+                'status' => 'failed',
+                'errors' => $validator->errors(),
+            ],422);
+        }
+
+    }
+
+    // checkout-page
+    // public function checkout(){}
 
     public function businessType(){
 
@@ -364,7 +409,7 @@ class UserBusinessOwnerInfoCo extends Controller
         $latitude = $request->input('lat');
         $longitude = $request->input('long');
         $perm = $request->input('perm');
-        $radius = 0.5; // Radius in kilometers (100 meters = 0.1 kilometers)
+        $radius = 0.1; // Radius in kilometers (100 meters = 0.1 kilometers)
 
         if ($perm == 0) {
             $latitude = '41.850033';         //'40.12150192260742';
@@ -372,34 +417,40 @@ class UserBusinessOwnerInfoCo extends Controller
             $data = TBusiness::select(
                 'id',
                 'business_name',
+                'business_profile_image',
                 'business_type_id',
                 'business_category_id',
                 'business_subcategory_id',
                 'creed_tags_id',
+                'address',
+                'zip_code',
                 'lat',
-                DB::raw('`long` AS longitude'),
+                'long',
+                'business_phone_number',
+                'business_email',
+                'business_website',
+                'affiliation_id',
+                // DB::raw('`long` AS longitude'),
                 DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
             )
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
-            ->get();
+            
+            ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
 
             $data = $data->map(function ($business) {
 
-                $business->business_type_name = $business->businessType->name ?? '';
+                $business->business_type_name = $business->businessTypeName ?? '';
                 $business->business_category_name = $business->businessCategory->name ?? '';
                 $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_tags_name = $business->businessTags->name ?? '';
-                $business->creed_tags_name = $business->creedTags->name ?? '';
+                $business->business_creed_name = $business->businessCreedeName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
                 $business->country_name = $business->country->name ?? '';
                 $business->state_name = $business->state->name ?? '';
                 $business->city_name = $business->city->name ?? '';
-    
-                unset($business->businessType);
+                
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
-                unset($business->businessTags);
-                unset($business->creedTags);
                 unset($business->country);
                 unset($business->state);
                 unset($business->city);
@@ -413,39 +464,44 @@ class UserBusinessOwnerInfoCo extends Controller
         $data = TBusiness::select(
             'id',
             'business_name',
+            'business_profile_image',
             'business_type_id',
             'business_category_id',
             'business_subcategory_id',
             'creed_tags_id',
+            'address',
+            'zip_code',
             'lat',
-            DB::raw('`long` AS longitude'),
+            'long',
+            'business_phone_number',
+            'business_email',
+            'business_website',
+            'affiliation_id',
+            // DB::raw('`long` AS longitude'),
             DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
         )
         ->having('distance', '<=', $radius)
         ->orderBy('distance', 'asc')
-        ->get();
+        ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
 
-        $data = $data->map(function ($business) {
+            $data = $data->map(function ($business) {
 
-            $business->business_type_name = $business->businessType->name ?? '';
-            $business->business_category_name = $business->businessCategory->name ?? '';
-            $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-            $business->business_tags_name = $business->businessTags->name ?? '';
-            $business->creed_tags_name = $business->creedTags->name ?? '';
-            $business->country_name = $business->country->name ?? '';
-            $business->state_name = $business->state->name ?? '';
-            $business->city_name = $business->city->name ?? '';
-
-            unset($business->businessType);
-            unset($business->businessCategory);
-            unset($business->businessSubCategory);
-            unset($business->businessTags);
-            unset($business->creedTags);
-            unset($business->country);
-            unset($business->state);
-            unset($business->city);
-            return $business;
-        });
+                $business->business_type_name = $business->businessTypeName ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_creed_name = $business->businessCreedeName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->country->name ?? '';
+                $business->state_name = $business->state->name ?? '';
+                $business->city_name = $business->city->name ?? '';
+                
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->country);
+                unset($business->state);
+                unset($business->city);
+                return $business;
+            });
 
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
@@ -499,8 +555,22 @@ class UserBusinessOwnerInfoCo extends Controller
         $longitude = $validated['long'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $multiBusinesses = TBusiness::with('businessOwnerInfos')->select(
-                '*',
+        $multiBusinesses = TBusiness::select(
+                'id',
+                'business_name',
+                'business_profile_image',
+                'business_type_id',
+                'business_category_id',
+                'business_subcategory_id',
+                'creed_tags_id',
+                'address',
+                'zip_code',
+                'lat',
+                'long',
+                'business_phone_number',
+                'business_email',
+                'business_website',
+                'affiliation_id',
                 DB::raw("(
                     6371 * acos(
                         cos(radians($latitude)) *
@@ -513,14 +583,82 @@ class UserBusinessOwnerInfoCo extends Controller
             )
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
-            ->get();
+            ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
+
+            $multiBusinesses = $multiBusinesses->map(function ($business) {
+
+                $business->business_type_name = $business->businessTypeName ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_creed_name = $business->businessCreedeName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->country->name ?? '';
+                $business->state_name = $business->state->name ?? '';
+                $business->city_name = $business->city->name ?? '';
+                
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->country);
+                unset($business->state);
+                unset($business->city);
+                return $business;
+            });
 
         return response()->json(['success' => true, 'data' => $multiBusinesses]);
     }
 
     public function getBusinessProfile(Request $request){
 
-        $business_profile = TBusiness::with('businessOwnerInfos')->find($request->id);
+        $business_profile = TBusiness::select(['id',
+                'business_name',
+                'business_profile_image',
+                'business_type_id',
+                'business_category_id',
+                'business_subcategory_id',
+                'creed_tags_id',
+                'address',
+                'zip_code',
+                'lat',
+                'long',
+                'service_area',
+                'business_phone_number',
+                'business_email',
+                'business_website',
+                'affiliation_id',
+                'customer_hotline',
+                'customer_email_leads',
+                'description',
+                'restaurant_id',
+                'halal_certificate',
+                'handcut_text',
+                'handcut_certificate',
+                'discount_code_description',
+                'discount_code',
+                'status'
+                ])
+                
+                ->with('businessOwnerInfos')->where('id', $request->id)
+                ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
+
+                $business_profile = $business_profile->map(function ($business) {
+
+                    $business->business_type_name = $business->businessTypeName ?? '';
+                    $business->business_category_name = $business->businessCategory->name ?? '';
+                    $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                    $business->business_creed_name = $business->businessCreedeName ?? '';
+                    $business->affiliation_name = $business->affiliationName ?? '';
+                    $business->country_name = $business->country->name ?? '';
+                    $business->state_name = $business->state->name ?? '';
+                    $business->city_name = $business->city->name ?? '';
+                    
+                    unset($business->businessCategory);
+                    unset($business->businessSubCategory);
+                    unset($business->country);
+                    unset($business->state);
+                    unset($business->city);
+                    return $business;
+                });
+
         return response()->json([$business_profile]);
     }
 

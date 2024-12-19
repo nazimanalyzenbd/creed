@@ -13,9 +13,42 @@ class TBusiness extends Model
         return $this->hasMany(TBusinessOwnerInfo::class, 'business_id');
     }
 
-    public function businessType()
+    protected $casts = [
+        'business_type_id' => 'array',
+        'affiliation_id' => 'array',
+        'creed_tag_id' => 'array',
+    ];
+
+    // public function businessType()
+    // {
+    //     // return $this->belongsTo(\App\Models\Admin\TBusinessType::class, 'business_type_id');
+    // }
+
+    public function getBusinessTypeNameAttribute()
     {
-        return $this->belongsTo(\App\Models\Admin\TBusinessType::class, 'business_type_id');
+        $typeIds = array_map('intval', $this->business_type_id ?? []);
+        
+        return \App\Models\Admin\TBusinessType::whereIn('id', $typeIds)
+                  ->pluck('name')
+                  ->toArray();
+    }
+
+    public function getAffiliationNameAttribute()
+    {
+        $affiliationIds = array_map('intval', $this->affiliation_id ?? []);
+        
+        return \App\Models\Admin\TAdminAffiliation::whereIn('id', $affiliationIds)
+                  ->pluck('name')
+                  ->toArray();
+    }
+
+    public function getCreedeTagsNameAttribute()
+    {
+        $creedTagsIds = array_map('intval', $this->creed_tag_id ?? []);
+        
+        return \App\Models\Admin\TCreedTags::whereIn('id', $creedTagsIds)
+                  ->pluck('name')
+                  ->toArray();
     }
 
     public function businessCategory()
@@ -33,10 +66,10 @@ class TBusiness extends Model
         return $this->belongsTo(\App\Models\Admin\TBusinessTags::class, 'business_tags_id');
     }
 
-    public function creedTags()
-    {
-        return $this->belongsTo(\App\Models\Admin\TCreedTags::class, 'creed_tags_id');
-    }
+    // public function creedTags()
+    // {
+    //     return $this->belongsTo(\App\Models\Admin\TCreedTags::class, 'creed_tags_id');
+    // }
 
     public function country()
     {

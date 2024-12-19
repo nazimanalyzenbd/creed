@@ -28,6 +28,8 @@ Route::prefix('auth')->group(function () {
 Route::post('/business-owner-info/store',[UserBusinessOwnerInfoCo::class, 'businessOwnerInfoStore'])->name('businessOwnerInfo.store')->middleware('auth:sanctum');
 Route::post('/business-info/store/step1',[UserBusinessOwnerInfoCo::class, 'businessInfoStore1'])->name('businessInfo.store.step1')->middleware('auth:sanctum');
 Route::post('/business-info/store/step2',[UserBusinessOwnerInfoCo::class, 'businessInfoStore2'])->name('businessInfo.store.step2')->middleware('auth:sanctum');
+Route::post('/business-info/store/step3',[UserBusinessOwnerInfoCo::class, 'businessInfoStore3'])->name('businessInfo.store.step3')->middleware('auth:sanctum');
+Route::post('/business-info/store/step4',[UserBusinessOwnerInfoCo::class, 'businessInfoStore4'])->name('businessInfo.store.step4')->middleware('auth:sanctum');
 Route::get('/business/creed-tags', [UserBusinessOwnerInfoCo::class, 'creedTags'])->name('creed.tags');
 Route::get('/business-type', [UserBusinessOwnerInfoCo::class, 'businessType'])->name('business.type');
 Route::get('/business-category', [UserBusinessOwnerInfoCo::class, 'businessCategory'])->name('business.category');

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('t_businesses', function (Blueprint $table) {
-            $table->string('creed_tags_id', '20')->nullable()->after('business_subcategory_id');
-            $table->foreign('creed_tags_id')
-                ->references('id')->on('t_creed_tags')
+            $table->string('restaurant_id', '20')->nullable()->after('business_profile_image');
+            $table->foreign('restaurant_id')
+                ->references('id')->on('t_admin_restaurants')
                 ->onDelete('cascade');
         });
     }
@@ -25,9 +25,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('t_businesses', function (Blueprint $table) {
-           
-            $table->dropForeign(['creed_tags_id']);
-            $table->dropColumn('creed_tags_id');
+            $table->dropForeign(['restaurant_id']);
+            $table->dropColumn('restaurant_id');
         });
     }
 };

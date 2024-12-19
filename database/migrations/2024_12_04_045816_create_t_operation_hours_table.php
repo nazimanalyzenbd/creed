@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('t_opertion_hours', function (Blueprint $table) {
+        Schema::create('t_operation_hours', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('business_id')->nullable();
             $table->string('day', 60)->nullable();

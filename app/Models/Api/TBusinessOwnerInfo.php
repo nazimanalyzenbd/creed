@@ -12,4 +12,8 @@ class TBusinessOwnerInfo extends Model
     {
         return $this->belongsTo(Business::class, 'business_id');
     }
+
+    public function users(){
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
 }

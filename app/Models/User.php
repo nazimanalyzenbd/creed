@@ -61,6 +61,6 @@ class User extends Authenticatable
 
     public function businessOwnerInfos()
     {
-        return $this->hasMany(TBusinessOwnerInfo::class, 'user_id');
+        return $this->hasMany(\App\Models\Api\TBusinessOwnerInfo::class);
     }
 }
