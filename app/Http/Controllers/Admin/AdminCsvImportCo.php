@@ -88,7 +88,7 @@ class AdminCsvImportCo extends Controller
             while ($row = fgetcsv($file)) {
                 $countryData = [
                     'id' => $row[0], 
-                    'name' => $row[1], 
+                    'name' => mb_convert_encoding($row[1], 'UTF-8', 'ISO-8859-1'), 
                     'state_id' => $row[2],
                     'state_code' => $row[3],
                     'country_id' => $row[4],

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('state_code')->nullable();
             $table->string('country_id')->nullable();
             $table->string('country_code')->nullable();
-            $table->decimal('latitude', 10, 7)->nullable();
-            $table->decimal('longitude', 10, 7)->nullable();
+            $table->string('latitude', 191)->nullable();
+            $table->string('longitude', 191)->nullable();
             $table->foreign('state_id')->references('id')->on('t_admin_states')->onDelete('cascade');
             $table->timestamps();
         });

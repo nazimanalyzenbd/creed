@@ -351,6 +351,7 @@ class UserBusinessOwnerInfoCo extends Controller
         $subcategory = TBusinessSubCategory::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
         $creedTags = TBusinessTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
         $businessTags = TCreedTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $affiliation = TAdminAffiliation::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
         $country = TAdminCountry::get();
         $state = TAdminState::get();
         $city = TAdminCity::get();
@@ -361,6 +362,7 @@ class UserBusinessOwnerInfoCo extends Controller
             'subcategory' => $subcategory,
             'creedTags' => $creedTags,
             'businessTags' => $businessTags,
+            'affiliation' => $affiliation,
             'country' => $country,
             'state' => $state,
             'city' => $city,
@@ -404,16 +406,24 @@ class UserBusinessOwnerInfoCo extends Controller
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
-    public function stateList(){
-
-        $data = TAdminState::get();
+    public function stateList(Request $request){
+        
+        if($request->country_id!='null'){
+            $data = TAdminState::select(['id','name','country_id'])->where('country_id', $request->country_id)->get();
+        }else{
+            $data = TAdminState::select(['id','name','country_id'])->get();
+        }
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
-    public function cityList(){
+    public function cityList(Request $request){
 
-        $data = TAdminCity::get();
+        if($request->state_id!='null'){
+            $data = TAdminCity::select(['id','name','state_id','country_id'])->where('state_id', $request->state_id)->get();
+        }else{
+            $data = TAdminCity::select(['id','name','state_id','country_id'])->get();
+        }
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }

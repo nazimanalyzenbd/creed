@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('country_name')->nullable();
             $table->string('state_code')->nullable();
             $table->string('type')->nullable();
-            $table->decimal('latitude', 10, 7)->nullable();
-            $table->decimal('longitude', 10, 7)->nullable();
+            $table->string('latitude', 191)->nullable();
+            $table->string('longitude', 191)->nullable();
             $table->foreign('country_id')->references('id')->on('t_admin_countries')->onDelete('cascade');
             $table->timestamps();
         });
