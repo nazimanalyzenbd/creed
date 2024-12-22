@@ -45,6 +45,7 @@ class AdminBusinessTypeCo extends Controller
         
             $data = New TBusinessType();
             $data->name = $request->name;
+            $data->description = $request->description;
             $data->status = $status;
             $data->created_by = Auth::id();
             $data->save();
@@ -90,6 +91,7 @@ class AdminBusinessTypeCo extends Controller
         
             $data = TBusinessType::find($id);
             $data->name = $request->name;
+            $data->description = $request->description;
             $data->status = $status;
             $data->updated_by = Auth::id();
             $data->save();

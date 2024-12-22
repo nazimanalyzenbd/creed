@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             TBusinessCategorySeeder::class,
             TBusinessSubCategorySeeder::class,
             TBusinessTagsSeeder::class,
-            TCountrySeeder::class,
             // TSubscriptionplanSeeder::class,
             TAffiliationSeeder::class,
             TAboutUsSeeder::class,

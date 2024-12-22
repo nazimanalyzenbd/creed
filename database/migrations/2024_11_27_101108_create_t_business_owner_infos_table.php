@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('first_name', 100);
             $table->string('last_name', 100);
             $table->string('email');
+            $table->string('country_code', 7)->nullable();
             $table->string('phone_number', 15)->nullable();
             $table->mediumText('address'); 
             $table->unsignedInteger('status')->default(1)->comment('1=business_owner_info_complete, 2=business_info_step1_complete, 3=business_info_step2_complete, 4=business_info_step3_complete, 5=business_info_step4_complete, 6=check_out_complete, 7=payment_success, 8=payment_failed');

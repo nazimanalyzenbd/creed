@@ -16,14 +16,17 @@ class TBusinessTypeSeeder extends Seeder
         $tBusinessType = TBusinessType::insert([
             [
                 'name' => 'Online Retail', 
+                'description' => 'Online Retail Description',
                 'created_by' => '1',
             ],
             [
                 'name' => 'Local Store', 
+                'description' => 'Local Store Description',
                 'created_by' => '1',
             ],
             [
                 'name' => 'Others', 
+                'description' => 'Others Description',
                 'created_by' => '1',
             ],
         ]);

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('first_name', 100)->nullable();
             $table->string('last_name', 100)->nullable();
             $table->string('email')->unique();
+            $table->string('country_code', 7)->nullable();
             $table->string('phone_number', 15)->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 255)->nullable()->comment('Stores the user\'s hashed password with minimum 8length');

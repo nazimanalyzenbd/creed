@@ -26,7 +26,11 @@ class TBusiness extends Model
 
     public function getBusinessTypeNameAttribute()
     {
-        $typeIds = array_map('intval', $this->business_type_id ?? []);
+        $typeIds = is_string($this->business_type_id)
+        ? json_decode($this->business_type_id, true)
+        : $this->business_type_id;
+
+        $typeIds = is_array($typeIds) ? array_map('intval', $typeIds) : [];
         
         return \App\Models\Admin\TBusinessType::whereIn('id', $typeIds)
                   ->pluck('name')
@@ -35,7 +39,12 @@ class TBusiness extends Model
 
     public function getAffiliationNameAttribute()
     {
-        $affiliationIds = array_map('intval', $this->affiliation_id ?? []);
+        // $affiliationIds = array_map('intval', $this->affiliation_id ?? []);
+        $affiliationIds = is_string($this->affiliation_id)
+        ? json_decode($this->affiliation_id, true)
+        : $this->affiliation_id;
+
+        $affiliationIds = is_array($affiliationIds) ? array_map('intval', $affiliationIds) : [];
         
         return \App\Models\Admin\TAdminAffiliation::whereIn('id', $affiliationIds)
                   ->pluck('name')
@@ -44,7 +53,11 @@ class TBusiness extends Model
 
     public function getCreedeTagsNameAttribute()
     {
-        $creedTagsIds = array_map('intval', $this->creed_tag_id ?? []);
+        $creedTagsIds = is_string($this->creed_tag_id)
+        ? json_decode($this->creed_tag_id, true)
+        : $this->creed_tag_id;
+
+        $creedTagsIds = is_array($creedTagsIds) ? array_map('intval', $creedTagsIds) : [];
         
         return \App\Models\Admin\TCreedTags::whereIn('id', $creedTagsIds)
                   ->pluck('name')

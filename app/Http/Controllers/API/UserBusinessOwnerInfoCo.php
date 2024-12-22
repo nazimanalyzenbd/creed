@@ -39,11 +39,12 @@ class UserBusinessOwnerInfoCo extends Controller
         try{
             
             $input = $request->all();
-            $input['user_id'] = '1';
+            $input['user_id'] = $request->user()->id;
             $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::create($input);
 
             return response()->json([
                 'status' => 'success',
+                'message'=> 'Owner info successfully saved.',
                 'tUserTBusinessOwnerInfo' => $tUserTBusinessOwnerInfo
             ],200);
 
@@ -85,6 +86,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->city = $request->city;
             $businessData->zip_code = $request->zip_code;
             $businessData->business_email = $request->business_email;
+            $businessData->country_code = $request->country_code;
             $businessData->business_phone_number = $request->business_phone_number;
             $businessData->business_website = $request->business_website;
             $businessData->affiliation_id = json_encode($request->affiliation_id);
@@ -153,6 +155,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->description = $request->description;
             $businessData->business_profile_image = $profile;
             $businessData->service_area = json_encode($request->service_area);
+            $businessData->hotline_country_code = $request->hotline_country_code;
             $businessData->customer_hotline = $request->customer_hotline;
             $businessData->customer_email_leads = $request->customer_email_leads;
             $businessData->status = 3;
@@ -341,9 +344,34 @@ class UserBusinessOwnerInfoCo extends Controller
     // checkout-page
     // public function checkout(){}
 
+    public function allDropDown(){
+
+        $type = TBusinessType::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $category = TBusinessCategory::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $subcategory = TBusinessSubCategory::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $creedTags = TBusinessTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $businessTags = TCreedTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $country = TAdminCountry::get();
+        $state = TAdminState::get();
+        $city = TAdminCity::get();
+
+        $data =  [
+            'type' => $type,
+            'category' => $category,
+            'subcategory' => $subcategory,
+            'creedTags' => $creedTags,
+            'businessTags' => $businessTags,
+            'country' => $country,
+            'state' => $state,
+            'city' => $city,
+        ];
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
     public function businessType(){
 
-        $data = TBusinessType::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);;
+        $data = TBusinessType::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -712,69 +740,6 @@ class UserBusinessOwnerInfoCo extends Controller
                 ) AS distance")
             )
             ->where('creed_tags_id', $creed_id)
-            ->having('distance', '<=', $radius)
-            ->orderBy('distance', 'asc')
-            ->get();
-
-            $filterBusinesses = $filterBusinesses->map(function ($business) {
-
-                $business->business_type_name = $business->businessType->name ?? '';
-                $business->business_category_name = $business->businessCategory->name ?? '';
-                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_tags_name = $business->businessTags->name ?? '';
-                $business->creed_tags_name = $business->creedTags->name ?? '';
-                $business->country_name = $business->country->name ?? '';
-                $business->state_name = $business->state->name ?? '';
-                $business->city_name = $business->city->name ?? '';
-
-                unset($business->businessType);
-                unset($business->businessCategory);
-                unset($business->businessSubCategory);
-                unset($business->businessTags);
-                unset($business->creedTags);
-                unset($business->country);
-                unset($business->state);
-                unset($business->city);
-                return $business;
-            });
-
-        return response()->json(['success' => true, 'data' => $filterBusinesses]);
-    }
-    
-    // Business Filter using Business Name
-    public function searchByBusinessName(Request $request){
-
-        $validated = $request->validate([
-            'lat' => 'required|string',
-            'long' => 'required|string',
-            'business_name' => 'required|string',
-        ]);
-
-        $latitude = $validated['lat'];
-        $longitude = $validated['long'];
-        $business_name = $validated['business_name'];
-        $radius = 0.1; 
-        // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
-                'id',
-                'business_name',
-                'business_type_id',
-                'business_category_id',
-                'business_subcategory_id',
-                'creed_tags_id',
-                'lat',
-                DB::raw('`long` AS longitude'),
-                DB::raw("(
-                    6371 * acos(
-                        cos(radians($latitude)) *
-                        cos(radians(lat)) *
-                        cos(radians(`long`) - radians($longitude)) +
-                        sin(radians($latitude)) *
-                        sin(radians(lat))
-                    )
-                ) AS distance")
-            )
-            ->where('business_name', $business_name)
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
             ->get();

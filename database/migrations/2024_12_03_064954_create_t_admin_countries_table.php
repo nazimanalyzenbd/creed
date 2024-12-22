@@ -15,12 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('iso3')->nullable();
-            $table->string('numeric_code')->nullable();
             $table->string('iso2')->nullable();
-            $table->string('phonecode')->nullable();
+            $table->string('numeric_code')->nullable();
+            $table->string('phone_code')->nullable();
             $table->string('capital')->nullable();
             $table->string('currency')->nullable();
             $table->string('currency_symbol')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->timestamps();
         });
     }

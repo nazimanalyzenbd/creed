@@ -53,12 +53,14 @@ class AdminCsvImportCo extends Controller
                     'id' => $row[0],
                     'name' => $row[1], 
                     'iso3' => $row[2],
-                    'numeric_code' => $row[3],
-                    'iso2' => $row[4],
-                    'phonecode' => $row[5],
+                    'iso2' => $row[3],
+                    'numeric_code' => $row[4],
+                    'phone_code' => $row[5],
                     'capital' => $row[6],
                     'currency' => $row[7],
                     'currency_symbol' => $row[8],
+                    'latitude' => $row[9],
+                    'longitude' => $row[10],
                 ];
                 
                 $country = TAdminCountry::create($countryData);

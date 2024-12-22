@@ -30,6 +30,7 @@ Route::post('/business-info/store/step1',[UserBusinessOwnerInfoCo::class, 'busin
 Route::post('/business-info/store/step2',[UserBusinessOwnerInfoCo::class, 'businessInfoStore2'])->name('businessInfo.store.step2')->middleware('auth:sanctum');
 Route::post('/business-info/store/step3',[UserBusinessOwnerInfoCo::class, 'businessInfoStore3'])->name('businessInfo.store.step3')->middleware('auth:sanctum');
 Route::post('/business-info/store/step4',[UserBusinessOwnerInfoCo::class, 'businessInfoStore4'])->name('businessInfo.store.step4')->middleware('auth:sanctum');
+Route::get('/business/all-dropDown-list', [UserBusinessOwnerInfoCo::class, 'allDropDown'])->name('business.all_dropDown_list');
 Route::get('/business/creed-tags', [UserBusinessOwnerInfoCo::class, 'creedTags'])->name('creed.tags');
 Route::get('/business-type', [UserBusinessOwnerInfoCo::class, 'businessType'])->name('business.type');
 Route::get('/business-category', [UserBusinessOwnerInfoCo::class, 'businessCategory'])->name('business.category');
@@ -47,15 +48,11 @@ Route::get('/business/multi-list', [UserBusinessOwnerInfoCo::class, 'getMultiBus
 Route::get('/business/single-profile', [UserBusinessOwnerInfoCo::class, 'getBusinessProfile'])->name('business.singleProfile');
 Route::get('/user-list', [UserBusinessOwnerInfoCo::class, 'userList'])->name('user.list');
 
-Route::post('/business-operation-hour', [UserBusinessOwnerInfoCo::class, 'businessOperationHour'])->name('business.operation');
-
 // Route::get('/google-business/profiles', [GoogleBusinessController::class, 'listProfiles']);
 
 
 // businessList search by Creed Tags
 Route::get('/business/search-by-creedtags', [UserBusinessOwnerInfoCo::class, 'searchByCreedTags'])->name('business.search-by-creedtags');
-// businessList search by Business-Name
-Route::get('/business/search-by-name', [UserBusinessOwnerInfoCo::class, 'searchByBusinessName'])->name('business.search-by-name');
 // businessList search by Business-Category-SubCategory-text
 Route::get('/business/search-by-catSubCat', [UserBusinessOwnerInfoCo::class, 'searchByBusinessCatSubCategory'])->name('business.search-by-category');
 // searchBox

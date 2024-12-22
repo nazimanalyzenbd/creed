@@ -66,6 +66,10 @@ class UserSocialAuthCo extends Controller
            
             $input = $request->only(['email', 'password']);
             $input['password'] = Hash::make($input['password']);
+
+            if($request->business_page == 1){
+                $user['account_type'] = 'GB';
+            }
             
             $user = User::create($input);
 
@@ -117,6 +121,9 @@ class UserSocialAuthCo extends Controller
             if(!$users){
                 $input = $request->all();
                 $input['avatar'] = $request->photo;
+                if($request->business_page == 1){
+                    $user['account_type'] = 'GB';
+                }
                 $user = User::create($input);
 
                 // Generate a token for API access

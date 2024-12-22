@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('t_business_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->comment('Online Retail, Local Store, Service Business'); 
+            $table->string('name', 100)->index()->comment('Online Retail, Local Store, Service Business'); 
+            $table->mediumText('description')->nullable();
             $table->boolean('status')->default(1)->comment('1=Active, 0=Inactive');
             $table->unsignedBigInteger('created_by')->nullable()->comment('Admin user who created the record');
             $table->unsignedBigInteger('updated_by')->nullable()->comment('Admin user who last updated the record');
@@ -22,13 +23,6 @@ return new class extends Migration
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
 
-            // Indexes
-            $table->index('name');
-            $table->index('status');
-            $table->index('created_by');
-            $table->index('updated_by');
-            $table->index('created_at');
-            $table->index('updated_at');
         });
     }
 
