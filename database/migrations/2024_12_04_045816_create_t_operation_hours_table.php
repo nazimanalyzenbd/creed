@@ -15,13 +15,13 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('business_id')->nullable();
             $table->string('day', 60)->nullable();
-            $table->time('open_time')->nullable();
-            $table->time('closed_time')->nullable();
+            $table->string('open_time')->nullable();
+            $table->string('closed_time')->nullable();
             $table->boolean('status')->default(1)->comment('1=Active, 0=Inactive');
             $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('SET NULL');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
-
+            $table->softDeletes();
             // Indexes
             $table->index('business_id');
             $table->index('day');
@@ -40,5 +40,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('t_opertion_hours');
         $table->dropForeign(['business_id']);
+        $table->dropSoftDeletes();
     }
 };

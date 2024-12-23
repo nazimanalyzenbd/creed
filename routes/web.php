@@ -49,7 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Customer Management
     Route::get('/customers/list', [CustomerManagementCo::class, 'customerList'])->name('customers.list');
-
+    Route::get('/customers-list/edit/{id}', [CustomerManagementCo::class, 'customerListEdit'])->name('customers-list.edit');
+    Route::delete('/customers-list/delete/{id}', [CustomerManagementCo::class, 'customerListDelete'])->name('customers-list.delete');
     // Usermanagement with Role&Permission
     Route::resource('/user-management/users', AdminUserCo::class);
     Route::resource('/user-management/roles', AdminRoleCo::class);

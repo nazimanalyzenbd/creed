@@ -42,6 +42,15 @@ class UserBusinessOwnerInfoCo extends Controller
             $input['user_id'] = $request->user()->id;
             $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::create($input);
 
+            $users = User::find($request->user()->id);
+            if($users->name!=''){
+                $users->name = $request->first_name .' '. $request->last_name;
+                $users->first_name = $request->first_name;
+                $users->last_name = $request->last_name;
+                $users->phone_number = $request->phone_number;
+                $users->save();
+            }
+
             return response()->json([
                 'status' => 'success',
                 'message'=> 'Owner info successfully saved.',
@@ -174,11 +183,11 @@ class UserBusinessOwnerInfoCo extends Controller
 
                     $galleryData = new TBusinessGallery();
                     $galleryData->business_id = $businessData->id;
-                    $galleryData->business_galley_image = $gallery;
+                    $galleryData->business_gallery_image = $gallery;
                     $galleryData->save();
                 }
             }
-            // return $request->all();
+            // return $request->operation_data;
             foreach($request->operation_data as $value){
                 
                 $operationDatas = new TOperationHour();
@@ -198,7 +207,8 @@ class UserBusinessOwnerInfoCo extends Controller
                 'status' => 'success',
                 'message' => $message,
                 'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at']),
-                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
+                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at']),
+                'galleryData' => $galleryData->makeHidden(['created_at','updated_at'])
             ],200);
 
         } catch (QueryException $e) {
@@ -349,12 +359,10 @@ class UserBusinessOwnerInfoCo extends Controller
         $type = TBusinessType::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
         $category = TBusinessCategory::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
         $subcategory = TBusinessSubCategory::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
-        $creedTags = TBusinessTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
-        $businessTags = TCreedTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $businessTags = TBusinessTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+        $creedTags = TCreedTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
         $affiliation = TAdminAffiliation::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
-        $country = TAdminCountry::get();
-        $state = TAdminState::get();
-        $city = TAdminCity::get();
+        $restaurant = TAdminRestaurant::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         $data =  [
             'type' => $type,
@@ -363,9 +371,7 @@ class UserBusinessOwnerInfoCo extends Controller
             'creedTags' => $creedTags,
             'businessTags' => $businessTags,
             'affiliation' => $affiliation,
-            'country' => $country,
-            'state' => $state,
-            'city' => $city,
+            'restaurant' => $restaurant,
         ];
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
@@ -401,7 +407,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function countryList(){
 
-        $data = TAdminCountry::get();
+        $data = TAdminCountry::select(['id','name'])->get();
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -461,6 +467,9 @@ class UserBusinessOwnerInfoCo extends Controller
                 'business_subcategory_id',
                 'creed_tags_id',
                 'address',
+                'country',
+                'state',
+                'city',
                 'zip_code',
                 'lat',
                 'long',
@@ -474,7 +483,7 @@ class UserBusinessOwnerInfoCo extends Controller
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
             
-            ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
+            ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
 
             $data = $data->map(function ($business) {
 
@@ -483,15 +492,15 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
                 $business->business_creed_name = $business->businessCreedeName ?? '';
                 $business->affiliation_name = $business->affiliationName ?? '';
-                $business->country_name = $business->country->name ?? '';
-                $business->state_name = $business->state->name ?? '';
-                $business->city_name = $business->city->name ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
-                unset($business->country);
-                unset($business->state);
-                unset($business->city);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
                 return $business;
             });
     
@@ -508,6 +517,9 @@ class UserBusinessOwnerInfoCo extends Controller
             'business_subcategory_id',
             'creed_tags_id',
             'address',
+            'country',
+            'state',
+            'city',
             'zip_code',
             'lat',
             'long',
@@ -520,7 +532,7 @@ class UserBusinessOwnerInfoCo extends Controller
         )
         ->having('distance', '<=', $radius)
         ->orderBy('distance', 'asc')
-        ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
+        ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
 
             $data = $data->map(function ($business) {
 
@@ -529,15 +541,15 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
                 $business->business_creed_name = $business->businessCreedeName ?? '';
                 $business->affiliation_name = $business->affiliationName ?? '';
-                $business->country_name = $business->country->name ?? '';
-                $business->state_name = $business->state->name ?? '';
-                $business->city_name = $business->city->name ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
-                unset($business->country);
-                unset($business->state);
-                unset($business->city);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
                 return $business;
             });
 

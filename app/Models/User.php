@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
@@ -12,7 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -34,7 +35,14 @@ class User extends Authenticatable
         'city',
         'zip_code',
         'account_type',
+        'otp',
+        'otp_expires_at',
+        'otp_sttaus',
+        'owner_id',
+        'status'
     ];
+
+    protected $dates = ['deleted_at'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -59,8 +67,25 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            if ($user->isForceDeleting()) {
+                $user->businessOwnerInfos()->forceDelete(); // Hard delete related posts
+            } else {
+                $user->businessOwnerInfos()->delete(); // Soft delete related posts
+            }
+        });
+
+        static::restoring(function ($user) {
+            $user->businessOwnerInfos()->withTrashed()->restore(); // Restore related posts
+        });
+    }
+
     public function businessOwnerInfos()
     {
-        return $this->hasMany(\App\Models\Api\TBusinessOwnerInfo::class);
+        return $this->hasMany(\App\Models\Api\TBusinessOwnerInfo::class, 'user_id', 'id');
     }
 }

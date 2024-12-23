@@ -3,10 +3,15 @@
 namespace App\Models\Api;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TBusiness extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = [];
+
+    protected $dates = ['deleted_at'];
 
     public function businessOwnerInfos()
     {
@@ -84,18 +89,26 @@ class TBusiness extends Model
     //     return $this->belongsTo(\App\Models\Admin\TCreedTags::class, 'creed_tags_id');
     // }
 
-    public function country()
+    public function countryName()
     {
-        return $this->belongsTo(\App\Models\Admin\TAdminCountry::class, 'country_id');
+        return $this->belongsTo(\App\Models\Admin\TAdminCountry::class, 'country','id');
     }
 
-    public function state()
+    public function stateName()
     {
-        return $this->belongsTo(\App\Models\Admin\TAdminState::class, 'state_id');
+        return $this->belongsTo(\App\Models\Admin\TAdminState::class, 'state','id');
     }
 
-    public function city()
+    public function cityName()
     {
-        return $this->belongsTo(\App\Models\Admin\TAdminCity::class, 'city_id');
+        return $this->belongsTo(\App\Models\Admin\TAdminCity::class, 'city','id');
+    }
+
+    public function operationData(){
+        return $this->hasMany(\App\Models\Api\TOperationHour::class, 'business_id');
+    }
+
+    public function galleryData(){
+        return $this->hasMany(\App\Models\Api\TBusinessGallery::class, 'business_id');
     }
 }

@@ -36,7 +36,7 @@ return new class extends Migration
             $table->boolean('status')->default(0)->comment('1=Active, 0=Inactive');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
-            
+            $table->softDeletes();
             // Indexes
             $table->index('name');
             $table->index('email');
@@ -71,5 +71,6 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        $table->dropSoftDeletes();
     }
 };

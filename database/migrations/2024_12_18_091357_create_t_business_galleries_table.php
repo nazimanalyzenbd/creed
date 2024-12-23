@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('cascade');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
+            $table->softDeletes();
         });
     }
 
@@ -27,5 +28,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('t_business_galleries');
+        $table->dropSoftDeletes();
     }
 };
