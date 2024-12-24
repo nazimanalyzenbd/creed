@@ -66,3 +66,5 @@ Route::get('/business/subCategory-with-relations', [UserBusinessOwnerInfoCo::cla
 
 // AboutUs
 Route::get('/about-us', [UserBusinessOwnerInfoCo::class, 'aboutUs'])->name('aboutus');
+
+Route::post('/save-business-list',[UserBusinessOwnerInfoCo::class, 'saveBusinessList'])->name('save-business-list')->middleware('auth:sanctum');

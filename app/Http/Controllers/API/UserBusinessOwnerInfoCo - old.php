@@ -26,9 +26,6 @@ use App\Http\Requests\Api\TBusinessOwnerInfoRequest;
 use App\Http\Requests\Api\TBusinessRequest;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Illuminate\Validation\ValidationException;
 use Auth;
 use DB;
 
@@ -133,7 +130,7 @@ class UserBusinessOwnerInfoCo extends Controller
          
             return response()->json([
                 'status' => 'failed',
-                'errors' => $e->errors(),
+                'errors' => $validator->errors(),
             ],422);
         }
 
@@ -142,103 +139,92 @@ class UserBusinessOwnerInfoCo extends Controller
     // Business info store step 2
     public function businessInfoStore2(Request $request)
     {
- 
-       // try{
+        try{
             
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
-//	            return $businessOwnerId;
-           // if(empty($businessOwnerId->id)){
-             //   $message = "Please first fillup Business information step 1.";
-               // return response()->json([
-                 //   'status' => 'failed',
-                   // 'message' => $message
-               // ],500);
-           // }
- 	// return $request->business_profile_image;
-
-	    if ($request->file('business_profile_image')) {
-
-                $file = $request->file('business_profile_image'); 
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', 2)->get()->first();
+            
+            if(empty($businessOwnerId->id)){
+                $message = "Please first fillup Business information step 1.";
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $message
+                ],500);
+            }
+           
+            if ($request->hasFile('business_profile_image')) {
+                $file = $request->file('business_profile_image');
                 $profile = time() . '.' . $file->getClientOriginalExtension();
-		$file->move(public_path('images/business/profile'), $profile);
-		$imagePath = 'images/business/profile/' .$profile;
-	   }
-//return 'image not save';
+                $file->move(public_path('images/business/profile'), $profile);
+                $imagePath = 'images/business/profile/' . $profile;
+            }else{
+                $profile = '';
+            }
+
             $businessData = TBusiness::find($businessOwnerId->business_id);
             $businessData->description = $request->description;
-            $businessData->business_profile_image = $imagePath;
+            $businessData->business_profile_image = $profile;
             $businessData->service_area = json_encode($request->service_area);
             $businessData->hotline_country_code = $request->hotline_country_code;
             $businessData->customer_hotline = $request->customer_hotline;
             $businessData->customer_email_leads = $request->customer_email_leads;
             $businessData->status = 3;
             $businessData->save();
-           // return $request->business_gallery_image;
-           // if($request->business_gallery_image!='null'){
-            //  $imagePaths=[];
+            
+            if($request->business_profile_image!='null'){
+                foreach($request->business_profile_image as $value){
+                    if ($request->hasFile($value)) {
+                        $file = $request->file($value);
+                        $gallery = time() . '.' . $file->getClientOriginalExtension();
+                        $file->move(public_path('images/business/gallery'), $gallery);
+                        $imagePath = 'images/business/gallery/' . $gallery;
+                    }else{
+                        $gallery = '';
+                    }
 
-        if ($request->hasFile('business_gallery_image')) { 
-            foreach ($request->file('business_gallery_image') as $image) {
-	// $image = $request->file('business_gallery_image');
-                $imageName = time().'_'.$image->getClientOriginalName();
-
-                $image->move(public_path('images/business/gallery'), $imageName);
-                $imagePaths = 'images/business/gallery/' . $imageName;
-//return $imagePaths;
                     $galleryData = new TBusinessGallery();
                     $galleryData->business_id = $businessData->id;
-                    $galleryData->business_gallery_image = $imagePaths;
+                    $galleryData->business_gallery_image = $gallery;
                     $galleryData->save();
-//return $galleryData;              
- }
+                }
             }
-
-//return 'failed';
- foreach ($request->operation_data as $scheduleData) {
-$scheduleData['business_id'] = $businessData->id;         
-   TOperationHour::create($scheduleData);
-        }
             // return $request->operation_data;
-          // foreach($request->operation_data as $value){
-         //
-          //      $operationDatas = new TOperationHour();
-          //      $operationDatas->business_id = $businessData->id;
-           //     $operationDatas->day = $value;
-           //     $operationDatas->open_time = $value;
-            //    $operationDatas->closed_time = $value; 
-            //    $operationDatas->save();
-          // }
-          //  return 'hi';
+            foreach($request->operation_data as $value){
+                
+                $operationDatas = new TOperationHour();
+                $operationDatas->business_id = $businessData->id;
+                $operationDatas->day = $value['day'];
+                $operationDatas->open_time = $value['open_time'];
+                $operationDatas->closed_time = $value['closed_time']; 
+                $operationDatas->save();
+            }
+            
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
             $tUserBusinessOwnerInfo->status = 3;
             $tUserBusinessOwnerInfo->save();
-
-	$galleryDatas = TBusinessGallery::where('business_id',$businessData->id)->get()->makeHidden(['created_at','updated_at']);          
-	$operationHours = TOperationHour::where('business_id',$businessData->id)->get()->makeHidden(['created_at','updated-at']);
+          
             $message = "Business information step 2 successfully saved.";
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
                 'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at']),
                 'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at']),
-		'galleryDatas' => $galleryDatas,
-		'operationHours' => $operationHours,
+                'galleryData' => $galleryData->makeHidden(['created_at','updated_at'])
             ],200);
 
-       // } catch (QueryException $e) {
-         //   $errorMessage = "Database error: Unable to submit data.!";
-           // return response()->json([
-             //   'status' => 'failed',
-              //  'message' => $errorMessage,
-         //   ],500);
-         //   return redirect()->back()->with('error', '');
-     //   } catch (\Throwable $e) {
+        } catch (QueryException $e) {
+            $errorMessage = "Database error: Unable to submit data.!";
+            return response()->json([
+                'status' => 'failed',
+                'message' => $errorMessage,
+            ],500);
+            return redirect()->back()->with('error', '');
+        } catch (\Exception $e) {
          
-       //     return response()->json([
-         //       'status' => 'failed',
-         //       'errors' => $e->errors(),
-         //   ],422);
-       // }
+            return response()->json([
+                'status' => 'failed',
+                'errors' => $validator->errors(),
+            ],422);
+        }
 
     }
 
@@ -248,43 +234,43 @@ $scheduleData['business_id'] = $businessData->id;
    
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', 3)->get()->first();
            
-           // if(empty($businessOwnerId->id)){
-             //   $message = "Please first fillup Business information step 2.";
-               // return response()->json([
-                 //   'status' => 'failed',
-                  //  'message' => $message
-              //  ],500);
-           // }
+            if(empty($businessOwnerId->id)){
+                $message = "Please first fillup Business information step 2.";
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $message
+                ],500);
+            }
            
-            if ($request->hasFile('halal_certificate')) { 
+            if ($request->hasFile('halal_certificate')) {
                 $file = $request->file('halal_certificate');
                 $halal_certificate = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images/business/halal_certificate'), $halal_certificate);
                 $imagePath = 'images/business/halal_certificate/' . $halal_certificate;
             }else{
-                $imagePath = '';
+                $halal_certificate = '';
             }
 
-            if ($request->hasFile('handcut_certificate')) { 
+            if ($request->hasFile('handcut_certificate')) {
                 $file = $request->file('handcut_certificate');
                 $handcut_certificate = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images/business/handcut_certificate'), $halal_certificate);
-                $imagePaths = 'images/business/handcut_certificate/' . $handcut_certificate;
+                $imagePath = 'images/business/handcut_certificate/' . $handcut_certificate;
             }else{
-                $imagePaths = '';
+                $handcut_certificate = '';
             }
 
-            $businessData = TBusiness::find($businessOwnerId->business_id);          
-	    $businessData->creed_tags_id = json_encode($request->creed_tags_id);
+            $businessData = TBusiness::find($businessOwnerId->business_id);
+            $businessData->creed_tags_id = json_encode($request->creed_tags_id);
             $businessData->restaurant_id = json_encode($request->restaurant_id);
-            $businessData->halal_certificate = $imagePath;
+            $businessData->halal_certificate = $halal_certificate;
             $businessData->handcut_text = $request->handcut_text;
-            $businessData->handcut_certificate = $imagePaths;
+            $businessData->handcut_certificate = $handcut_certificate;
             $businessData->status = 4;
             $businessData->save();
-          
+            
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
             $tUserBusinessOwnerInfo->status = 4;
             $tUserBusinessOwnerInfo->save();
@@ -308,7 +294,7 @@ $scheduleData['business_id'] = $businessData->id;
          
             return response()->json([
                 'status' => 'failed',
-                'errors' => $e->errors(),
+                'errors' => $validator->errors(),
             ],422);
         }
 
@@ -320,15 +306,15 @@ $scheduleData['business_id'] = $businessData->id;
    
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', 4)->get()->first();
             
-          //  if(empty($businessOwnerId->id)){
-            //    $message = "Please first fillup Business information step 3.";
-              //  return response()->json([
-                //    'status' => 'failed',
-                 //   'message' => $message
-              //  ],500);
-          //  }
+            if(empty($businessOwnerId->id)){
+                $message = "Please first fillup Business information step 3.";
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $message
+                ],500);
+            }
 
             $businessData = TBusiness::find($businessOwnerId->business_id);
             $businessData->discount_code_description = $request->discount_code_description;
@@ -1032,10 +1018,5 @@ $scheduleData['business_id'] = $businessData->id;
 
             return response()->json(['success' => true, 'data' => $filterBusinesses]);
         }
-    }
-
-    public function saveBusinessList(Request $request){
-        $data = $request->business_id;
-        return response()->json(['success' => true, 'data' => $data]);
     }
 }
