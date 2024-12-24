@@ -20,31 +20,32 @@ class TBusinessOwnerSeeder extends Seeder
         $tUser = User::insert([
             [
                 'email' => 'azam.hh@gmail.com',
-                'password' => '12345678', 
+                'password' => '$2a$10$zVEdZ5C2cl8szxnukTddlOCrL47xs44o3hW4RBRqTDkymDA4exKiO', 
             ],
             [
-                'email' => 'azam.hh@gmail.com',
-                'password' => '12345678',  
+                'email' => 'azam1.hh@gmail.com',
+                'password' => '$2a$10$zVEdZ5C2cl8szxnukTddlOCrL47xs44o3hW4RBRqTDkymDA4exKiO',  
             ],
             [
                 'email' => 'Mikaeel@gmail.com',
-                'password' => '12345678', 
+                'password' => '$2a$10$zVEdZ5C2cl8szxnukTddlOCrL47xs44o3hW4RBRqTDkymDA4exKiO', 
             ],
             [
                 'email' => 'Sana@gmail.com',
-                'password' => '12345678', 
+                'password' => '$2a$10$zVEdZ5C2cl8szxnukTddlOCrL47xs44o3hW4RBRqTDkymDA4exKiO', 
             ],
             [
-                'email' => 'azam.hh@gmail.com',
-                'password' => '12345678', 
+                'email' => 'azam2.hh@gmail.com',
+                'password' => '$2a$10$zVEdZ5C2cl8szxnukTddlOCrL47xs44o3hW4RBRqTDkymDA4exKiO', 
             ],
             [
                 'email' => 'Hal@gmail.com',
-                'password' => '12345678', 
+                'password' => '$2a$10$zVEdZ5C2cl8szxnukTddlOCrL47xs44o3hW4RBRqTDkymDA4exKiO', 
             ],
         ]);
         $tBusinessOwnerInfo = TBusinessOwnerInfo::insert([
             [
+                'user_id' => 1,
                 'first_name' => 'Azam',
                 'last_name' => 'Hassim', 
                 'email' => 'azam.hh@gmail.com', 
@@ -52,6 +53,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'address' => '21329 Gosier Way', 
             ],
             [
+                'user_id' => 2,
                 'first_name' => 'Surah',
                 'last_name' => 'Hassim', 
                 'email' => 'azam.hh@gmail.com', 
@@ -59,6 +61,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'address' => '20423 US-441 Suite F18', 
             ],
             [
+                'user_id' => 3,
                 'first_name' => 'Mikaeel',
                 'last_name' => 'Hassim', 
                 'email' => 'Mikaeel@gmail.com', 
@@ -66,6 +69,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'address' => '8185 Via Ancho Rd', 
             ],
             [
+                'user_id' => 4,
                 'first_name' => 'Sana',
                 'last_name' => 'Shaikh', 
                 'email' => 'Sana@gmail.com', 
@@ -73,6 +77,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'address' => '2005 Greenbriar Blvd', 
             ],
             [
+                'user_id' => 5,
                 'first_name' => 'Azam',
                 'last_name' => 'Hassim', 
                 'email' => 'azam.hh@gmail.com', 
@@ -80,6 +85,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'address' => '19196 Natures View Ct', 
             ],
             [
+                'user_id' => 6,
                 'first_name' => 'Hal',
                 'last_name' => 'Al', 
                 'email' => 'Hal@gmail.com', 
@@ -102,7 +108,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'state' => '',
                 'city' => '',
                 'zip_code' => '33428',
-                'business_description' => 'app development information technology consulting',
+                'description' => 'app development information technology consulting',
             ],
             [
                 'business_owner_id' => 2,
@@ -118,7 +124,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'state' => '',
                 'city' => '',
                 'zip_code' => '33498', 
-                'business_description' => 'Dental Surgeon Dentist Dental Hygeine',
+                'description' => 'Dental Surgeon Dentist Dental Hygeine',
             ],
             [
                 'business_owner_id' => 3,
@@ -134,7 +140,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'state' => '',
                 'city' => '',
                 'zip_code' => '33488', 
-                'business_description' => 'Lawyer Family Law Probate Custody Divorce',
+                'description' => 'Lawyer Family Law Probate Custody Divorce',
             ],
             [
                 'business_owner_id' => 4,
@@ -150,7 +156,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'state' => '',
                 'city' => '',
                 'zip_code' => '33414',
-                'business_description' => 'event planning parties corporate events birthday planner wedding fun outdoor florida event planner',
+                'description' => 'event planning parties corporate events birthday planner wedding fun outdoor florida event planner',
             ],
             [
                 'business_owner_id' => 5,
@@ -166,7 +172,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'state' => '',
                 'city' => '',
                 'zip_code' => '33498',
-                'business_description' => 'halal yemeni arab restaurant',
+                'description' => 'halal yemeni arab restaurant',
             ],
             [
                 'business_owner_id' => 6,
@@ -182,7 +188,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'state' => '',
                 'city' => '',
                 'zip_code' => '77036',  
-                'business_description' => 'Halal Italian Restaurant pizza pasta',
+                'description' => 'Halal Italian Restaurant pizza pasta',
             ],
         ]);
     }
