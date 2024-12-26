@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('t_business_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100)->index()->comment('Restaurant, Law Firm');
+            $table->mediumText('description')->nullable();
             $table->boolean('status')->default(1)->comment('1=Active, 0=Inactive');
             $table->unsignedBigInteger('created_by')->nullable()->comment('Admin user who created the record');
             $table->unsignedBigInteger('updated_by')->nullable()->comment('Admin user who last updated the record');

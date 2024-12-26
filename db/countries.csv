@@ -1,251 +1,251 @@
-id,name,iso3,iso2,numeric_code,phone_code,capital,currency,currency_symbol,latitude,longitude
-1,Afghanistan,AFG,AF,004,93,Kabul,AFN,؋,33,65
-2,Aland Islands,ALA,AX,248,358,Mariehamn,EUR,€,60.116667,19.9
-3,Albania,ALB,AL,008,355,Tirana,ALL,Lek,41,20
-4,Algeria,DZA,DZ,012,213,Algiers,DZD,دج,28,3
-5,American Samoa,ASM,AS,016,1,Pago Pago,USD,$,-14.33333333,-170
-6,Andorra,AND,AD,020,376,Andorra la Vella,EUR,€,42.5,1.5
-7,Angola,AGO,AO,024,244,Luanda,AOA,Kz,-12.5,18.5
-8,Anguilla,AIA,AI,660,1,The Valley,XCD,$,18.25,-63.16666666
-9,Antarctica,ATA,AQ,010,672,,AAD,$,-74.65,4.48
-10,Antigua and Barbuda,ATG,AG,028,1,St. John's,XCD,$,17.05,-61.8
-11,Argentina,ARG,AR,032,54,Buenos Aires,ARS,$,-34,-64
-12,Armenia,ARM,AM,051,374,Yerevan,AMD,֏,40,45
-13,Aruba,ABW,AW,533,297,Oranjestad,AWG,ƒ,12.5,-69.96666666
-14,Australia,AUS,AU,036,61,Canberra,AUD,$,-27,133
-15,Austria,AUT,AT,040,43,Vienna,EUR,€,47.33333333,13.33333333
-16,Azerbaijan,AZE,AZ,031,994,Baku,AZN,m,40.5,47.5
-18,Bahrain,BHR,BH,048,973,Manama,BHD,.د.ب,26,50.55
-19,Bangladesh,BGD,BD,050,880,Dhaka,BDT,৳,24,90
-20,Barbados,BRB,BB,052,1,Bridgetown,BBD,Bds$,13.16666666,-59.53333333
-21,Belarus,BLR,BY,112,375,Minsk,BYN,Br,53,28
-22,Belgium,BEL,BE,056,32,Brussels,EUR,€,50.83333333,4
-23,Belize,BLZ,BZ,084,501,Belmopan,BZD,$,17.25,-88.75
-24,Benin,BEN,BJ,204,229,Porto-Novo,XOF,CFA,9.5,2.25
-25,Bermuda,BMU,BM,060,1,Hamilton,BMD,$,32.33333333,-64.75
-26,Bhutan,BTN,BT,064,975,Thimphu,BTN,Nu.,27.5,90.5
-27,Bolivia,BOL,BO,068,591,Sucre,BOB,Bs.,-17,-65
-155,"Bonaire, Sint Eustatius and Saba",BES,BQ,535,599,Kralendijk,USD,$,12.15,-68.266667
-28,Bosnia and Herzegovina,BIH,BA,070,387,Sarajevo,BAM,KM,44,18
-29,Botswana,BWA,BW,072,267,Gaborone,BWP,P,-22,24
-30,Bouvet Island,BVT,BV,074,0055,,NOK,ko,-54.43333333,3.4
-31,Brazil,BRA,BR,076,55,Brasilia,BRL,R$,-10,-55
-32,British Indian Ocean Territory,IOT,IO,086,246,Diego Garcia,USD,$,-6,71.5
-33,Brunei,BRN,BN,096,673,Bandar Seri Begawan,BND,B$,4.5,114.6666667
-34,Bulgaria,BGR,BG,100,359,Sofia,BGN,Лв.,43,25
-35,Burkina Faso,BFA,BF,854,226,Ouagadougou,XOF,CFA,13,-2
-36,Burundi,BDI,BI,108,257,Bujumbura,BIF,FBu,-3.5,30
-37,Cambodia,KHM,KH,116,855,Phnom Penh,KHR,KHR,13,105
-38,Cameroon,CMR,CM,120,237,Yaounde,XAF,FCFA,6,12
-39,Canada,CAN,CA,124,1,Ottawa,CAD,$,60,-95
-40,Cape Verde,CPV,CV,132,238,Praia,CVE,$,16,-24
-41,Cayman Islands,CYM,KY,136,1,George Town,KYD,$,19.5,-80.5
-42,Central African Republic,CAF,CF,140,236,Bangui,XAF,FCFA,7,21
-43,Chad,TCD,TD,148,235,N'Djamena,XAF,FCFA,15,19
-44,Chile,CHL,CL,152,56,Santiago,CLP,$,-30,-71
-45,China,CHN,CN,156,86,Beijing,CNY,¥,35,105
-46,Christmas Island,CXR,CX,162,61,Flying Fish Cove,AUD,$,-10.5,105.6666667
-47,Cocos (Keeling) Islands,CCK,CC,166,61,West Island,AUD,$,-12.5,96.83333333
-48,Colombia,COL,CO,170,57,Bogotá,COP,$,4,-72
-49,Comoros,COM,KM,174,269,Moroni,KMF,CF,-12.16666666,44.25
-50,Congo,COG,CG,178,242,Brazzaville,XAF,FC,-1,15
-52,Cook Islands,COK,CK,184,682,Avarua,NZD,$,-21.23333333,-159.7666667
-53,Costa Rica,CRI,CR,188,506,San Jose,CRC,₡,10,-84
-54,Cote D'Ivoire (Ivory Coast),CIV,CI,384,225,Yamoussoukro,XOF,CFA,8,-5
-55,Croatia,HRV,HR,191,385,Zagreb,EUR,€,45.16666666,15.5
-56,Cuba,CUB,CU,192,53,Havana,CUP,$,21.5,-80
-249,Curaçao,CUW,CW,531,599,Willemstad,ANG,ƒ,12.116667,-68.933333
-57,Cyprus,CYP,CY,196,357,Nicosia,EUR,€,35,33
-58,Czech Republic,CZE,CZ,203,420,Prague,CZK,Kč,49.75,15.5
-51,Democratic Republic of the Congo,COD,CD,180,243,Kinshasa,CDF,FC,0,25
-59,Denmark,DNK,DK,208,45,Copenhagen,DKK,Kr.,56,10
-60,Djibouti,DJI,DJ,262,253,Djibouti,DJF,Fdj,11.5,43
-61,Dominica,DMA,DM,212,1,Roseau,XCD,$,15.41666666,-61.33333333
-62,Dominican Republic,DOM,DO,214,1,Santo Domingo,DOP,$,19,-70.66666666
-64,Ecuador,ECU,EC,218,593,Quito,USD,$,-2,-77.5
-65,Egypt,EGY,EG,818,20,Cairo,EGP,ج.م,27,30
-66,El Salvador,SLV,SV,222,503,San Salvador,USD,$,13.83333333,-88.91666666
-67,Equatorial Guinea,GNQ,GQ,226,240,Malabo,XAF,FCFA,2,10
-68,Eritrea,ERI,ER,232,291,Asmara,ERN,Nfk,15,39
-69,Estonia,EST,EE,233,372,Tallinn,EUR,€,59,26
-212,Eswatini,SWZ,SZ,748,268,Mbabane,SZL,E,-26.5,31.5
-70,Ethiopia,ETH,ET,231,251,Addis Ababa,ETB,Nkf,8,38
-71,Falkland Islands,FLK,FK,238,500,Stanley,FKP,£,-51.75,-59
-72,Faroe Islands,FRO,FO,234,298,Torshavn,DKK,Kr.,62,-7
-73,Fiji Islands,FJI,FJ,242,679,Suva,FJD,FJ$,-18,175
-74,Finland,FIN,FI,246,358,Helsinki,EUR,€,64,26
-75,France,FRA,FR,250,33,Paris,EUR,€,46,2
-76,French Guiana,GUF,GF,254,594,Cayenne,EUR,€,4,-53
-77,French Polynesia,PYF,PF,258,689,Papeete,XPF,₣,-15,-140
-78,French Southern Territories,ATF,TF,260,262,Port-aux-Francais,EUR,€,-49.25,69.167
-79,Gabon,GAB,GA,266,241,Libreville,XAF,FCFA,-1,11.75
-81,Georgia,GEO,GE,268,995,Tbilisi,GEL,ლ,42,43.5
-82,Germany,DEU,DE,276,49,Berlin,EUR,€,51,9
-83,Ghana,GHA,GH,288,233,Accra,GHS,GH₵,8,-2
-84,Gibraltar,GIB,GI,292,350,Gibraltar,GIP,£,36.13333333,-5.35
-85,Greece,GRC,GR,300,30,Athens,EUR,€,39,22
-86,Greenland,GRL,GL,304,299,Nuuk,DKK,Kr.,72,-40
-87,Grenada,GRD,GD,308,1,St. George's,XCD,$,12.11666666,-61.66666666
-88,Guadeloupe,GLP,GP,312,590,Basse-Terre,EUR,€,16.25,-61.583333
-89,Guam,GUM,GU,316,1,Hagatna,USD,$,13.46666666,144.7833333
-90,Guatemala,GTM,GT,320,502,Guatemala City,GTQ,Q,15.5,-90.25
-91,Guernsey and Alderney,GGY,GG,831,44,St Peter Port,GBP,£,49.46666666,-2.58333333
-92,Guinea,GIN,GN,324,224,Conakry,GNF,FG,11,-10
-93,Guinea-Bissau,GNB,GW,624,245,Bissau,XOF,CFA,12,-15
-94,Guyana,GUY,GY,328,592,Georgetown,GYD,$,5,-59
-95,Haiti,HTI,HT,332,509,Port-au-Prince,HTG,G,19,-72.41666666
-96,Heard Island and McDonald Islands,HMD,HM,334,672,,AUD,$,-53.1,72.51666666
-97,Honduras,HND,HN,340,504,Tegucigalpa,HNL,L,15,-86.5
-98,Hong Kong S.A.R.,HKG,HK,344,852,Hong Kong,HKD,$,22.25,114.1666667
-99,Hungary,HUN,HU,348,36,Budapest,HUF,Ft,47,20
-100,Iceland,ISL,IS,352,354,Reykjavik,ISK,ko,65,-18
-101,India,IND,IN,356,91,New Delhi,INR,₹,20,77
-102,Indonesia,IDN,ID,360,62,Jakarta,IDR,Rp,-5,120
-103,Iran,IRN,IR,364,98,Tehran,IRR,﷼,32,53
-104,Iraq,IRQ,IQ,368,964,Baghdad,IQD,د.ع,33,44
-105,Ireland,IRL,IE,372,353,Dublin,EUR,€,53,-8
-106,Israel,ISR,IL,376,972,Jerusalem,ILS,₪,31.5,34.75
-107,Italy,ITA,IT,380,39,Rome,EUR,€,42.83333333,12.83333333
-108,Jamaica,JAM,JM,388,1,Kingston,JMD,J$,18.25,-77.5
-109,Japan,JPN,JP,392,81,Tokyo,JPY,¥,36,138
-110,Jersey,JEY,JE,832,44,Saint Helier,GBP,£,49.25,-2.16666666
-111,Jordan,JOR,JO,400,962,Amman,JOD,ا.د,31,36
-112,Kazakhstan,KAZ,KZ,398,7,Astana,KZT,лв,48,68
-113,Kenya,KEN,KE,404,254,Nairobi,KES,KSh,1,38
-114,Kiribati,KIR,KI,296,686,Tarawa,AUD,$,1.41666666,173
-248,Kosovo,XKX,XK,926,383,Pristina,EUR,€,42.5612909,20.3403035
-117,Kuwait,KWT,KW,414,965,Kuwait City,KWD,ك.د,29.5,45.75
-118,Kyrgyzstan,KGZ,KG,417,996,Bishkek,KGS,лв,41,75
-119,Laos,LAO,LA,418,856,Vientiane,LAK,₭,18,105
-120,Latvia,LVA,LV,428,371,Riga,EUR,€,57,25
-121,Lebanon,LBN,LB,422,961,Beirut,LBP,£,33.83333333,35.83333333
-122,Lesotho,LSO,LS,426,266,Maseru,LSL,L,-29.5,28.5
-123,Liberia,LBR,LR,430,231,Monrovia,LRD,$,6.5,-9.5
-124,Libya,LBY,LY,434,218,Tripolis,LYD,د.ل,25,17
-125,Liechtenstein,LIE,LI,438,423,Vaduz,CHF,CHf,47.26666666,9.53333333
-126,Lithuania,LTU,LT,440,370,Vilnius,EUR,€,56,24
-127,Luxembourg,LUX,LU,442,352,Luxembourg,EUR,€,49.75,6.16666666
-128,Macau S.A.R.,MAC,MO,446,853,Macao,MOP,$,22.16666666,113.55
-130,Madagascar,MDG,MG,450,261,Antananarivo,MGA,Ar,-20,47
-131,Malawi,MWI,MW,454,265,Lilongwe,MWK,MK,-13.5,34
-132,Malaysia,MYS,MY,458,60,Kuala Lumpur,MYR,RM,2.5,112.5
-133,Maldives,MDV,MV,462,960,Male,MVR,Rf,3.25,73
-134,Mali,MLI,ML,466,223,Bamako,XOF,CFA,17,-4
-135,Malta,MLT,MT,470,356,Valletta,EUR,€,35.83333333,14.58333333
-136,Man (Isle of),IMN,IM,833,44,"Douglas, Isle of Man",GBP,£,54.25,-4.5
-137,Marshall Islands,MHL,MH,584,692,Majuro,USD,$,9,168
-138,Martinique,MTQ,MQ,474,596,Fort-de-France,EUR,€,14.666667,-61
-139,Mauritania,MRT,MR,478,222,Nouakchott,MRO,MRU,20,-12
-140,Mauritius,MUS,MU,480,230,Port Louis,MUR,₨,-20.28333333,57.55
-141,Mayotte,MYT,YT,175,262,Mamoudzou,EUR,€,-12.83333333,45.16666666
-142,Mexico,MEX,MX,484,52,Ciudad de México,MXN,$,23,-102
-143,Micronesia,FSM,FM,583,691,Palikir,USD,$,6.91666666,158.25
-144,Moldova,MDA,MD,498,373,Chisinau,MDL,L,47,29
-145,Monaco,MCO,MC,492,377,Monaco,EUR,€,43.73333333,7.4
-146,Mongolia,MNG,MN,496,976,Ulan Bator,MNT,₮,46,105
-147,Montenegro,MNE,ME,499,382,Podgorica,EUR,€,42.5,19.3
-148,Montserrat,MSR,MS,500,1,Plymouth,XCD,$,16.75,-62.2
-149,Morocco,MAR,MA,504,212,Rabat,MAD,DH,32,-5
-150,Mozambique,MOZ,MZ,508,258,Maputo,MZN,MT,-18.25,35
-151,Myanmar,MMR,MM,104,95,Nay Pyi Taw,MMK,K,22,98
-152,Namibia,NAM,NA,516,264,Windhoek,NAD,$,-22,17
-153,Nauru,NRU,NR,520,674,Yaren,AUD,$,-0.53333333,166.9166667
-154,Nepal,NPL,NP,524,977,Kathmandu,NPR,₨,28,84
-156,Netherlands,NLD,NL,528,31,Amsterdam,EUR,€,52.5,5.75
-157,New Caledonia,NCL,NC,540,687,Noumea,XPF,₣,-21.5,165.5
-158,New Zealand,NZL,NZ,554,64,Wellington,NZD,$,-41,174
-159,Nicaragua,NIC,NI,558,505,Managua,NIO,C$,13,-85
-160,Niger,NER,NE,562,227,Niamey,XOF,CFA,16,8
-161,Nigeria,NGA,NG,566,234,Abuja,NGN,₦,10,8
-162,Niue,NIU,NU,570,683,Alofi,NZD,$,-19.03333333,-169.8666667
-163,Norfolk Island,NFK,NF,574,672,Kingston,AUD,$,-29.03333333,167.95
-115,North Korea,PRK,KP,408,850,Pyongyang,KPW,₩,40,127
-129,North Macedonia,MKD,MK,807,389,Skopje,MKD,ден,41.83333333,22
-164,Northern Mariana Islands,MNP,MP,580,1,Saipan,USD,$,15.2,145.75
-165,Norway,NOR,NO,578,47,Oslo,NOK,ko,62,10
-166,Oman,OMN,OM,512,968,Muscat,OMR,.ع.ر,21,57
-167,Pakistan,PAK,PK,586,92,Islamabad,PKR,₨,30,70
-168,Palau,PLW,PW,585,680,Melekeok,USD,$,7.5,134.5
-169,Palestinian Territory Occupied,PSE,PS,275,970,East Jerusalem,ILS,₪,31.9,35.2
-170,Panama,PAN,PA,591,507,Panama City,PAB,B/.,9,-80
-171,Papua New Guinea,PNG,PG,598,675,Port Moresby,PGK,K,-6,147
-172,Paraguay,PRY,PY,600,595,Asuncion,PYG,₲,-23,-58
-173,Peru,PER,PE,604,51,Lima,PEN,S/.,-10,-76
-174,Philippines,PHL,PH,608,63,Manila,PHP,₱,13,122
-175,Pitcairn Island,PCN,PN,612,870,Adamstown,NZD,$,-25.06666666,-130.1
-176,Poland,POL,PL,616,48,Warsaw,PLN,zł,52,20
-177,Portugal,PRT,PT,620,351,Lisbon,EUR,€,39.5,-8
-178,Puerto Rico,PRI,PR,630,1,San Juan,USD,$,18.25,-66.5
-179,Qatar,QAT,QA,634,974,Doha,QAR,ق.ر,25.5,51.25
-180,Reunion,REU,RE,638,262,Saint-Denis,EUR,€,-21.15,55.5
-181,Romania,ROU,RO,642,40,Bucharest,RON,lei,46,25
-182,Russia,RUS,RU,643,7,Moscow,RUB,₽,60,100
-183,Rwanda,RWA,RW,646,250,Kigali,RWF,FRw,-2,30
-184,Saint Helena,SHN,SH,654,290,Jamestown,SHP,£,-15.95,-5.7
-185,Saint Kitts and Nevis,KNA,KN,659,1,Basseterre,XCD,$,17.33333333,-62.75
-186,Saint Lucia,LCA,LC,662,1,Castries,XCD,$,13.88333333,-60.96666666
-187,Saint Pierre and Miquelon,SPM,PM,666,508,Saint-Pierre,EUR,€,46.83333333,-56.33333333
-188,Saint Vincent and the Grenadines,VCT,VC,670,1,Kingstown,XCD,$,13.25,-61.2
-189,Saint-Barthelemy,BLM,BL,652,590,Gustavia,EUR,€,18.5,-63.41666666
-190,Saint-Martin (French part),MAF,MF,663,590,Marigot,EUR,€,18.08333333,-63.95
-191,Samoa,WSM,WS,882,685,Apia,WST,SAT,-13.58333333,-172.3333333
-192,San Marino,SMR,SM,674,378,San Marino,EUR,€,43.76666666,12.41666666
-193,Sao Tome and Principe,STP,ST,678,239,Sao Tome,STD,Db,1,7
-194,Saudi Arabia,SAU,SA,682,966,Riyadh,SAR,﷼,25,45
-195,Senegal,SEN,SN,686,221,Dakar,XOF,CFA,14,-14
-196,Serbia,SRB,RS,688,381,Belgrade,RSD,din,44,21
-197,Seychelles,SYC,SC,690,248,Victoria,SCR,SRe,-4.58333333,55.66666666
-198,Sierra Leone,SLE,SL,694,232,Freetown,SLL,Le,8.5,-11.5
-199,Singapore,SGP,SG,702,65,Singapur,SGD,$,1.36666666,103.8
-250,Sint Maarten (Dutch part),SXM,SX,534,1721,Philipsburg,ANG,ƒ,18.033333,-63.05
-200,Slovakia,SVK,SK,703,421,Bratislava,EUR,€,48.66666666,19.5
-201,Slovenia,SVN,SI,705,386,Ljubljana,EUR,€,46.11666666,14.81666666
-202,Solomon Islands,SLB,SB,090,677,Honiara,SBD,Si$,-8,159
-203,Somalia,SOM,SO,706,252,Mogadishu,SOS,Sh.so.,10,49
-204,South Africa,ZAF,ZA,710,27,Pretoria,ZAR,R,-29,24
-205,South Georgia,SGS,GS,239,500,Grytviken,GBP,£,-54.5,-37
-116,South Korea,KOR,KR,410,82,Seoul,KRW,₩,37,127.5
-206,South Sudan,SSD,SS,728,211,Juba,SSP,£,7,30
-207,Spain,ESP,ES,724,34,Madrid,EUR,€,40,-4
-208,Sri Lanka,LKA,LK,144,94,Colombo,LKR,Rs,7,81
-209,Sudan,SDN,SD,729,249,Khartoum,SDG,.س.ج,15,30
-210,Suriname,SUR,SR,740,597,Paramaribo,SRD,$,4,-56
-211,Svalbard and Jan Mayen Islands,SJM,SJ,744,47,Longyearbyen,NOK,ko,78,20
-213,Sweden,SWE,SE,752,46,Stockholm,SEK,ko,62,15
-214,Switzerland,CHE,CH,756,41,Bern,CHF,CHf,47,8
-215,Syria,SYR,SY,760,963,Damascus,SYP,LS,35,38
-216,Taiwan,TWN,TW,158,886,Taipei,TWD,$,23.5,121
-217,Tajikistan,TJK,TJ,762,992,Dushanbe,TJS,SM,39,71
-218,Tanzania,TZA,TZ,834,255,Dodoma,TZS,TSh,-6,35
-219,Thailand,THA,TH,764,66,Bangkok,THB,฿,15,100
-17,The Bahamas,BHS,BS,044,1,Nassau,BSD,B$,24.25,-76
-80,The Gambia ,GMB,GM,270,220,Banjul,GMD,D,13.46666666,-16.56666666
-63,Timor-Leste,TLS,TL,626,670,Dili,USD,$,-8.83333333,125.9166667
-220,Togo,TGO,TG,768,228,Lome,XOF,CFA,8,1.16666666
-221,Tokelau,TKL,TK,772,690,,NZD,$,-9,-172
-222,Tonga,TON,TO,776,676,Nuku'alofa,TOP,$,-20,-175
-223,Trinidad and Tobago,TTO,TT,780,1,Port of Spain,TTD,$,11,-61
-224,Tunisia,TUN,TN,788,216,Tunis,TND,ت.د,34,9
-225,Turkey,TUR,TR,792,90,Ankara,TRY,₺,39,35
-226,Turkmenistan,TKM,TM,795,993,Ashgabat,TMT,T,40,60
-227,Turks and Caicos Islands,TCA,TC,796,1,Cockburn Town,USD,$,21.75,-71.58333333
-228,Tuvalu,TUV,TV,798,688,Funafuti,AUD,$,-8,178
-229,Uganda,UGA,UG,800,256,Kampala,UGX,USh,1,32
-230,Ukraine,UKR,UA,804,380,Kyiv,UAH,₴,49,32
-231,United Arab Emirates,ARE,AE,784,971,Abu Dhabi,AED,إ.د,24,54
-232,United Kingdom,GBR,GB,826,44,London,GBP,£,54,-2
-233,United States,USA,US,840,1,Washington,USD,$,38,-97
-234,United States Minor Outlying Islands,UMI,UM,581,1,,USD,$,0,0
-235,Uruguay,URY,UY,858,598,Montevideo,UYU,$,-33,-56
-236,Uzbekistan,UZB,UZ,860,998,Tashkent,UZS,лв,41,64
-237,Vanuatu,VUT,VU,548,678,Port Vila,VUV,VT,-16,167
-238,Vatican City State (Holy See),VAT,VA,336,379,Vatican City,EUR,€,41.9,12.45
-239,Venezuela,VEN,VE,862,58,Caracas,VES,Bs,8,-66
-240,Vietnam,VNM,VN,704,84,Hanoi,VND,₫,16.16666666,107.8333333
-241,Virgin Islands (British),VGB,VG,092,1,Road Town,USD,$,18.431383,-64.62305
-242,Virgin Islands (US),VIR,VI,850,1,Charlotte Amalie,USD,$,18.34,-64.93
-243,Wallis and Futuna Islands,WLF,WF,876,681,Mata Utu,XPF,₣,-13.3,-176.2
-244,Western Sahara,ESH,EH,732,212,El-Aaiun,MAD,MAD,24.5,-13
-245,Yemen,YEM,YE,887,967,Sanaa,YER,﷼,15,48
-246,Zambia,ZMB,ZM,894,260,Lusaka,ZMW,ZK,-15,30
-247,Zimbabwe,ZWE,ZW,716,263,Harare,ZWL,$,-20,30
+id,name,latitude,longitude
+1,Afghanistan,33,65
+2,Aland Islands,60.116667,19.9
+3,Albania,41,20
+4,Algeria,28,3
+5,American Samoa,-14.33333333,-170
+6,Andorra,42.5,1.5
+7,Angola,-12.5,18.5
+8,Anguilla,18.25,-63.16666666
+9,Antarctica,-74.65,4.48
+10,Antigua and Barbuda,17.05,-61.8
+11,Argentina,-34,-64
+12,Armenia,40,45
+13,Aruba,12.5,-69.96666666
+14,Australia,-27,133
+15,Austria,47.33333333,13.33333333
+16,Azerbaijan,40.5,47.5
+18,Bahrain,26,50.55
+19,Bangladesh,24,90
+20,Barbados,13.16666666,-59.53333333
+21,Belarus,53,28
+22,Belgium,50.83333333,4
+23,Belize,17.25,-88.75
+24,Benin,9.5,2.25
+25,Bermuda,32.33333333,-64.75
+26,Bhutan,27.5,90.5
+27,Bolivia,-17,-65
+155,"Bonaire, Sint Eustatius and Saba",12.15,-68.266667
+28,Bosnia and Herzegovina,44,18
+29,Botswana,-22,24
+30,Bouvet Island,-54.43333333,3.4
+31,Brazil,-10,-55
+32,British Indian Ocean Territory,-6,71.5
+33,Brunei,4.5,114.6666667
+34,Bulgaria,43,25
+35,Burkina Faso,13,-2
+36,Burundi,-3.5,30
+37,Cambodia,13,105
+38,Cameroon,6,12
+39,Canada,60,-95
+40,Cape Verde,16,-24
+41,Cayman Islands,19.5,-80.5
+42,Central African Republic,7,21
+43,Chad,15,19
+44,Chile,-30,-71
+45,China,35,105
+46,Christmas Island,-10.5,105.6666667
+47,Cocos (Keeling) Islands,-12.5,96.83333333
+48,Colombia,4,-72
+49,Comoros,-12.16666666,44.25
+50,Congo,-1,15
+52,Cook Islands,-21.23333333,-159.7666667
+53,Costa Rica,10,-84
+54,Cote D'Ivoire (Ivory Coast),8,-5
+55,Croatia,45.16666666,15.5
+56,Cuba,21.5,-80
+249,Cura�ao,12.116667,-68.933333
+57,Cyprus,35,33
+58,Czech Republic,49.75,15.5
+51,Democratic Republic of the Congo,0,25
+59,Denmark,56,10
+60,Djibouti,11.5,43
+61,Dominica,15.41666666,-61.33333333
+62,Dominican Republic,19,-70.66666666
+64,Ecuador,-2,-77.5
+65,Egypt,27,30
+66,El Salvador,13.83333333,-88.91666666
+67,Equatorial Guinea,2,10
+68,Eritrea,15,39
+69,Estonia,59,26
+212,Eswatini,-26.5,31.5
+70,Ethiopia,8,38
+71,Falkland Islands,-51.75,-59
+72,Faroe Islands,62,-7
+73,Fiji Islands,-18,175
+74,Finland,64,26
+75,France,46,2
+76,French Guiana,4,-53
+77,French Polynesia,-15,-140
+78,French Southern Territories,-49.25,69.167
+79,Gabon,-1,11.75
+81,Georgia,42,43.5
+82,Germany,51,9
+83,Ghana,8,-2
+84,Gibraltar,36.13333333,-5.35
+85,Greece,39,22
+86,Greenland,72,-40
+87,Grenada,12.11666666,-61.66666666
+88,Guadeloupe,16.25,-61.583333
+89,Guam,13.46666666,144.7833333
+90,Guatemala,15.5,-90.25
+91,Guernsey and Alderney,49.46666666,-2.58333333
+92,Guinea,11,-10
+93,Guinea-Bissau,12,-15
+94,Guyana,5,-59
+95,Haiti,19,-72.41666666
+96,Heard Island and McDonald Islands,-53.1,72.51666666
+97,Honduras,15,-86.5
+98,Hong Kong S.A.R.,22.25,114.1666667
+99,Hungary,47,20
+100,Iceland,65,-18
+101,India,20,77
+102,Indonesia,-5,120
+103,Iran,32,53
+104,Iraq,33,44
+105,Ireland,53,-8
+106,Israel,31.5,34.75
+107,Italy,42.83333333,12.83333333
+108,Jamaica,18.25,-77.5
+109,Japan,36,138
+110,Jersey,49.25,-2.16666666
+111,Jordan,31,36
+112,Kazakhstan,48,68
+113,Kenya,1,38
+114,Kiribati,1.41666666,173
+248,Kosovo,42.5612909,20.3403035
+117,Kuwait,29.5,45.75
+118,Kyrgyzstan,41,75
+119,Laos,18,105
+120,Latvia,57,25
+121,Lebanon,33.83333333,35.83333333
+122,Lesotho,-29.5,28.5
+123,Liberia,6.5,-9.5
+124,Libya,25,17
+125,Liechtenstein,47.26666666,9.53333333
+126,Lithuania,56,24
+127,Luxembourg,49.75,6.16666666
+128,Macau S.A.R.,22.16666666,113.55
+130,Madagascar,-20,47
+131,Malawi,-13.5,34
+132,Malaysia,2.5,112.5
+133,Maldives,3.25,73
+134,Mali,17,-4
+135,Malta,35.83333333,14.58333333
+136,Man (Isle of),54.25,-4.5
+137,Marshall Islands,9,168
+138,Martinique,14.666667,-61
+139,Mauritania,20,-12
+140,Mauritius,-20.28333333,57.55
+141,Mayotte,-12.83333333,45.16666666
+142,Mexico,23,-102
+143,Micronesia,6.91666666,158.25
+144,Moldova,47,29
+145,Monaco,43.73333333,7.4
+146,Mongolia,46,105
+147,Montenegro,42.5,19.3
+148,Montserrat,16.75,-62.2
+149,Morocco,32,-5
+150,Mozambique,-18.25,35
+151,Myanmar,22,98
+152,Namibia,-22,17
+153,Nauru,-0.53333333,166.9166667
+154,Nepal,28,84
+156,Netherlands,52.5,5.75
+157,New Caledonia,-21.5,165.5
+158,New Zealand,-41,174
+159,Nicaragua,13,-85
+160,Niger,16,8
+161,Nigeria,10,8
+162,Niue,-19.03333333,-169.8666667
+163,Norfolk Island,-29.03333333,167.95
+115,North Korea,40,127
+129,North Macedonia,41.83333333,22
+164,Northern Mariana Islands,15.2,145.75
+165,Norway,62,10
+166,Oman,21,57
+167,Pakistan,30,70
+168,Palau,7.5,134.5
+169,Palestinian Territory Occupied,31.9,35.2
+170,Panama,9,-80
+171,Papua New Guinea,-6,147
+172,Paraguay,-23,-58
+173,Peru,-10,-76
+174,Philippines,13,122
+175,Pitcairn Island,-25.06666666,-130.1
+176,Poland,52,20
+177,Portugal,39.5,-8
+178,Puerto Rico,18.25,-66.5
+179,Qatar,25.5,51.25
+180,Reunion,-21.15,55.5
+181,Romania,46,25
+182,Russia,60,100
+183,Rwanda,-2,30
+184,Saint Helena,-15.95,-5.7
+185,Saint Kitts and Nevis,17.33333333,-62.75
+186,Saint Lucia,13.88333333,-60.96666666
+187,Saint Pierre and Miquelon,46.83333333,-56.33333333
+188,Saint Vincent and the Grenadines,13.25,-61.2
+189,Saint-Barthelemy,18.5,-63.41666666
+190,Saint-Martin (French part),18.08333333,-63.95
+191,Samoa,-13.58333333,-172.3333333
+192,San Marino,43.76666666,12.41666666
+193,Sao Tome and Principe,1,7
+194,Saudi Arabia,25,45
+195,Senegal,14,-14
+196,Serbia,44,21
+197,Seychelles,-4.58333333,55.66666666
+198,Sierra Leone,8.5,-11.5
+199,Singapore,1.36666666,103.8
+250,Sint Maarten (Dutch part),18.033333,-63.05
+200,Slovakia,48.66666666,19.5
+201,Slovenia,46.11666666,14.81666666
+202,Solomon Islands,-8,159
+203,Somalia,10,49
+204,South Africa,-29,24
+205,South Georgia,-54.5,-37
+116,South Korea,37,127.5
+206,South Sudan,7,30
+207,Spain,40,-4
+208,Sri Lanka,7,81
+209,Sudan,15,30
+210,Suriname,4,-56
+211,Svalbard and Jan Mayen Islands,78,20
+213,Sweden,62,15
+214,Switzerland,47,8
+215,Syria,35,38
+216,Taiwan,23.5,121
+217,Tajikistan,39,71
+218,Tanzania,-6,35
+219,Thailand,15,100
+17,The Bahamas,24.25,-76
+80,The Gambia ,13.46666666,-16.56666666
+63,Timor-Leste,-8.83333333,125.9166667
+220,Togo,8,1.16666666
+221,Tokelau,-9,-172
+222,Tonga,-20,-175
+223,Trinidad and Tobago,11,-61
+224,Tunisia,34,9
+225,Turkey,39,35
+226,Turkmenistan,40,60
+227,Turks and Caicos Islands,21.75,-71.58333333
+228,Tuvalu,-8,178
+229,Uganda,1,32
+230,Ukraine,49,32
+231,United Arab Emirates,24,54
+232,United Kingdom,54,-2
+233,United States,38,-97
+234,United States Minor Outlying Islands,0,0
+235,Uruguay,-33,-56
+236,Uzbekistan,41,64
+237,Vanuatu,-16,167
+238,Vatican City State (Holy See),41.9,12.45
+239,Venezuela,8,-66
+240,Vietnam,16.16666666,107.8333333
+241,Virgin Islands (British),18.431383,-64.62305
+242,Virgin Islands (US),18.34,-64.93
+243,Wallis and Futuna Islands,-13.3,-176.2
+244,Western Sahara,24.5,-13
+245,Yemen,15,48
+246,Zambia,-15,30
+247,Zimbabwe,-20,30

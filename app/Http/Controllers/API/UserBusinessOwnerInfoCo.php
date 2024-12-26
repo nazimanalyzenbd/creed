@@ -368,6 +368,7 @@ $scheduleData['business_id'] = $businessData->id;
     // checkout-page
     // public function checkout(){}
 
+    // business type, category, subcategory, affiliations, creedtags, restaurant list.
     public function allDropDown(){
 
         $type = TBusinessType::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
@@ -419,6 +420,27 @@ $scheduleData['business_id'] = $businessData->id;
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
 
+    public function creedTags(){
+
+        $data = TCreedTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function affiliationList(){
+
+        $data = TAdminAffiliation::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
+    public function restaurantDataList(){
+
+        $data = TAdminRestaurant::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
+
+        return response()->json(['status' => 'success', 'data' => $data,], 200);
+    }
+
     public function countryList(){
 
         $data = TAdminCountry::select(['id','name'])->get();
@@ -444,20 +466,6 @@ $scheduleData['business_id'] = $businessData->id;
         }else{
             $data = TAdminCity::select(['id','name','state_id','country_id'])->get();
         }
-
-        return response()->json(['status' => 'success', 'data' => $data,], 200);
-    }
-
-    public function creedTags(){
-
-        $data = TCreedTags::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
-
-        return response()->json(['status' => 'success', 'data' => $data,], 200);
-    }
-
-    public function affiliationList(){
-
-        $data = TAdminAffiliation::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -497,14 +505,16 @@ $scheduleData['business_id'] = $businessData->id;
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
             
-            ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
+            ->get()
+
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
             $data = $data->map(function ($business) {
 
                 $business->business_type_name = $business->businessTypeName ?? '';
                 $business->business_category_name = $business->businessCategory->name ?? '';
                 $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_creed_name = $business->businessCreedeName ?? '';
+                $business->business_creed_name = $business->creedTagsName ?? '';
                 $business->affiliation_name = $business->affiliationName ?? '';
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
@@ -546,39 +556,34 @@ $scheduleData['business_id'] = $businessData->id;
         )
         ->having('distance', '<=', $radius)
         ->orderBy('distance', 'asc')
-        ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
+        ->get()
 
-            $data = $data->map(function ($business) {
+        ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
-                $business->business_type_name = $business->businessTypeName ?? '';
-                $business->business_category_name = $business->businessCategory->name ?? '';
-                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_creed_name = $business->businessCreedeName ?? '';
-                $business->affiliation_name = $business->affiliationName ?? '';
-                $business->country_name = $business->countryName->name ?? '';
-                $business->state_name = $business->stateName->name ?? '';
-                $business->city_name = $business->cityName->name ?? '';
-                
-                unset($business->businessCategory);
-                unset($business->businessSubCategory);
-                unset($business->countryName);
-                unset($business->stateName);
-                unset($business->cityName);
-                return $business;
-            });
+        $data = $data->map(function ($business) {
+
+            $business->business_type_name = $business->businessTypeName ?? '';
+            $business->business_category_name = $business->businessCategory->name ?? '';
+            $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+            $business->business_creed_name = $business->creedTagsName ?? '';
+            $business->affiliation_name = $business->affiliationName ?? '';
+            $business->country_name = $business->countryName->name ?? '';
+            $business->state_name = $business->stateName->name ?? '';
+            $business->city_name = $business->cityName->name ?? '';
+            
+            unset($business->businessCategory);
+            unset($business->businessSubCategory);
+            unset($business->countryName);
+            unset($business->stateName);
+            unset($business->cityName);
+            return $business;
+        });
 
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
     public function businessOperationHour(Request $request){
 
-        // $validated = $request->validate([
-        //     'business_id' => 'required|exists:businesses,id',
-        //     'monday.open_time' => 'required|date_format:H:i',
-        //     'monday.closed_time' => 'required|date_format:H:i',
-        // ]);
-    
-        //$businessHours = [];
         foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
             if ($request->has($day)) {
                 $businessHours[] = [
@@ -589,21 +594,13 @@ $scheduleData['business_id'] = $businessData->id;
                 ];
             }
         }
-    
-        // TOperationHour::insert($businessHours);
+
         return $businessHours;
     }
 
     public function daysList(){
 
         $data = TDays::where('status', 1)->get()->makeHidden(['created_at','updated_at']);
-
-        return response()->json(['status' => 'success', 'data' => $data,], 200);
-    }
-
-    public function restaurantDataList(){
-
-        $data = TAdminRestaurant::where('status', 1)->get()->makeHidden(['created_by','updated_by','created_at','updated_at']);
 
         return response()->json(['status' => 'success', 'data' => $data,], 200);
     }
@@ -647,28 +644,30 @@ $scheduleData['business_id'] = $businessData->id;
             )
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
-            ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
+            ->get()
+
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
             $multiBusinesses = $multiBusinesses->map(function ($business) {
 
                 $business->business_type_name = $business->businessTypeName ?? '';
                 $business->business_category_name = $business->businessCategory->name ?? '';
                 $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_creed_name = $business->businessCreedeName ?? '';
+                $business->business_creed_name = $business->creedTagsName ?? '';
                 $business->affiliation_name = $business->affiliationName ?? '';
-                $business->country_name = $business->country->name ?? '';
-                $business->state_name = $business->state->name ?? '';
-                $business->city_name = $business->city->name ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
-                unset($business->country);
-                unset($business->state);
-                unset($business->city);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
                 return $business;
             });
 
-        return response()->json(['success' => true, 'data' => $multiBusinesses]);
+        return response()->json(['success' => 'success', 'data' => $multiBusinesses]);
     }
 
     public function getBusinessProfile(Request $request){
@@ -701,27 +700,30 @@ $scheduleData['business_id'] = $businessData->id;
                 'status'
                 ])
                 
-                ->with('businessOwnerInfos')->where('id', $request->id)
-                ->get()->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id']);
+                ->with('businessOwnerInfos','galleryData','operationData')->where('id', $request->id)
+                
+                ->get()
 
-                $business_profile = $business_profile->map(function ($business) {
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
-                    $business->business_type_name = $business->businessTypeName ?? '';
-                    $business->business_category_name = $business->businessCategory->name ?? '';
-                    $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                    $business->business_creed_name = $business->businessCreedeName ?? '';
-                    $business->affiliation_name = $business->affiliationName ?? '';
-                    $business->country_name = $business->country->name ?? '';
-                    $business->state_name = $business->state->name ?? '';
-                    $business->city_name = $business->city->name ?? '';
-                    
-                    unset($business->businessCategory);
-                    unset($business->businessSubCategory);
-                    unset($business->country);
-                    unset($business->state);
-                    unset($business->city);
-                    return $business;
-                });
+            $business_profile = $business_profile->map(function ($business) {
+
+                $business->business_type_name = $business->businessTypeName ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_creed_name = $business->creedTagsName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
+                
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
+                return $business;
+            });
 
         return response()->json([$business_profile]);
     }
@@ -756,7 +758,7 @@ $scheduleData['business_id'] = $businessData->id;
         $creed_id = $validated['creed_id'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
                 'id',
                 'business_name',
                 'business_type_id',
@@ -778,31 +780,30 @@ $scheduleData['business_id'] = $businessData->id;
             ->where('creed_tags_id', $creed_id)
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
-            ->get();
+            ->get()
+
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
             $filterBusinesses = $filterBusinesses->map(function ($business) {
 
-                $business->business_type_name = $business->businessType->name ?? '';
+                $business->business_type_name = $business->businessTypeName ?? '';
                 $business->business_category_name = $business->businessCategory->name ?? '';
                 $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_tags_name = $business->businessTags->name ?? '';
-                $business->creed_tags_name = $business->creedTags->name ?? '';
-                $business->country_name = $business->country->name ?? '';
-                $business->state_name = $business->state->name ?? '';
-                $business->city_name = $business->city->name ?? '';
-
-                unset($business->businessType);
+                $business->business_creed_name = $business->creedTagsName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
+                
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
-                unset($business->businessTags);
-                unset($business->creedTags);
-                unset($business->country);
-                unset($business->state);
-                unset($business->city);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
                 return $business;
             });
 
-        return response()->json(['success' => true, 'data' => $filterBusinesses]);
+        return response()->json(['success' => 'success', 'data' => $filterBusinesses]);
     }
 
     // Business Filter using Business Category,SubCategory text
@@ -819,7 +820,7 @@ $scheduleData['business_id'] = $businessData->id;
         $catSubCat = $validated['catSubCat'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
                 'id',
                 'business_name',
                 'business_type_id',
@@ -845,31 +846,30 @@ $scheduleData['business_id'] = $businessData->id;
                 $query->where('name', $catSubCat);})
             ->having('distance', '<=', $radius)
             ->orderBy('distance', 'asc')
-            ->get();
+            ->get()
+
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
 
             $filterBusinesses = $filterBusinesses->map(function ($business) {
 
-                $business->business_type_name = $business->businessType->name ?? '';
+                $business->business_type_name = $business->businessTypeName ?? '';
                 $business->business_category_name = $business->businessCategory->name ?? '';
                 $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_tags_name = $business->businessTags->name ?? '';
-                $business->creed_tags_name = $business->creedTags->name ?? '';
-                $business->country_name = $business->country->name ?? '';
-                $business->state_name = $business->state->name ?? '';
-                $business->city_name = $business->city->name ?? '';
-
-                unset($business->businessType);
+                $business->business_creed_name = $business->creedTagsName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
+                
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
-                unset($business->businessTags);
-                unset($business->creedTags);
-                unset($business->country);
-                unset($business->state);
-                unset($business->city);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
                 return $business;
             });
 
-        return response()->json(['success' => true, 'data' => $filterBusinesses]);
+        return response()->json(['success' => 'success', 'data' => $filterBusinesses]);
     }
 
     // search box
@@ -883,7 +883,7 @@ $scheduleData['business_id'] = $businessData->id;
         $data['subcategory'] = $subcategory;
         $data['businessName'] = $businessName;
 
-        return response()->json(['success' => true, 'data' => $data]);
+        return response()->json(['success' => 'success', 'data' => $data]);
     }
 
     // get category relations
@@ -891,7 +891,7 @@ $scheduleData['business_id'] = $businessData->id;
         
         $data = TBusinessCategory::with(['businesses','subcategories'])->get();
 
-        return response()->json(['success' => true, 'data' => $data]);
+        return response()->json(['success' => 'success', 'data' => $data]);
     }
 
     // get subcategory relations
@@ -899,14 +899,14 @@ $scheduleData['business_id'] = $businessData->id;
         
         $data = TBusinessSubCategory::with(['businesses','category'])->get();
 
-        return response()->json(['success' => true, 'data' => $data]);
+        return response()->json(['success' => 'success', 'data' => $data]);
     }
 
     // aboutUs
     public function aboutUs(){
 
         $data = TAboutUs::get()->makeHidden(['status','created_by','updated_by','created_at','updated_at']);
-        return response()->json(['success' => true, 'data' => $data]);
+        return response()->json(['success' => 'success', 'data' => $data]);
     }
 
     // search with search box
@@ -926,7 +926,7 @@ $scheduleData['business_id'] = $businessData->id;
             $business_name = $validated['business_name'];
             $radius = 0.1; 
             // Convert degrees to radians for calculations
-            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
                     'id',
                     'business_name',
                     'business_type_id',
@@ -948,31 +948,29 @@ $scheduleData['business_id'] = $businessData->id;
                 ->where('business_name', $business_name)
                 ->having('distance', '<=', $radius)
                 ->orderBy('distance', 'asc')
-                ->get();
+                ->get()
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
-                $filterBusinesses = $filterBusinesses->map(function ($business) {
+            $filterBusinesses = $filterBusinesses->map(function ($business) {
 
-                    $business->business_type_name = $business->businessType->name ?? '';
-                    $business->business_category_name = $business->businessCategory->name ?? '';
-                    $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                    $business->business_tags_name = $business->businessTags->name ?? '';
-                    $business->creed_tags_name = $business->creedTags->name ?? '';
-                    $business->country_name = $business->country->name ?? '';
-                    $business->state_name = $business->state->name ?? '';
-                    $business->city_name = $business->city->name ?? '';
+                $business->business_type_name = $business->businessTypeName ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_creed_name = $business->creedTagsName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
+                
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
+                return $business;
+            });
 
-                    unset($business->businessType);
-                    unset($business->businessCategory);
-                    unset($business->businessSubCategory);
-                    unset($business->businessTags);
-                    unset($business->creedTags);
-                    unset($business->country);
-                    unset($business->state);
-                    unset($business->city);
-                    return $business;
-                });
-
-            return response()->json(['success' => true, 'data' => $filterBusinesses]);
+            return response()->json(['success' => 'success', 'data' => $filterBusinesses]);
         }else{
 
             $latitude = $validated['lat'];
@@ -980,7 +978,7 @@ $scheduleData['business_id'] = $businessData->id;
             $catSubCat = $validated['catSubCat'];
             $radius = 0.1; 
             // Convert degrees to radians for calculations
-            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','country:id,name','state:id,name','city:id,name'])->select(
+            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
                     'id',
                     'business_name',
                     'business_type_id',
@@ -1006,7 +1004,9 @@ $scheduleData['business_id'] = $businessData->id;
                     $query->where('name', $catSubCat);})
                 ->having('distance', '<=', $radius)
                 ->orderBy('distance', 'asc')
-                ->get();
+                ->get()
+
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
                 $filterBusinesses = $filterBusinesses->map(function ($business) {
 
@@ -1030,12 +1030,91 @@ $scheduleData['business_id'] = $businessData->id;
                     return $business;
                 });
 
-            return response()->json(['success' => true, 'data' => $filterBusinesses]);
+            return response()->json(['success' => 'success', 'data' => $filterBusinesses]);
         }
     }
 
+    // save business list for user wise
     public function saveBusinessList(Request $request){
-        $data = $request->business_id;
-        return response()->json(['success' => true, 'data' => $data]);
+        
+        $userId = $request->user()->id;
+        $business_id = $request->business_id;
+
+        $users = User::find($userId);
+
+        if($users->save_business_list==''){
+            $users->save_business_list = json_encode($business_id);
+            $users->save();
+        }else{
+            $storeArray = json_decode($users->save_business_list, true);
+            $matches = array_intersect($storeArray, $request->business_id);
+
+            if(!$matches){
+                $dataArray = array_merge($storeArray, $request->business_id);
+                $users->save_business_list = $dataArray;
+                $users->save();
+
+                $data = [
+                    'userId' => $users->id,
+                    'business_id' => $users->save_business_list
+                ];
+
+                return response()->json(['success' => 'success', 'message' => 'Save Business List Succesful.', 'data' => $data]);
+            }
+
+            $data = [
+                'userId' => $userId,
+                'business_id' => $business_id
+            ];
+    
+            return response()->json(['success' => 'success', 'message' => 'This Business already listed for this user.', 'data' => $data]);
+        }
+
+        $data = [
+            'userId' => $userId,
+            'business_id' => $business_id
+        ];
+
+        return response()->json(['success' => 'success', 'message' => 'Save Business List Succesful.', 'data' => $data]);
+    }
+
+    // show saved business list for user wise 
+    public function saveBusinessListShow(Request $request){
+
+        $users = User::find($request->user()->id);
+        $businessList = json_decode($users->save_business_list); 
+        $businessDetails = [];
+        foreach($businessList as $value){
+
+            $data = \App\Models\Api\TBusiness::where('id', $value)->get()
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
+
+            $data = $data->map(function ($business) {
+
+                $business->business_type_name = $business->businessTypeName ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_creed_name = $business->creedTagsName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
+                
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
+                return $business;
+            });
+
+            $businessDetails[] = $data;
+
+        }
+
+        $data = [
+            'businessList' => $businessDetails,
+        ];
+        return response()->json(['success' => 'success', 'message' => 'Business Save List.', 'data' => $data]);
     }
 }

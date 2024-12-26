@@ -15,23 +15,28 @@ class TBusinessCategorySeeder extends Seeder
     {
         $tBusinessCategory = TBusinessCategory::insert([
             [
-                'name' => 'Law Firm', 
+                'name' => 'Technology', 
+                'description' => 'Technology Consultant/Computers/Phones.', 
                 'created_by' => '1',
             ],
             [
-                'name' => 'Lawyer', 
+                'name' => 'Medical', 
+                'description' => 'Doctor/Dentist/Surgeon/Mental Health/Medical Services/Health & Well Being Facility.', 
                 'created_by' => '1',
             ],
             [
-                'name' => 'Law Suite', 
+                'name' => 'Legal', 
+                'description' => 'Lawyer/Law-Firm/Legal Expert/Legal Consultant.', 
                 'created_by' => '1',
             ],
             [
-                'name' => 'Restaurant', 
+                'name' => 'Event Planning', 
+                'description' => 'Event Planning description', 
                 'created_by' => '1',
             ],
             [
-                'name' => 'Law', 
+                'name' => 'Halal Restaurant', 
+                'description' => 'Halal Restaurant description', 
                 'created_by' => '1',
             ],
         ]);

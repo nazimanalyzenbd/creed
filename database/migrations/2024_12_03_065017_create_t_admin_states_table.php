@@ -15,10 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable(); 
             $table->unsignedBigInteger('country_id')->nullable();
-            $table->string('country_code')->nullable();
             $table->string('country_name')->nullable();
-            $table->string('state_code')->nullable();
-            $table->string('type')->nullable();
             $table->string('latitude', 191)->nullable();
             $table->string('longitude', 191)->nullable();
             $table->foreign('country_id')->references('id')->on('t_admin_countries')->onDelete('cascade');

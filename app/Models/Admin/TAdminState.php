@@ -9,10 +9,10 @@ class TAdminState extends Model
     protected $guarded = [];
 
     public function cities(){
-        return $this->hasMany(City::class);
+        return $this->hasMany(TAdminCity::class, 'state_id');
     }
    
     public function country(){
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(TAdminCountry::class);
     }
 }

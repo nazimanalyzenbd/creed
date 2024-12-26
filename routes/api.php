@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\Auth\UserSocialAuthCo;
 use App\Http\Controllers\API\UserBusinessOwnerInfoCo;
+use App\Http\Controllers\API\UserBusinessPaymentInfoCo;
 use App\Http\Controllers\API\AdminBusinessCo;
 use App\Http\Controllers\Admin\GoogleBusinessController;
 
@@ -68,3 +69,6 @@ Route::get('/business/subCategory-with-relations', [UserBusinessOwnerInfoCo::cla
 Route::get('/about-us', [UserBusinessOwnerInfoCo::class, 'aboutUs'])->name('aboutus');
 
 Route::post('/save-business-list',[UserBusinessOwnerInfoCo::class, 'saveBusinessList'])->name('save-business-list')->middleware('auth:sanctum');
+Route::get('/save-business-list/show',[UserBusinessOwnerInfoCo::class, 'saveBusinessListShow'])->name('save-business-list.show')->middleware('auth:sanctum');
+
+Route::post('/stripe-payment', [UserBusinessPaymentInfoCo::class, 'createPayment'])->name('stripe-payment')->middleware('auth:sanctum');

@@ -9,6 +9,6 @@ class TAdminCity extends Model
     protected $guarded = [];
 
     public function state(){
-        return $this->belongsTo(State::class);
+        return $this->belongsTo(TAdminState::class);
     }
 }

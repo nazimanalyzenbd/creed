@@ -9,7 +9,7 @@ class TAdminCountry extends Model
     protected $guarded = [];
 
     public function states(){
-        return $this->hasMany(State::class);
+        return $this->hasMany(TAdminState::class, 'country_id');
     }
    
     public function statesWithCities(){

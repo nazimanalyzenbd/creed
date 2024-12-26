@@ -15,7 +15,9 @@ class AdminCsvImportCo extends Controller
 {
     public function showForm()
     {
-        return view('admin.importCsv.import-csv');
+        $countryList = TAdminState::with('cities')->orderBy('country_id','ASC')->get();
+        
+        return view('admin.importCsv.import-csv',compact('countryList'));
     }
 
     public function importCsv(Request $request)
@@ -51,16 +53,9 @@ class AdminCsvImportCo extends Controller
             while ($row = fgetcsv($file)) {
                 $countryData = [
                     'id' => $row[0],
-                    'name' => $row[1], 
-                    'iso3' => $row[2],
-                    'iso2' => $row[3],
-                    'numeric_code' => $row[4],
-                    'phone_code' => $row[5],
-                    'capital' => $row[6],
-                    'currency' => $row[7],
-                    'currency_symbol' => $row[8],
-                    'latitude' => $row[9],
-                    'longitude' => $row[10],
+                    'name' => mb_convert_encoding($row[1], 'UTF-8', 'ISO-8859-1'),
+                    'latitude' => $row[2],
+                    'longitude' => $row[3],
                 ];
                 
                 $country = TAdminCountry::create($countryData);
@@ -68,36 +63,31 @@ class AdminCsvImportCo extends Controller
         }elseif($tableName=='state'){
 
             while ($row = fgetcsv($file)) {
-                $countryData = [
+                $stateData = [
                     'id' => $row[0],
-                    'name' => $row[1], 
+                    'name' => mb_convert_encoding($row[1], 'UTF-8', 'ISO-8859-1'),
                     'country_id' => $row[2],
-                    'country_code' => $row[3],
-                    'country_name' => $row[4],
-                    'state_code' => $row[5],
-                    'type' => $row[6],
-                    'latitude' => $row[7],
-                    'longitude' => $row[8],
+                    'country_name' => mb_convert_encoding($row[3], 'UTF-8', 'ISO-8859-1'),
+                    'latitude' => $row[4],
+                    'longitude' => $row[5],
                 ];
                 
-                $country = TAdminState::create($countryData);
+                $state = TAdminState::create($stateData);
             }
 
         }elseif($tableName=='city'){
 
             while ($row = fgetcsv($file)) {
-                $countryData = [
+                $cityData = [
                     'id' => $row[0], 
                     'name' => mb_convert_encoding($row[1], 'UTF-8', 'ISO-8859-1'), 
                     'state_id' => $row[2],
-                    'state_code' => $row[3],
-                    'country_id' => $row[4],
-                    'country_code' => $row[5],
-                    'latitude' => $row[6],
-                    'longitude' => $row[7],
+                    'country_id' => $row[3],
+                    'latitude' => $row[4],
+                    'longitude' => $row[5],
                 ];
                 
-                $country = TAdminCity::create($countryData);
+                $city = TAdminCity::create($cityData);
             }
 
         }

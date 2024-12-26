@@ -56,11 +56,11 @@ class TBusiness extends Model
                   ->toArray();
     }
 
-    public function getCreedeTagsNameAttribute()
+    public function getCreedTagsNameAttribute()
     {
-        $creedTagsIds = is_string($this->creed_tag_id)
-        ? json_decode($this->creed_tag_id, true)
-        : $this->creed_tag_id;
+        $creedTagsIds = is_string($this->creed_tags_id)
+        ? json_decode($this->creed_tags_id, true)
+        : $this->creed_tags_id;
 
         $creedTagsIds = is_array($creedTagsIds) ? array_map('intval', $creedTagsIds) : [];
         
