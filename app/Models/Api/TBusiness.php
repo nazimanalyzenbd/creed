@@ -111,4 +111,15 @@ class TBusiness extends Model
     public function galleryData(){
         return $this->hasMany(\App\Models\Api\TBusinessGallery::class, 'business_id');
     }
+
+    public function ratings()
+    {
+        return $this->hasMany(\App\Models\Api\TBusinessRating::class, 'business_id');
+    }
+
+    public function averageRating()
+    {
+        $avarage = $this->ratings()->avg('rating_star');
+        return number_format($avarage, 1);
+    }
 }

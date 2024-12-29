@@ -23,6 +23,7 @@ class TBusinessTypeRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
+            'description' => 'nullable',
             'status' => 'nullable',
         ];
     }

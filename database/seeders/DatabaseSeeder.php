@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             TAffiliationSeeder::class,
             TAboutUsSeeder::class,
             TBusinessOwnerSeeder::class,
+            TAppTermsAndConditionsSeeder::class,
         ]);
 
         // User::factory(10)->create();

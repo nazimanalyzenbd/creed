@@ -10,9 +10,11 @@ use App\Models\Admin\TAdminState;
 use App\Models\Admin\TAdminCity;
 use App\Models\Admin\TCreedTags;
 use App\Models\Admin\TAboutUs;
+use App\Models\Admin\TAppTermsAndConditions;
 use App\Models\Api\TBusinessOwnerInfo;
 use App\Models\Api\TBusiness;
 use App\Models\Admin\TDays;
+use App\Models\Api\TBusinessRating;
 use App\Models\Api\TBusinessGallery;
 use App\Models\Admin\TAdminAffiliation;
 use App\Models\Admin\TAdminRestaurant;
@@ -480,7 +482,7 @@ $scheduleData['business_id'] = $businessData->id;
         if ($perm == 0) {
             $latitude = '41.850033';         //'40.12150192260742';
             $longitude = '-87.6500523';      //'-100.45039367675781';
-            $data = TBusiness::select(
+            $data = TBusiness::with('operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
                 'id',
                 'business_name',
                 'business_profile_image',
@@ -507,7 +509,7 @@ $scheduleData['business_id'] = $businessData->id;
             
             ->get()
 
-            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at','ratings']);
 
             $data = $data->map(function ($business) {
 
@@ -519,6 +521,7 @@ $scheduleData['business_id'] = $businessData->id;
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
+                $business->average_rating = $business->averageRating() ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -532,7 +535,7 @@ $scheduleData['business_id'] = $businessData->id;
         }
 
         // Haversine formula to calculate distance between two points
-        $data = TBusiness::select(
+        $data = TBusiness::with('operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
             'id',
             'business_name',
             'business_profile_image',
@@ -558,7 +561,7 @@ $scheduleData['business_id'] = $businessData->id;
         ->orderBy('distance', 'asc')
         ->get()
 
-        ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
+        ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at','ratings']);
 
         $data = $data->map(function ($business) {
 
@@ -570,6 +573,7 @@ $scheduleData['business_id'] = $businessData->id;
             $business->country_name = $business->countryName->name ?? '';
             $business->state_name = $business->stateName->name ?? '';
             $business->city_name = $business->cityName->name ?? '';
+            $business->average_rating = $business->averageRating() ?? '';
             
             unset($business->businessCategory);
             unset($business->businessSubCategory);
@@ -616,7 +620,7 @@ $scheduleData['business_id'] = $businessData->id;
         $longitude = $validated['long'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $multiBusinesses = TBusiness::select(
+        $multiBusinesses = TBusiness::with('operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
                 'id',
                 'business_name',
                 'business_profile_image',
@@ -646,7 +650,7 @@ $scheduleData['business_id'] = $businessData->id;
             ->orderBy('distance', 'asc')
             ->get()
 
-            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
 
             $multiBusinesses = $multiBusinesses->map(function ($business) {
 
@@ -658,6 +662,7 @@ $scheduleData['business_id'] = $businessData->id;
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
+                $business->average_rating = $business->averageRating() ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -672,7 +677,7 @@ $scheduleData['business_id'] = $businessData->id;
 
     public function getBusinessProfile(Request $request){
 
-        $business_profile = TBusiness::select(['id',
+        $business_profile = TBusiness::with(['operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image'])->select(['id',
                 'business_name',
                 'business_profile_image',
                 'business_type_id',
@@ -704,7 +709,7 @@ $scheduleData['business_id'] = $businessData->id;
                 
                 ->get()
 
-                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at','ratings']);
 
             $business_profile = $business_profile->map(function ($business) {
 
@@ -716,6 +721,7 @@ $scheduleData['business_id'] = $businessData->id;
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
+                $business->average_rating = $business->averageRating() ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -758,7 +764,7 @@ $scheduleData['business_id'] = $businessData->id;
         $creed_id = $validated['creed_id'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
                 'id',
                 'business_name',
                 'business_type_id',
@@ -782,7 +788,7 @@ $scheduleData['business_id'] = $businessData->id;
             ->orderBy('distance', 'asc')
             ->get()
 
-            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
 
             $filterBusinesses = $filterBusinesses->map(function ($business) {
 
@@ -794,6 +800,7 @@ $scheduleData['business_id'] = $businessData->id;
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
+                $business->average_rating = $business->averageRating() ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -820,7 +827,7 @@ $scheduleData['business_id'] = $businessData->id;
         $catSubCat = $validated['catSubCat'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
                 'id',
                 'business_name',
                 'business_type_id',
@@ -848,7 +855,7 @@ $scheduleData['business_id'] = $businessData->id;
             ->orderBy('distance', 'asc')
             ->get()
 
-            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
+            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
 
             $filterBusinesses = $filterBusinesses->map(function ($business) {
 
@@ -860,6 +867,7 @@ $scheduleData['business_id'] = $businessData->id;
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
+                $business->average_rating = $business->averageRating() ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -870,20 +878,6 @@ $scheduleData['business_id'] = $businessData->id;
             });
 
         return response()->json(['success' => 'success', 'data' => $filterBusinesses]);
-    }
-
-    // search box
-    public function searchBox(){
-        
-        $businessName = TBusiness::select('id','business_name')->get(); 
-        // $businessCatSUbCat =TBusinessCategory::with('subcategories:id,name,category_id')->select(['id','name'])->where('status', 1)->get(); 
-        $category = TBusinessCategory::select('id','name')->where('status', 1)->get(); 
-        $subcategory = TBusinessSubcategory::select('id','name','category_id')->where('status', 1)->get(); 
-        $data['category'] = $category;
-        $data['subcategory'] = $subcategory;
-        $data['businessName'] = $businessName;
-
-        return response()->json(['success' => 'success', 'data' => $data]);
     }
 
     // get category relations
@@ -909,6 +903,29 @@ $scheduleData['business_id'] = $businessData->id;
         return response()->json(['success' => 'success', 'data' => $data]);
     }
 
+    // appTermsAndConditions
+    public function appTermsAndConditions(){
+
+        $data = TAppTermsAndConditions::get()->first()->makeHidden(['status','created_by','updated_by','created_at','updated_at']);
+        $data['page_1_heading'] = json_decode($data->page_1_heading);
+        
+        return response()->json(['success' => 'success', 'data' => $data]);
+    }
+
+    // search box
+    public function searchBox(){
+        
+        $businessName = TBusiness::select('id','business_name')->get(); 
+        // $businessCatSUbCat =TBusinessCategory::with('subcategories:id,name,category_id')->select(['id','name'])->where('status', 1)->get(); 
+        $category = TBusinessCategory::select('id','name')->where('status', 1)->get(); 
+        $subcategory = TBusinessSubcategory::select('id','name','category_id')->where('status', 1)->get(); 
+        $data['category'] = $category;
+        $data['subcategory'] = $subcategory;
+        $data['businessName'] = $businessName;
+
+        return response()->json(['success' => 'success', 'data' => $data]);
+    }
+
     // search with search box
     public function searchBySearchBox(Request $request){
 
@@ -926,7 +943,7 @@ $scheduleData['business_id'] = $businessData->id;
             $business_name = $validated['business_name'];
             $radius = 0.1; 
             // Convert degrees to radians for calculations
-            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
+            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
                     'id',
                     'business_name',
                     'business_type_id',
@@ -949,7 +966,7 @@ $scheduleData['business_id'] = $businessData->id;
                 ->having('distance', '<=', $radius)
                 ->orderBy('distance', 'asc')
                 ->get()
-                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at','ratings']);
 
             $filterBusinesses = $filterBusinesses->map(function ($business) {
 
@@ -961,6 +978,7 @@ $scheduleData['business_id'] = $businessData->id;
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
+                $business->average_rating = $business->averageRating() ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -978,7 +996,7 @@ $scheduleData['business_id'] = $businessData->id;
             $catSubCat = $validated['catSubCat'];
             $radius = 0.1; 
             // Convert degrees to radians for calculations
-            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','country:id,name','state:id,name','city:id,name'])->select(
+            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
                     'id',
                     'business_name',
                     'business_type_id',
@@ -1006,27 +1024,25 @@ $scheduleData['business_id'] = $businessData->id;
                 ->orderBy('distance', 'asc')
                 ->get()
 
-                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
 
                 $filterBusinesses = $filterBusinesses->map(function ($business) {
 
-                    $business->business_type_name = $business->businessType->name ?? '';
+                    $business->business_type_name = $business->businessTypeName ?? '';
                     $business->business_category_name = $business->businessCategory->name ?? '';
                     $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                    $business->business_tags_name = $business->businessTags->name ?? '';
-                    $business->creed_tags_name = $business->creedTags->name ?? '';
-                    $business->country_name = $business->country->name ?? '';
-                    $business->state_name = $business->state->name ?? '';
-                    $business->city_name = $business->city->name ?? '';
-
-                    unset($business->businessType);
+                    $business->business_creed_name = $business->creedTagsName ?? '';
+                    $business->affiliation_name = $business->affiliationName ?? '';
+                    $business->country_name = $business->countryName->name ?? '';
+                    $business->state_name = $business->stateName->name ?? '';
+                    $business->city_name = $business->cityName->name ?? '';
+                    $business->average_rating = $business->averageRating() ?? '';
+                    
                     unset($business->businessCategory);
                     unset($business->businessSubCategory);
-                    unset($business->businessTags);
-                    unset($business->creedTags);
-                    unset($business->country);
-                    unset($business->state);
-                    unset($business->city);
+                    unset($business->countryName);
+                    unset($business->stateName);
+                    unset($business->cityName);
                     return $business;
                 });
 
@@ -1116,5 +1132,72 @@ $scheduleData['business_id'] = $businessData->id;
             'businessList' => $businessDetails,
         ];
         return response()->json(['success' => 'success', 'message' => 'Business Save List.', 'data' => $data]);
+    }
+
+    // Business Rating store
+    public function businessRating(Request $request){
+        
+        $validated = $request->validate([
+            'business_id' => 'required|exists:t_businesses,id',
+            'rating_star' => 'required|integer|min:1|max:5',
+            'description' => 'nullable|string',
+            // 'image' => 'nullable|mimes:jpeg,jpg,png',
+        ]);
+
+        if ($request->file('image')) {
+
+            $file = $request->file('image'); 
+            $ratingImage = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images/business/rating'), $ratingImage);
+            $imagePath = 'images/business/rating/' .$ratingImage;
+        }
+
+        $ratingData = TBusinessRating::where('user_id', auth()->id())->where('business_id', $request->business_id)->get()->first();
+
+        if($ratingData){
+            $rating = TBusinessRating::find($ratingData->id);
+            $rating->user_id = auth()->id();
+            $rating->business_id = $validated['business_id'];
+            $rating->rating_star = $validated['rating_star'];
+            $rating->description = $validated['description'];
+            $rating->image = $imagePath ?? '';
+            $rating->status = 1;
+            $rating->save();
+        }else{
+            $rating = new TBusinessRating();
+            $rating->user_id = auth()->id();
+            $rating->business_id = $validated['business_id'];
+            $rating->rating_star = $validated['rating_star'];
+            $rating->description = $validated['description'];
+            $rating->image = $imagePath ?? 'null';
+            $rating->status = 1;
+            $rating->save();
+        }
+
+        return response()->json(['success' => 'success', 'message' => 'Rating Submit Successful.', 'data' => $rating]);
+    }
+
+    // Business Rating view
+    public function ratingView(Request $request){
+    
+        $ratingData = TBusinessRating::where('user_id', $request->user()->id)->where('business_id', $request->business_id)->get()->first();
+        
+        $ratingDataCount = TBusiness::withCount('ratings')->findOrFail($request->business_id);
+        $averageRating = $ratingDataCount->averageRating();
+
+        return response()->json(['success' => 'success', 'message' => 'View Rating.', 'Data' => $averageRating]);
+
+    }
+    
+    // Business Rating delete
+    public function ratingDelete(Request $request){
+    
+        $ratingData = TBusinessRating::where('user_id', $request->user()->id)->where('business_id', $request->business_id)->get()->first();
+        
+        $ratingDeleted = TBusinessRating::find($ratingData->id);
+        $ratingDeleted->forceDelete();
+
+        return response()->json(['success' => 'success', 'message' => 'Rating Deleted Successful.']);
+
     }
 }

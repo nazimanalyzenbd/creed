@@ -67,8 +67,14 @@ Route::get('/business/subCategory-with-relations', [UserBusinessOwnerInfoCo::cla
 
 // AboutUs
 Route::get('/about-us', [UserBusinessOwnerInfoCo::class, 'aboutUs'])->name('aboutus');
+// AppTermsAndConditions
+Route::get('/app-termsAndConditions', [UserBusinessOwnerInfoCo::class, 'appTermsAndConditions'])->name('appTermsAndConditions');
 
 Route::post('/save-business-list',[UserBusinessOwnerInfoCo::class, 'saveBusinessList'])->name('save-business-list')->middleware('auth:sanctum');
 Route::get('/save-business-list/show',[UserBusinessOwnerInfoCo::class, 'saveBusinessListShow'])->name('save-business-list.show')->middleware('auth:sanctum');
 
 Route::post('/stripe-payment', [UserBusinessPaymentInfoCo::class, 'createPayment'])->name('stripe-payment')->middleware('auth:sanctum');
+// Reviews-Rating management
+Route::post('/business-rating', [UserBusinessOwnerInfoCo::class, 'businessRating'])->name('business.rating')->middleware('auth:sanctum');
+Route::get('/business-rating/delete', [UserBusinessOwnerInfoCo::class, 'ratingDelete'])->name('business.rating.delete')->middleware('auth:sanctum');
+Route::get('/business-rating-view', [UserBusinessOwnerInfoCo::class, 'ratingView'])->name('business.rating.view')->middleware('auth:sanctum');

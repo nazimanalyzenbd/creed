@@ -45,6 +45,7 @@ class AdminBusinessCategoryCo extends Controller
         
             $data = New TBusinessCategory();
             $data->name = $request->name;
+            $data->description = $request->description;
             $data->status = $status;
             $data->created_by = Auth::id();
             $data->save();
@@ -90,6 +91,7 @@ class AdminBusinessCategoryCo extends Controller
         
             $data = TBusinessCategory::find($id);
             $data->name = $request->name;
+            $data->description = $request->description;
             $data->status = $status;
             $data->updated_by = Auth::id();
             $data->save();

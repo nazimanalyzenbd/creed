@@ -31,14 +31,14 @@
 
                         <form action="{{ route('csv.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <label for="csv_file">Select Table:</label>
-                            <select name="table_name" class="form-control mb-4">
+                            <label for="csv_file">Select Table:<span class="requiredStar">*</span></label>
+                            <select name="table_name" class="form-control mb-4" required>
                                 <option value="">Select one..</option>
                                 <option value="country">Country</option>
                                 <option value="state">State</option>
                                 <option value="city">City</option>
                             </select>
-                            <label for="csv_file">Choose CSV file:</label>
+                            <label for="csv_file">Choose CSV file:<span class="requiredStar">*</span></label>
                             <input type="file" name="csv_file" id="csv_file" required>
                             <button type="submit" class="btn btn-primary btn-sm">Upload</button>
                         </form>
