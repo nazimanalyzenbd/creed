@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('t_about_us', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 191); 
-            $table->mediumText('description'); 
+            $table->string('individual_title', 191); 
+            $table->string('business_title', 191); 
             $table->mediumText('individual_description'); 
             $table->mediumText('business_description'); 
+            $table->mediumText('individual_tab_description'); 
+            $table->mediumText('business_tab_description'); 
             $table->boolean('status')->default(1)->comment('1=Active, 0=Inactive');
             $table->unsignedBigInteger('created_by')->nullable()->comment('Admin user who created the record');
             $table->unsignedBigInteger('updated_by')->nullable()->comment('Admin user who last updated the record');

@@ -899,7 +899,13 @@ $scheduleData['business_id'] = $businessData->id;
     // aboutUs
     public function aboutUs(){
 
-        $data = TAboutUs::get()->makeHidden(['status','created_by','updated_by','created_at','updated_at']);
+        $data = TAboutUs::get()->first()->makeHidden(['status','created_by','updated_by','created_at','updated_at']);
+       
+        $data['individual_description'] = json_decode($data->individual_description);
+        $data['business_description'] = json_decode($data->business_description);
+        $data['individual_tab_description'] = json_decode($data->individual_tab_description);
+        $data['business_tab_description'] = json_decode($data->business_tab_description);
+
         return response()->json(['success' => 'success', 'data' => $data]);
     }
 
