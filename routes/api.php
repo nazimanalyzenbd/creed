@@ -53,7 +53,7 @@ Route::get('/user-list', [UserBusinessOwnerInfoCo::class, 'userList'])->name('us
 
 
 // businessList search by Creed Tags
-Route::get('/business/search-by-creedtags', [UserBusinessOwnerInfoCo::class, 'searchByCreedTags'])->name('business.search-by-creedtags');
+Route::post('/business/search-by-creedtags', [UserBusinessOwnerInfoCo::class, 'searchByCreedTags'])->name('business.search-by-creedtags');
 // businessList search by Business-Category-SubCategory-text
 Route::get('/business/search-by-catSubCat', [UserBusinessOwnerInfoCo::class, 'searchByBusinessCatSubCategory'])->name('business.search-by-category');
 // searchBox

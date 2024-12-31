@@ -82,7 +82,7 @@ class UserBusinessOwnerInfoCo extends Controller
     // Business info store step 1
     public function businessInfoStore1(Request $request)
     {
-   
+  
         try{
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
            
@@ -247,7 +247,7 @@ $scheduleData['business_id'] = $businessData->id;
     // Business info store step 3
     public function businessInfoStore3(Request $request)
     {
-   
+   return gettype($request->creed_tags_id);
         try{
 
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
@@ -477,7 +477,7 @@ $scheduleData['business_id'] = $businessData->id;
         $latitude = $request->input('lat');
         $longitude = $request->input('long');
         $perm = $request->input('perm');
-        $radius = 0.1; // Radius in kilometers (100 meters = 0.1 kilometers)
+        $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
 
         if ($perm == 0) {
             $latitude = '41.850033';         //'40.12150192260742';
@@ -756,59 +756,113 @@ $scheduleData['business_id'] = $businessData->id;
         $validated = $request->validate([
             'lat' => 'required|string',
             'long' => 'required|string',
-            'creed_id' => 'required',
+           // 'creed_id' => 'required',
         ]);
 
         $latitude = $validated['lat'];
         $longitude = $validated['long'];
-        $creed_id = $validated['creed_id'];
-        $radius = 0.1; 
-        // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
-                'id',
-                'business_name',
-                'business_type_id',
-                'business_category_id',
-                'business_subcategory_id',
-                'creed_tags_id',
-                'lat',
-                DB::raw('`long` AS longitude'),
-                DB::raw("(
-                    6371 * acos(
-                        cos(radians($latitude)) *
-                        cos(radians(lat)) *
-                        cos(radians(`long`) - radians($longitude)) +
-                        sin(radians($latitude)) *
-                        sin(radians(lat))
-                    )
-                ) AS distance")
-            )
-            ->where('creed_tags_id', $creed_id)
-            ->having('distance', '<=', $radius)
-            ->orderBy('distance', 'asc')
-            ->get()
+       // $creed_id = $validated['creed_id'];
+	    $creed_id = $request->creed_id;
+        $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
 
-            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
+        if($creed_id){
+            // Convert degrees to radians for calculations
+            $filterBusinesses = TBusiness::with(['businessOwnerInfos','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings'])->select(
+                    'id',
+                    'business_name',
+                    'business_type_id',
+                    'business_category_id',
+                    'business_subcategory_id',
+                    'creed_tags_id',
+                    'lat',
+            'long',
+                // DB::raw('`long` AS longitude'),90.4128379
+                    DB::raw("(
+                        6371 * acos(
+                            cos(radians($latitude)) *
+                            cos(radians(lat)) *
+                            cos(radians(`long`) - radians($longitude)) +
+                            sin(radians($latitude)) *
+                            sin(radians(lat))
+                        )
+                    ) AS distance")
+                )
+        
+                ->whereJsonContains('creed_tags_id', $creed_id)
+                ->having('distance', '<=', $radius)
+                ->orderBy('distance', 'asc')
+                ->get()
 
-            $filterBusinesses = $filterBusinesses->map(function ($business) {
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
 
-                $business->business_type_name = $business->businessTypeName ?? '';
-                $business->business_category_name = $business->businessCategory->name ?? '';
-                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_creed_name = $business->creedTagsName ?? '';
-                $business->affiliation_name = $business->affiliationName ?? '';
-                $business->country_name = $business->countryName->name ?? '';
-                $business->state_name = $business->stateName->name ?? '';
-                $business->city_name = $business->cityName->name ?? '';
-                $business->average_rating = $business->averageRating() ?? '';
-                
-                unset($business->businessCategory);
-                unset($business->businessSubCategory);
-                unset($business->countryName);
-                unset($business->stateName);
-                unset($business->cityName);
-                return $business;
-            });
+                $filterBusinesses = $filterBusinesses->map(function ($business) {
+
+                    $business->business_type_name = $business->businessTypeName ?? '';
+                    $business->business_category_name = $business->businessCategory->name ?? '';
+                    $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                    $business->business_creed_name = $business->creedTagsName ?? '';
+                    $business->affiliation_name = $business->affiliationName ?? '';
+                    $business->country_name = $business->countryName->name ?? '';
+                    $business->state_name = $business->stateName->name ?? '';
+                    $business->city_name = $business->cityName->name ?? '';
+                    $business->average_rating = $business->averageRating() ?? '';
+                    
+                    unset($business->businessCategory);
+                    unset($business->businessSubCategory);
+                    unset($business->countryName);
+                    unset($business->stateName);
+                    unset($business->cityName);
+                    return $business;
+                });
+            }else{
+                // Convert degrees to radians for calculations
+                $filterBusinesses = TBusiness::with(['businessOwnerInfos','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings'])->select(
+                    'id',
+                    'business_name',
+                    'business_type_id',
+                    'business_category_id',
+                    'business_subcategory_id',
+                    'creed_tags_id',
+                    'lat',
+            'long',
+                // DB::raw('`long` AS longitude'),90.4128379
+                    DB::raw("(
+                        6371 * acos(
+                            cos(radians($latitude)) *
+                            cos(radians(lat)) *
+                            cos(radians(`long`) - radians($longitude)) +
+                            sin(radians($latitude)) *
+                            sin(radians(lat))
+                        )
+                    ) AS distance")
+                )
+                ->having('distance', '<=', $radius)
+                ->orderBy('distance', 'asc')
+                ->get()
+
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
+
+                $filterBusinesses = $filterBusinesses->map(function ($business) {
+
+                    $business->business_type_name = $business->businessTypeName ?? '';
+                    $business->business_category_name = $business->businessCategory->name ?? '';
+                    $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                    $business->business_creed_name = $business->creedTagsName ?? '';
+                    $business->affiliation_name = $business->affiliationName ?? '';
+                    $business->country_name = $business->countryName->name ?? '';
+                    $business->state_name = $business->stateName->name ?? '';
+                    $business->city_name = $business->cityName->name ?? '';
+                    $business->average_rating = $business->averageRating() ?? '';
+                    
+                    unset($business->businessCategory);
+                    unset($business->businessSubCategory);
+                    unset($business->countryName);
+                    unset($business->stateName);
+                    unset($business->cityName);
+                    return $business;
+                });
+
+            }
 
         return response()->json(['success' => 'success', 'data' => $filterBusinesses]);
     }
@@ -827,7 +881,7 @@ $scheduleData['business_id'] = $businessData->id;
         $catSubCat = $validated['catSubCat'];
         $radius = 0.1; 
         // Convert degrees to radians for calculations
-        $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
+        $filterBusinesses = TBusiness::with(['businessOwnerInfos','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings'])->select(
                 'id',
                 'business_name',
                 'business_type_id',
@@ -835,6 +889,7 @@ $scheduleData['business_id'] = $businessData->id;
                 'business_subcategory_id',
                 'creed_tags_id',
                 'lat',
+		'long',
                 DB::raw('`long` AS longitude'),
                 DB::raw("(
                     6371 * acos(
@@ -957,6 +1012,7 @@ $scheduleData['business_id'] = $businessData->id;
                     'business_subcategory_id',
                     'creed_tags_id',
                     'lat',
+		    'long',
                     DB::raw('`long` AS longitude'),
                     DB::raw("(
                         6371 * acos(
