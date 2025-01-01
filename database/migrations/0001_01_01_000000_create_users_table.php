@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('password', 255)->nullable()->comment('Stores the user\'s hashed password with minimum 8length');
             $table->rememberToken();
             $table->string('google_id')->nullable(); 
-            $table->mediumText('avatar')->nullable(); 
+            $table->string('avatar')->nullable(); 
             $table->mediumText('address')->nullable(); 
             $table->string('country', 100)->nullable(); 
             $table->string('state', 100)->nullable(); 

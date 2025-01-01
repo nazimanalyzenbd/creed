@@ -31,16 +31,18 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\RedirectResponse;
 use Auth;
 use DB;
 
 class UserBusinessOwnerInfoCo extends Controller
 {
-
-    public function businessOwnerInfoStore(TBusinessOwnerInfoRequest $request)
-    {
+    // Business Owner info page
+    public function businessOwnerInfoStore(TBusinessOwnerInfoRequest $request){
 
         $validator = $request->validated();
+
         try{
             
             $input = $request->all();
@@ -80,10 +82,33 @@ class UserBusinessOwnerInfoCo extends Controller
     }
 
     // Business info store step 1
-    public function businessInfoStore1(Request $request)
-    {
+    public function businessInfoStore1(Request $request){
+
+        // $validator = Validator::make($request->all(), [
+
+        //     'business_name' => 'required|string',
+        //     'business_type_id' => 'required',
+        //     'business_category_id' => 'required',
+        //     'address' => 'required|string',
+        //     'lat' => 'required',
+        //     'long' => 'required',
+        //     'country' => 'required',
+        //     'state' => 'required',
+        //     'city' => 'required',
+        //     'zip_code' => 'required',
+        //     'business_email' => 'required|email',
+        //     'business_phone_number' => 'required',
+        //     'business_subcategory_id' => 'nullable',
+        //     'business_website' => 'nullable',
+        //     'affiliation_id' => 'nullable',
+        // ]);
+
+        // if ($validator->fails()) {
+        //     return withErrors($validator)->withInput();
+        // }
   
         try{
+
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
            
             $businessData = New TBusiness();
@@ -106,7 +131,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->affiliation_id = json_encode($request->affiliation_id);
             $businessData->status = 2;
             $businessData->save();
-            // return $businessData;
+       
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId);
             $tUserBusinessOwnerInfo->business_id = $businessData->id;
             $tUserBusinessOwnerInfo->status = 2;
@@ -142,30 +167,20 @@ class UserBusinessOwnerInfoCo extends Controller
     }
 
     // Business info store step 2
-    public function businessInfoStore2(Request $request)
-    {
+    public function businessInfoStore2(Request $request){
  
-       // try{
+       try{
             
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
-//	            return $businessOwnerId;
-           // if(empty($businessOwnerId->id)){
-             //   $message = "Please first fillup Business information step 1.";
-               // return response()->json([
-                 //   'status' => 'failed',
-                   // 'message' => $message
-               // ],500);
-           // }
- 	// return $request->business_profile_image;
 
-	    if ($request->file('business_profile_image')) {
+            if ($request->file('business_profile_image')) {
 
                 $file = $request->file('business_profile_image'); 
                 $profile = time() . '.' . $file->getClientOriginalExtension();
-		$file->move(public_path('images/business/profile'), $profile);
-		$imagePath = 'images/business/profile/' .$profile;
-	   }
-//return 'image not save';
+                $file->move(public_path('images/business/profile'), $profile);
+                $imagePath = 'images/business/profile/' .$profile;
+            }
+
             $businessData = TBusiness::find($businessOwnerId->business_id);
             $businessData->description = $request->description;
             $businessData->business_profile_image = $imagePath;
@@ -175,90 +190,78 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->customer_email_leads = $request->customer_email_leads;
             $businessData->status = 3;
             $businessData->save();
-           // return $request->business_gallery_image;
-           // if($request->business_gallery_image!='null'){
-            //  $imagePaths=[];
 
-        if ($request->hasFile('business_gallery_image')) { 
-            foreach ($request->file('business_gallery_image') as $image) {
-	// $image = $request->file('business_gallery_image');
-                $imageName = time().'_'.$image->getClientOriginalName();
+            if ($request->hasFile('business_gallery_image')) {
 
-                $image->move(public_path('images/business/gallery'), $imageName);
-                $imagePaths = 'images/business/gallery/' . $imageName;
-//return $imagePaths;
+                foreach ($request->file('business_gallery_image') as $image) {
+
+                    $imageName = time().'_'.$image->getClientOriginalName();
+                    $image->move(public_path('images/business/gallery'), $imageName);
+                    $imagePaths = 'images/business/gallery/' . $imageName;
+
                     $galleryData = new TBusinessGallery();
                     $galleryData->business_id = $businessData->id;
                     $galleryData->business_gallery_image = $imagePaths;
                     $galleryData->save();
-//return $galleryData;              
- }
+                }  
             }
 
-//return 'failed';
- foreach ($request->operation_data as $scheduleData) {
-$scheduleData['business_id'] = $businessData->id;         
-   TOperationHour::create($scheduleData);
-        }
-            // return $request->operation_data;
-          // foreach($request->operation_data as $value){
-         //
-          //      $operationDatas = new TOperationHour();
-          //      $operationDatas->business_id = $businessData->id;
-           //     $operationDatas->day = $value;
-           //     $operationDatas->open_time = $value;
-            //    $operationDatas->closed_time = $value; 
-            //    $operationDatas->save();
-          // }
-          //  return 'hi';
+            foreach ($request->operation_data as $scheduleData) {
+
+                $scheduleData['business_id'] = $businessData->id;         
+                TOperationHour::create($scheduleData);
+
+            }
+
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
             $tUserBusinessOwnerInfo->status = 3;
             $tUserBusinessOwnerInfo->save();
 
-	$galleryDatas = TBusinessGallery::where('business_id',$businessData->id)->get()->makeHidden(['created_at','updated_at']);          
-	$operationHours = TOperationHour::where('business_id',$businessData->id)->get()->makeHidden(['created_at','updated-at']);
+	        $galleryDatas = TBusinessGallery::where('business_id',$businessData->id)->get()->makeHidden(['created_at','updated_at']);          
+	        $operationHours = TOperationHour::where('business_id',$businessData->id)->get()->makeHidden(['created_at','updated-at']);
+            
             $message = "Business information step 2 successfully saved.";
+            
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
                 'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at']),
                 'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at']),
-		'galleryDatas' => $galleryDatas,
-		'operationHours' => $operationHours,
+                'galleryDatas' => $galleryDatas,
+                'operationHours' => $operationHours,
             ],200);
 
-       // } catch (QueryException $e) {
-         //   $errorMessage = "Database error: Unable to submit data.!";
-           // return response()->json([
-             //   'status' => 'failed',
-              //  'message' => $errorMessage,
-         //   ],500);
-         //   return redirect()->back()->with('error', '');
-     //   } catch (\Throwable $e) {
+       } catch (QueryException $e) {
+           $errorMessage = "Database error: Unable to submit data.!";
+           return response()->json([
+               'status' => 'failed',
+               'message' => $errorMessage,
+           ],500);
+           return redirect()->back()->with('error', '');
+       } catch (\Throwable $e) {
          
-       //     return response()->json([
-         //       'status' => 'failed',
-         //       'errors' => $e->errors(),
-         //   ],422);
-       // }
+           return response()->json([
+               'status' => 'failed',
+               'errors' => $e->errors(),
+           ],422);
+       }
 
     }
 
     // Business info store step 3
-    public function businessInfoStore3(Request $request)
-    {
-   return gettype($request->creed_tags_id);
+    public function businessInfoStore3(Request $request){
+
         try{
 
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
            
-           // if(empty($businessOwnerId->id)){
-             //   $message = "Please first fillup Business information step 2.";
-               // return response()->json([
-                 //   'status' => 'failed',
-                  //  'message' => $message
-              //  ],500);
-           // }
+           if(empty($businessOwnerId->id)){
+               $message = "Please first fillup Business information step 2.";
+               return response()->json([
+                   'status' => 'failed',
+                   'message' => $message
+               ],500);
+           }
            
             if ($request->hasFile('halal_certificate')) { 
                 $file = $request->file('halal_certificate');
@@ -279,7 +282,7 @@ $scheduleData['business_id'] = $businessData->id;
             }
 
             $businessData = TBusiness::find($businessOwnerId->business_id);          
-	    $businessData->creed_tags_id = json_encode($request->creed_tags_id);
+	        $businessData->creed_tags_id = json_encode($request->creed_tags_id);
             $businessData->restaurant_id = json_encode($request->restaurant_id);
             $businessData->halal_certificate = $imagePath;
             $businessData->handcut_text = $request->handcut_text;
@@ -317,20 +320,19 @@ $scheduleData['business_id'] = $businessData->id;
     }
 
     // Business info store step 4
-    public function businessInfoStore4(Request $request)
-    {
+    public function businessInfoStore4(Request $request){
    
         try{
 
             $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
             
-          //  if(empty($businessOwnerId->id)){
-            //    $message = "Please first fillup Business information step 3.";
-              //  return response()->json([
-                //    'status' => 'failed',
-                 //   'message' => $message
-              //  ],500);
-          //  }
+           if(empty($businessOwnerId->id)){
+               $message = "Please first fillup Business information step 3.";
+               return response()->json([
+                   'status' => 'failed',
+                   'message' => $message
+               ],500);
+           }
 
             $businessData = TBusiness::find($businessOwnerId->business_id);
             $businessData->discount_code_description = $request->discount_code_description;
@@ -361,7 +363,7 @@ $scheduleData['business_id'] = $businessData->id;
          
             return response()->json([
                 'status' => 'failed',
-                'errors' => $validator->errors(),
+                'errors' => $e->errors(),
             ],422);
         }
 
@@ -586,22 +588,6 @@ $scheduleData['business_id'] = $businessData->id;
         return response()->json(['status' => 'success', 'data' => $data], 200);
     }
 
-    public function businessOperationHour(Request $request){
-
-        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
-            if ($request->has($day)) {
-                $businessHours[] = [
-                    'business_id' => $request->business_id,
-                    'day' => $day,
-                    'open_time' => $request->input("{$day}.open_time"),
-                    'closed_time' => $request->input("{$day}.closed_time"),
-                ];
-            }
-        }
-
-        return $businessHours;
-    }
-
     public function daysList(){
 
         $data = TDays::where('status', 1)->get()->makeHidden(['created_at','updated_at']);
@@ -618,7 +604,8 @@ $scheduleData['business_id'] = $businessData->id;
 
         $latitude = $validated['lat'];
         $longitude = $validated['long'];
-        $radius = 0.1; 
+        $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
+
         // Convert degrees to radians for calculations
         $multiBusinesses = TBusiness::with('operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
                 'id',
@@ -685,6 +672,9 @@ $scheduleData['business_id'] = $businessData->id;
                 'business_subcategory_id',
                 'creed_tags_id',
                 'address',
+                'country',
+                'state',
+                'city',
                 'zip_code',
                 'lat',
                 'long',
@@ -731,7 +721,8 @@ $scheduleData['business_id'] = $businessData->id;
                 return $business;
             });
 
-        return response()->json([$business_profile]);
+        
+            return response()->json(['status' => 'success', 'message'=>'Business Profile Data Showing Success', 'data' => $business_profile,], 200);
     }
 
     // All User List
@@ -761,8 +752,8 @@ $scheduleData['business_id'] = $businessData->id;
 
         $latitude = $validated['lat'];
         $longitude = $validated['long'];
-       // $creed_id = $validated['creed_id'];
 	    $creed_id = $request->creed_id;
+
         $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
 
         if($creed_id){
@@ -775,7 +766,7 @@ $scheduleData['business_id'] = $businessData->id;
                     'business_subcategory_id',
                     'creed_tags_id',
                     'lat',
-            'long',
+                    'long',
                 // DB::raw('`long` AS longitude'),90.4128379
                     DB::raw("(
                         6371 * acos(
@@ -788,7 +779,11 @@ $scheduleData['business_id'] = $businessData->id;
                     ) AS distance")
                 )
         
-                ->whereJsonContains('creed_tags_id', $creed_id)
+                ->where(function ($query) use ($creed_id) {
+                    foreach ($creed_id as $id) {
+                        $query->orWhereJsonContains('creed_tags_id', $id);
+                    }
+                })
                 ->having('distance', '<=', $radius)
                 ->orderBy('distance', 'asc')
                 ->get()
@@ -824,7 +819,7 @@ $scheduleData['business_id'] = $businessData->id;
                     'business_subcategory_id',
                     'creed_tags_id',
                     'lat',
-            'long',
+                    'long',
                 // DB::raw('`long` AS longitude'),90.4128379
                     DB::raw("(
                         6371 * acos(
@@ -879,7 +874,8 @@ $scheduleData['business_id'] = $businessData->id;
         $latitude = $validated['lat'];
         $longitude = $validated['long'];
         $catSubCat = $validated['catSubCat'];
-        $radius = 0.1; 
+        $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
+
         // Convert degrees to radians for calculations
         $filterBusinesses = TBusiness::with(['businessOwnerInfos','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings'])->select(
                 'id',
@@ -954,8 +950,7 @@ $scheduleData['business_id'] = $businessData->id;
     // aboutUs
     public function aboutUs(){
 
-        $data = TAboutUs::get()->first()->makeHidden(['status','created_by','updated_by','created_at','updated_at']);
-       
+        $data = TAboutUs::get()->first()->makeHidden(['status','created_by','updated_by','created_at','updated_at']);   
         $data['individual_description'] = json_decode($data->individual_description);
         $data['business_description'] = json_decode($data->business_description);
         $data['individual_tab_description'] = json_decode($data->individual_tab_description);
@@ -1002,7 +997,7 @@ $scheduleData['business_id'] = $businessData->id;
             $latitude = $validated['lat'];
             $longitude = $validated['long'];
             $business_name = $validated['business_name'];
-            $radius = 0.1; 
+            $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
             // Convert degrees to radians for calculations
             $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
                     'id',
@@ -1056,7 +1051,7 @@ $scheduleData['business_id'] = $businessData->id;
             $latitude = $validated['lat'];
             $longitude = $validated['long'];
             $catSubCat = $validated['catSubCat'];
-            $radius = 0.1; 
+            $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
             // Convert degrees to radians for calculations
             $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
                     'id',
@@ -1236,16 +1231,73 @@ $scheduleData['business_id'] = $businessData->id;
             $rating->save();
         }
 
-        return response()->json(['success' => 'success', 'message' => 'Rating Submit Successful.', 'data' => $rating]);
+        $business_profile = TBusiness::with(['operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image'])->select(['id',
+                'business_name',
+                'business_profile_image',
+                'business_type_id',
+                'business_category_id',
+                'business_subcategory_id',
+                'creed_tags_id',
+                'address',
+                'country',
+                'state',
+                'city',
+                'zip_code',
+                'lat',
+                'long',
+                'service_area',
+                'business_phone_number',
+                'business_email',
+                'business_website',
+                'affiliation_id',
+                'customer_hotline',
+                'customer_email_leads',
+                'description',
+                'restaurant_id',
+                'halal_certificate',
+                'handcut_text',
+                'handcut_certificate',
+                'discount_code_description',
+                'discount_code',
+                'status'
+                ])
+                
+                ->with('businessOwnerInfos','galleryData','operationData')->where('id', $request->business_id)
+                
+                ->get()
+
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at','ratings']);
+
+            $business_profile = $business_profile->map(function ($business) {
+
+                $business->business_type_name = $business->businessTypeName ?? '';
+                $business->business_category_name = $business->businessCategory->name ?? '';
+                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                $business->business_creed_name = $business->creedTagsName ?? '';
+                $business->affiliation_name = $business->affiliationName ?? '';
+                $business->country_name = $business->countryName->name ?? '';
+                $business->state_name = $business->stateName->name ?? '';
+                $business->city_name = $business->cityName->name ?? '';
+                $business->average_rating = $business->averageRating() ?? '';
+                
+                unset($business->businessCategory);
+                unset($business->businessSubCategory);
+                unset($business->countryName);
+                unset($business->stateName);
+                unset($business->cityName);
+                return $business;
+            });
+
+        return response()->json(['success' => 'success', 'message' => 'Rating Submit Successful.', 'data' => $business_profile]);
     }
 
     // Business Rating view
     public function ratingView(Request $request){
     
-        $ratingData = TBusinessRating::where('user_id', $request->user()->id)->where('business_id', $request->business_id)->get()->first();
+        $ratingData = TBusinessRating::where('user_id', $request->user()->id)->where('business_id', $request->business_id)->get()->first()->makeHidden(['status','created_at','updated_at','deleted_at']);
         
         $ratingDataCount = TBusiness::withCount('ratings')->findOrFail($request->business_id);
-        $averageRating = $ratingDataCount->averageRating();
+        $ratingData[average_rating] = $ratingDataCount->averageRating();
 
         return response()->json(['success' => 'success', 'message' => 'View Rating.', 'Data' => $averageRating]);
 

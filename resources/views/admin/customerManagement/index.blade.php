@@ -1,5 +1,6 @@
 @extends('layouts.app')
-
+@push('style')
+@endpush
 @section('content')
         <div class="content-body">
             <div class="container-fluid">
@@ -15,11 +16,13 @@
                                     <div class="row">
                                         <div class="col-md-4 mx-auto">
                                             <div class="card text-center">
-                                                <select class="form-control" name="customer_type" id="customer_type">
-                                                    <option value="">All</option>
-                                                    <option value="G">General Account</option>
-                                                    <option value="GB">Business Account</option>
-                                                </select>
+                                                <form action="{{route('customers.list')}}" method="get" id="auto-submit-form">
+                                                    <select class="form-control" name="account_type" id="account_type">
+                                                        <option value="all">All</option>
+                                                        <option value="G" {{$accountType=='G' ? 'selected':''}}>General Account</option>
+                                                        <option value="GB" {{$accountType=='GB' ? 'selected':''}}>Business Account</option>
+                                                    </select>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -30,8 +33,8 @@
                                             <tr>
                                                 <th>Sl</th>
                                                 <th>Name</th>
-                                                <th>Phone</th>
                                                 <th>Email</th>
+                                                <th>Phone</th>
                                                 <th>Customer Type</th>
                                                 <!-- <th>Status</th> -->
                                                 <th>Action</th>
@@ -42,8 +45,8 @@
                                                 <tr>
                                                     <td>{{++$key}}</td>
                                                     <td>{{$value->first_name .' '. $value->last_name}}</td>
-                                                    <td>{{$value->phone_number}}</td>
                                                     <td>{{$value->email}}</td>
+                                                    <td>{{$value->phone_number}}</td>
                                                     <td>@if($value->account_type=="G")
                                                            <span class="badge badge-warning"> General </span>
                                                         @else
@@ -52,6 +55,7 @@
                                                     </td>
                                                     <!-- <td>@if($value->status==1)<span>Active</span>@else<span>Inactive</span>@endif</td> -->
                                                     <td>
+                                                        <a href="{{route('customers-details.view', $value->id)}}" class="btn btn-info btn-sm"><i class="fa fa-view"></i> View</a>
                                                         <a href="{{route('customers-list.edit', $value->id)}}" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Edit</a>
                                                         <form action="{{ route('customers-list.delete', $value->id) }}" method="POST" style="display: inline-block;">
                                                             @csrf
@@ -75,25 +79,9 @@
 
 @endsection
 @push('script')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $('#customer_type').on('change', function () {
-        const selectedValue = $(this).val();
-
-        $.ajax({
-            url: `/customers/list?customer_type=${selectedValue}`,
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            success: function (response) {
-                console.log(response); // Handle the response
-            },
-            error: function (error) {
-                console.error('Error:', error);
-            }
-        });
+    document.getElementById('account_type').addEventListener('change', function() {
+        document.getElementById('auto-submit-form').submit();
     });
 </script>
-
 @endpush
