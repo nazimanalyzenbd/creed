@@ -27,6 +27,7 @@
                                 class="icon icon-single-04"></i><span class="nav-text">Customer Management</span></a>
                         <ul aria-expanded="false">
                             <li><a href="{{route('customers.list')}}">Customers List</a></li>
+                            <li><a href="{{route('customers.archive.list')}}">Archieve List</a></li>
                         </ul>
                     </li>
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i

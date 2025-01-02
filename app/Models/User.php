@@ -67,25 +67,26 @@ class User extends Authenticatable
         ];
     }
 
+    public function businessOwnerInfos()
+    {
+        return $this->hasMany(\App\Models\Api\TBusinessOwnerInfo::class, 'user_id');
+    }
+
     protected static function boot()
     {
         parent::boot();
 
         static::deleting(function ($user) {
             if ($user->isForceDeleting()) {
-                $user->businessOwnerInfos()->forceDelete(); // Hard delete related posts
+                $user->businessOwnerInfos()->forceDelete(); // Hard delete related data
             } else {
-                $user->businessOwnerInfos()->delete(); // Soft delete related posts
+                $user->businessOwnerInfos()->delete(); // Soft delete related data
             }
         });
 
         static::restoring(function ($user) {
-            $user->businessOwnerInfos()->withTrashed()->restore(); // Restore related posts
+            $user->businessOwnerInfos()->withTrashed()->restore(); // Restore related data
         });
     }
 
-    public function businessOwnerInfos()
-    {
-        return $this->hasMany(\App\Models\Api\TBusinessOwnerInfo::class, 'user_id', 'id');
-    }
 }

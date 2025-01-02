@@ -42,22 +42,41 @@ class UserBusinessOwnerInfoCo extends Controller
     public function businessOwnerInfoStore(TBusinessOwnerInfoRequest $request){
 
         $validator = $request->validated();
-
+        
         try{
-            
-            $input = $request->all();
-            $input['user_id'] = $request->user()->id;
-            $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::create($input);
+            if($request->owner_id=='null')
+            {
+                $input = $request->all();
+                // $input['user_id'] = $request->user()->id;
+                // $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::create($input);
+                $tUserTBusinessOwnerInfo = new TBusinessOwnerInfo();
+                $tUserTBusinessOwnerInfo->user_id = $request->user()->id;
+                $tUserTBusinessOwnerInfo->first_name = $request->first_name;
+                $tUserTBusinessOwnerInfo->last_name = $request->last_name;
+                $tUserTBusinessOwnerInfo->email = $request->email;
+                $tUserTBusinessOwnerInfo->country_code = $request->phone_number;
+                $tUserTBusinessOwnerInfo->phone_number = $request->phone_number;
+                $tUserTBusinessOwnerInfo->address = $request->address;
+                $tUserTBusinessOwnerInfo->save();
 
-            $users = User::find($request->user()->id);
-            if($users->name!=''){
-                $users->name = $request->first_name .' '. $request->last_name;
-                $users->first_name = $request->first_name;
-                $users->last_name = $request->last_name;
-                $users->phone_number = $request->phone_number;
-                $users->save();
+                $users = User::find($request->user()->id);
+                if($users->name==''){
+                    $users->name = $request->first_name .' '. $request->last_name;
+                    $users->first_name = $request->first_name;
+                    $users->last_name = $request->last_name;
+                    $users->phone_number = $request->phone_number;
+                    $users->address = $request->address;
+                    $users->save();
+                }
+            }else{
+                $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::find();
+                $tUserTBusinessOwnerInfo->first_name = $request->first_name;
+                $tUserTBusinessOwnerInfo->last_name = $request->last_name;
+                $tUserTBusinessOwnerInfo->email = $request->email;
+                $tUserTBusinessOwnerInfo->phone_number = $request->phone_number;
+                $tUserTBusinessOwnerInfo->address = $request->address;
+                $tUserTBusinessOwnerInfo->save();
             }
-
             return response()->json([
                 'status' => 'success',
                 'message'=> 'Owner info successfully saved.',
@@ -84,63 +103,96 @@ class UserBusinessOwnerInfoCo extends Controller
     // Business info store step 1
     public function businessInfoStore1(Request $request){
 
-        // $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
+            
+            'owner_id' => 'required',
+            'business_name' => 'required|string',
+            'business_type_id' => 'required',
+            'business_category_id' => 'required',
+            'address' => 'required|string',
+            'lat' => 'required',
+            'long' => 'required',
+            'country' => 'required',
+            'state' => 'required',
+            'city' => 'required',
+            'zip_code' => 'required',
+            'business_email' => 'required|email',
+            'business_phone_number' => 'required',
+            'business_subcategory_id' => 'nullable',
+            'business_website' => 'nullable',
+            'affiliation_id' => 'nullable',
+        ]);
 
-        //     'business_name' => 'required|string',
-        //     'business_type_id' => 'required',
-        //     'business_category_id' => 'required',
-        //     'address' => 'required|string',
-        //     'lat' => 'required',
-        //     'long' => 'required',
-        //     'country' => 'required',
-        //     'state' => 'required',
-        //     'city' => 'required',
-        //     'zip_code' => 'required',
-        //     'business_email' => 'required|email',
-        //     'business_phone_number' => 'required',
-        //     'business_subcategory_id' => 'nullable',
-        //     'business_website' => 'nullable',
-        //     'affiliation_id' => 'nullable',
-        // ]);
-
-        // if ($validator->fails()) {
-        //     return withErrors($validator)->withInput();
-        // }
+        if ($validator->fails()) {
+            return withErrors($validator)->withInput();
+        }
   
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->pluck('id')->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', 1)->get()->first();
            
-            $businessData = New TBusiness();
-            $businessData->business_owner_id = $businessOwnerId;
-            $businessData->business_name = $request->business_name;
-            $businessData->business_type_id = json_encode($request->business_type_id);
-            $businessData->business_category_id = $request->business_category_id;
-            $businessData->business_subcategory_id = $request->business_subcategory_id;
-            $businessData->address = $request->address;
-            $businessData->lat = $request->lat;
-            $businessData->long = $request->long;
-            $businessData->country = $request->country;
-            $businessData->state = $request->state;
-            $businessData->city = $request->city;
-            $businessData->zip_code = $request->zip_code;
-            $businessData->business_email = $request->business_email;
-            $businessData->country_code = $request->country_code;
-            $businessData->business_phone_number = $request->business_phone_number;
-            $businessData->business_website = $request->business_website;
-            $businessData->affiliation_id = json_encode($request->affiliation_id);
-            $businessData->status = 2;
-            $businessData->save();
-       
-            $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId);
-            $tUserBusinessOwnerInfo->business_id = $businessData->id;
-            $tUserBusinessOwnerInfo->status = 2;
-            $tUserBusinessOwnerInfo->save();
-        
-            $tUsers = User::find($tUserBusinessOwnerInfo->user_id);
-            $tUsers->account_type = 'GB';
-            $tUsers->save();
+           if(empty($businessOwnerId->id)){
+               $message = "Please first fillup Business Owner information.";
+               return response()->json([
+                   'status' => 'failed',
+                   'message' => $message
+               ],500);
+           }
 
+           if($businessOwnerId->business_id!=''){
+
+                $businessData = TBusiness::find($businessOwnerId->business_id);
+                $businessData->business_owner_id = $businessOwnerId->id;
+                $businessData->business_name = $request->business_name;
+                $businessData->business_type_id = json_encode($request->business_type_id);
+                $businessData->business_category_id = $request->business_category_id;
+                $businessData->business_subcategory_id = $request->business_subcategory_id;
+                $businessData->address = $request->address;
+                $businessData->lat = $request->lat;
+                $businessData->long = $request->long;
+                $businessData->country = $request->country;
+                $businessData->state = $request->state;
+                $businessData->city = $request->city;
+                $businessData->zip_code = $request->zip_code;
+                $businessData->business_email = $request->business_email;
+                $businessData->country_code = $request->country_code;
+                $businessData->business_phone_number = $request->business_phone_number;
+                $businessData->business_website = $request->business_website;
+                $businessData->affiliation_id = json_encode($request->affiliation_id);
+                $businessData->status = 2;
+                $businessData->save();
+           }else{
+           
+                $businessData = New TBusiness();
+                $businessData->business_owner_id = $businessOwnerId->id;
+                $businessData->business_name = $request->business_name;
+                $businessData->business_type_id = json_encode($request->business_type_id);
+                $businessData->business_category_id = $request->business_category_id;
+                $businessData->business_subcategory_id = $request->business_subcategory_id;
+                $businessData->address = $request->address;
+                $businessData->lat = $request->lat;
+                $businessData->long = $request->long;
+                $businessData->country = $request->country;
+                $businessData->state = $request->state;
+                $businessData->city = $request->city;
+                $businessData->zip_code = $request->zip_code;
+                $businessData->business_email = $request->business_email;
+                $businessData->country_code = $request->country_code;
+                $businessData->business_phone_number = $request->business_phone_number;
+                $businessData->business_website = $request->business_website;
+                $businessData->affiliation_id = json_encode($request->affiliation_id);
+                $businessData->status = 2;
+                $businessData->save();
+        
+                $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
+                $tUserBusinessOwnerInfo->business_id = $businessData->id;
+                $tUserBusinessOwnerInfo->status = 2;
+                $tUserBusinessOwnerInfo->save();
+            
+                $tUsers = User::find($tUserBusinessOwnerInfo->user_id);
+                $tUsers->account_type = 'GB';
+                $tUsers->save();
+            }
             $message = "Business information step 1 successfully saved.";
             return response()->json([
                 'status' => 'success',
@@ -171,7 +223,15 @@ class UserBusinessOwnerInfoCo extends Controller
  
        try{
             
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '2')->get()->first();
+
+            if(empty($businessOwnerId->id)){
+                $message = "Please first fillup Business information step 1.";
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $message
+                ],500);
+            }
 
             if ($request->file('business_profile_image')) {
 
@@ -199,7 +259,13 @@ class UserBusinessOwnerInfoCo extends Controller
                     $image->move(public_path('images/business/gallery'), $imageName);
                     $imagePaths = 'images/business/gallery/' . $imageName;
 
-                    $galleryData = new TBusinessGallery();
+                    $galleryCheck = TBusinessGallery::where('business_id', $businessData->id)->get()->first();
+                    if($galleryCheck){
+                        $galleryData = TBusinessGallery::find($galleryCheck->id);
+                    }else{
+                        $galleryData = new TBusinessGallery();
+                    }
+                    
                     $galleryData->business_id = $businessData->id;
                     $galleryData->business_gallery_image = $imagePaths;
                     $galleryData->save();
@@ -208,9 +274,14 @@ class UserBusinessOwnerInfoCo extends Controller
 
             foreach ($request->operation_data as $scheduleData) {
 
-                $scheduleData['business_id'] = $businessData->id;         
-                TOperationHour::create($scheduleData);
-
+                $operationHourCheck = TOperationHour::where('business_id', $businessData->id)->get()->first();
+                if($operationHourCheck){
+                    $scheduleData['business_id'] = $businessData->id; 
+                    $operationHour->update($scheduleData); 
+                }else{
+                    $scheduleData['business_id'] = $businessData->id;         
+                    TOperationHour::create($scheduleData);
+                }
             }
 
             $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
@@ -253,7 +324,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '3')->get()->first();
            
            if(empty($businessOwnerId->id)){
                $message = "Please first fillup Business information step 2.";
@@ -324,7 +395,7 @@ class UserBusinessOwnerInfoCo extends Controller
    
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', '4')->get()->first();
             
            if(empty($businessOwnerId->id)){
                $message = "Please first fillup Business information step 3.";
@@ -1262,7 +1333,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 'status'
                 ])
                 
-                ->with('businessOwnerInfos','galleryData','operationData')->where('id', $request->business_id)
+                ->with('businessOwnerInfos','galleryData','operationData','ratings')->where('id', $request->business_id)
                 
                 ->get()
 
@@ -1287,6 +1358,8 @@ class UserBusinessOwnerInfoCo extends Controller
                 unset($business->cityName);
                 return $business;
             });
+
+            $business_profile['rating_count'] = TBusinessRating::where('business_id', $request->business_id)->count('id');
 
         return response()->json(['success' => 'success', 'message' => 'Rating Submit Successful.', 'data' => $business_profile]);
     }

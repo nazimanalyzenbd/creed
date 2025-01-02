@@ -21,4 +21,21 @@ class TBusinessOwnerInfo extends Model
     public function users(){
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($ownerInfo) {
+            if ($ownerInfo->isForceDeleting()) {
+                $ownerInfo->business()->forceDelete(); // Hard delete related data
+            } else {
+                $ownerInfo->business()->delete(); // Soft delete related data
+            }
+        });
+
+        static::restoring(function ($ownerInfo) {
+            $ownerInfo->business()->withTrashed()->restore(); // Restore related data
+        });
+    }
 }

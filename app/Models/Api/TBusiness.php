@@ -122,4 +122,23 @@ class TBusiness extends Model
         $avarage = $this->ratings()->avg('rating_star');
         return number_format($avarage, 1);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($business) {
+            if ($business->isForceDeleting()) {
+                $business->galleryData()->forceDelete(); // Hard delete related data
+            } else {
+                $business->galleryData()->delete(); 
+                tBusiness->operationData()->delete();
+                tBusiness->ratings()->delete();
+            }
+        });
+
+        static::restoring(function ($business) {
+            $business->galleryData()->withTrashed()->restore(); // Restore related data
+        });
+    }
 }

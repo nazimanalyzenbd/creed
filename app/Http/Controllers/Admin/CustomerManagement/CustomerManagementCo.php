@@ -71,15 +71,34 @@ class CustomerManagementCo extends Controller
     public function customerListDelete($id){
     
         try{
-            $user = User::with(['businessOwnerInfos','businessOwnerInfos.business','businessOwnerInfos.business.operationData','businessOwnerInfos.business.galleryData'])->find($id);
-            // $ownerInfo = TBusinessOwnerInfo::with(['business'])->where('user_id', $id)->get();
-            dd($user);
-            // $data->delete();
+            $users = User::with(['businessOwnerInfos','businessOwnerInfos.business','businessOwnerInfos.business.galleryData','businessOwnerInfos.business.operationData','businessOwnerInfos.business.ratings'])->find($id);
+  
+            foreach($users->businessOwnerInfos as $value){
+                
+                $ownerInfo = TBusinessOwnerInfo::with(['business','business.galleryData','business.operationData','business.ratings'])->find($value->id);
+                    
+                if(!empty($ownerInfo->business)){ $data [] = $ownerInfo->business;
+                    
+                    $ownerInfo->business->galleryData()->delete();
+                    $ownerInfo->business->operationData()->delete();
+                    $ownerInfo->business->ratings()->delete();
+                }
 
-            return redirect()->route('affiliations.index')->with('danger','Data Deleted Successfully');
+                $ownerInfo->business()->delete();
+            }
+      
+            $users->delete();
+
+            return redirect()->route('customers.list')->with('danger','Data Deleted Successfully');
         } catch (\Exception $e) {
             Log::error('Error deleting user: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Unable to delete the user.');
         }
+    }
+
+    public function customerArchiveList(){
+        
+        $archiveData = User::get();
+        return view('admin.customerManagement.index', compact('archiveData'));
     }
 }
