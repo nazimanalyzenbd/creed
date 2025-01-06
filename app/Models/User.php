@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Api\TBusinessOwnerInfo::class, 'user_id');
     }
 
+    public function businesses()
+    {
+        return $this->hasManyThrough(\App\Models\Api\TBusiness::class, 'user_id', 'owner_info_id');
+    }
+
     protected static function boot()
     {
         parent::boot();

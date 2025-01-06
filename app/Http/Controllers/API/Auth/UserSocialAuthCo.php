@@ -138,8 +138,12 @@ class UserSocialAuthCo extends Controller
 
             }else{
 
+                $token = $users->createToken('google-auth-token')->plainTextToken;
+                $users['token'] = $token;
+
                 return response()->json([
                     'status' => 'success',
+                    'message' => 'SignIn Successful.',
                     'user' => $users->makeHidden(['created_at','updated_at']),
                 ]);
             }

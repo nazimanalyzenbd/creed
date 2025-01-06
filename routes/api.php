@@ -78,3 +78,5 @@ Route::post('/stripe-payment', [UserBusinessPaymentInfoCo::class, 'createPayment
 Route::post('/business-rating', [UserBusinessOwnerInfoCo::class, 'businessRating'])->name('business.rating')->middleware('auth:sanctum');
 Route::get('/business-rating/delete', [UserBusinessOwnerInfoCo::class, 'ratingDelete'])->name('business.rating.delete')->middleware('auth:sanctum');
 Route::get('/business-rating-view', [UserBusinessOwnerInfoCo::class, 'ratingView'])->name('business.rating.view')->middleware('auth:sanctum');
+
+Route::get('/user-details', [UserBusinessOwnerInfoCo::class, 'userDetails'])->name('user.profile.details')->middleware('auth:sanctum');
