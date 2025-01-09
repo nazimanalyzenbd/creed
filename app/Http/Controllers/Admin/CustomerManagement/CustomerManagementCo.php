@@ -77,8 +77,8 @@ class CustomerManagementCo extends Controller
                 
                 $ownerInfo = TBusinessOwnerInfo::with(['business','business.galleryData','business.operationData','business.ratings'])->find($value->id);
                     
-                if(!empty($ownerInfo->business)){ $data [] = $ownerInfo->business;
-                    
+                if(!empty($ownerInfo->business)){ 
+                    // $data [] = $ownerInfo->business;
                     $ownerInfo->business->galleryData()->delete();
                     $ownerInfo->business->operationData()->delete();
                     $ownerInfo->business->ratings()->delete();
@@ -98,7 +98,33 @@ class CustomerManagementCo extends Controller
 
     public function customerArchiveList(){
         
-        $archiveData = User::get();
-        return view('admin.customerManagement.index', compact('archiveData'));
+        $archiveData = User::onlyTrashed()->get();
+        return view('admin.customerManagement.archieveList', compact('archiveData'));
+    }
+
+    public function customerArchiveListRetrieve($id){
+
+        $users =  User::withTrashed()->find($id)->restore();
+        
+        $users = User::with(['businessOwnerInfos','businessOwnerInfos.business','businessOwnerInfos.business.galleryData','businessOwnerInfos.business.operationData','businessOwnerInfos.business.ratings'])->withTrashed()->find($id);
+       
+        foreach($users->businessOwnerInfos as $value){
+      
+            $ownerInfo = TBusinessOwnerInfo::with(['business','business.galleryData','business.operationData','business.ratings'])->where('id',$value->id)->withTrashed()->get()->first();
+            // dd($ownerInfo->business());
+            // dd($ownerInfo->business()->galleryData()->withTrashed()->restore());
+            if(!empty($ownerInfo->business()->withTrashed())){ 
+                //$ownerInfo->business()->galleryData()->withTrashed()->restore();
+                // $ownerInfo->business->galleryData()->withTrashed()->restore();
+                // $ownerInfo->business->operationData()->withTrashed()->restore();
+                // $ownerInfo->business->ratings()->withTrashed()->restore();
+            }
+
+            $ownerInfo->business()->withTrashed()->restore();
+        }
+
+        // $users->restore();
+      
+        return redirect()->back()->with('error', 'Selected data successfully retrieve.');
     }
 }

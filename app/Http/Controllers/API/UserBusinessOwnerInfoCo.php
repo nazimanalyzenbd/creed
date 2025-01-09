@@ -67,7 +67,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     $users->save();
                 }
             }else{
-                $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::find();
+                $tUserTBusinessOwnerInfo = TBusinessOwnerInfo::find($request->owner_id);
                 $tUserTBusinessOwnerInfo->first_name = $request->first_name;
                 $tUserTBusinessOwnerInfo->last_name = $request->last_name;
                 $tUserTBusinessOwnerInfo->email = $request->email;
@@ -127,7 +127,7 @@ class UserBusinessOwnerInfoCo extends Controller
   
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', 1)->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '>=', 1)->get()->first();
            
            if(empty($businessOwnerId->id)){
                $message = "Please first fillup Business Owner information.";
@@ -171,6 +171,9 @@ class UserBusinessOwnerInfoCo extends Controller
                 $businessData->affiliation_id = json_encode($array);
                 $businessData->status = 2;
                 $businessData->save();
+
+                $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
+
            }else{
            
                 $businessData = New TBusiness();
@@ -233,7 +236,7 @@ class UserBusinessOwnerInfoCo extends Controller
  
        try{
             
-            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '2')->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '>=', 2)->get()->first();
 
             if(empty($businessOwnerId->id)){
                 $message = "Please first fillup Business information step 1.";
@@ -261,7 +264,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->status = 3;
             $businessData->save();
 	
-            $galleryCheck = TBusinessGallery::where('business_id', $businessData->id)->get()->first();    
+            $galleryCheck = TBusinessGallery::where('business_id', $businessData->id)->get();    
             if(!empty($galleryCheck)){
             foreach($galleryCheck as $value){
                 $galleryData = TBusinessGallery::find($value->id);
@@ -275,10 +278,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     $image->move(public_path('images/business/gallery'), $imageName);
                     $imagePaths = 'images/business/gallery/' . $imageName;
 
-            
-                 
-                        $galleryData = new TBusinessGallery();
-                    
+                    $galleryData = new TBusinessGallery();                    
                     $galleryData->business_id = $businessData->id;
                     $galleryData->business_gallery_image = $imagePaths;
                     $galleryData->save();
@@ -339,7 +339,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '3')->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '>=', 3)->get()->first();
            
            if(empty($businessOwnerId->id)){
                $message = "Please first fillup Business information step 2.";
@@ -410,7 +410,7 @@ class UserBusinessOwnerInfoCo extends Controller
    
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', '4')->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', '>=', 4)->get()->first();
             
            if(empty($businessOwnerId->id)){
                $message = "Please first fillup Business information step 3.";
@@ -750,7 +750,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function getBusinessProfile(Request $request){
 
-        $business_profile = TBusiness::with(['operationData:id,business_id,open_time,closed_time','ratings:id,user_id,business_id,rating_star,description,image,created_at','galleryData:id,business_id,business_gallery_image'])->select(['id',
+        $business_profile = TBusiness::with(['businessOwnerInfos','operationData:id,business_id,day,open_time,closed_time','ratings:id,user_id,business_id,rating_star,description,image,created_at','ratings.user:id,name,first_name,last_name,avatar','galleryData:id,business_id,business_gallery_image'])->select(['id',
                 'business_name',
                 'business_profile_image',
                 'business_type_id',
@@ -780,9 +780,9 @@ class UserBusinessOwnerInfoCo extends Controller
                 'discount_code',
                 'status'
                 ])
-                
-                ->with('businessOwnerInfos','galleryData','operationData')->where('id', $request->id)
-                
+
+                ->where('id', $request->id) 
+
                 ->get()
 
                 ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
@@ -800,7 +800,18 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
                 $business->average_rating = round((double) $business->averageRating(),2) ?? '';
-		$business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
+		        $business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
+
+                // each star count and make percentage start
+                $totalRatings = TBusinessRating::where('business_id', $business->id)->count();
+                $eachRatingsPercentage = TBusinessRating::select(DB::raw('rating_star, COUNT(*) as count'))->where('business_id', $business->id)->groupBy('rating_star')->pluck('count', 'rating_star'); // [5 => 20, 4 => 10, ...]
+                $star_percentages = [];
+                foreach (range(1, 5) as $star) {
+                    $count = $eachRatingsPercentage[$star] ?? 0; 
+                    $star_percentages[$star] = $totalRatings > 0 ? round(($count / $totalRatings) * 100, 2) : 0;
+                }
+                $business->each_star_percentages = $star_percentages;
+                // end
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -1087,7 +1098,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $business_name = $validated['business_name'];
             $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
             // Convert degrees to radians for calculations
-            $filterBusinesses = TBusiness::with(['businessOwnerInfos','creedTags:id,name:id,name','businessType:id,name','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings','country:id,name','state:id,name','city:id,name'])->select(
+            $filterBusinesses = TBusiness::with(['businessOwnerInfos','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings'])->select(
                     'id',
                     'business_name',
                     'business_type_id',
@@ -1289,12 +1300,15 @@ class UserBusinessOwnerInfoCo extends Controller
             // 'image' => 'nullable|mimes:jpeg,jpg,png',
         ]);
 
-        if ($request->file('image')) {
+        $imagePath = [];
 
-            $file = $request->file('image'); 
-            $ratingImage = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images/business/rating'), $ratingImage);
-            $imagePath = 'images/business/rating/' .$ratingImage;
+        if ($request->file('image')) {
+            foreach($request->file('image') as $key=>$images){
+                // $file = $request->file('image'); 
+                $ratingImage = ++$key.time() . '.' . $images->getClientOriginalExtension();
+                $images->move(public_path('images/business/rating'), $ratingImage);
+                $imagePath[] = 'images/business/rating/' .$ratingImage;       
+            }
         }
 
         $ratingData = TBusinessRating::where('user_id', auth()->id())->where('business_id', $request->business_id)->get()->first();
@@ -1319,7 +1333,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $rating->save();
         }
 
-        $business_profile = TBusiness::with(['businessOwnerInfos','operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image'])->select(['id',
+        $business_profile = TBusiness::with(['businessOwnerInfos','operationData:id,business_id,open_time,closed_time','ratings','ratings.user:id,name,first_name,last_name,avatar','galleryData:id,business_id,business_gallery_image'])->select(['id',
                 'business_name',
                 'business_profile_image',
                 'business_type_id',
@@ -1356,7 +1370,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
                 ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
 
-            $business_profile = $business_profile->map(function ($business) {
+                $business_profile = $business_profile->map(function ($business) {
 
                 $business->business_type_name = $business->businessTypeName ?? '';
                 $business->business_category_name = $business->businessCategory->name ?? '';
@@ -1368,6 +1382,17 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->city_name = $business->cityName->name ?? '';
                 $business->average_rating = round((double)$business->averageRating(),2) ?? '';
                 $business->rating_count = TBusinessRating::where('business_id', $business->id)->count('id');
+
+                // each star count and make percentage start
+                $totalRatings = TBusinessRating::where('business_id', $business->id)->count();
+                $eachRatingsPercentage = TBusinessRating::select(DB::raw('rating_star, COUNT(*) as count'))->where('business_id', $business->id)->groupBy('rating_star')->pluck('count', 'rating_star'); // [5 => 20, 4 => 10, ...]
+                $star_percentages = [];
+                foreach (range(1, 5) as $star) {
+                    $count = $eachRatingsPercentage[$star] ?? 0; 
+                    $star_percentages[$star] = $totalRatings > 0 ? round(($count / $totalRatings) * 100, 2) : 0;
+                }
+                $business->each_star_percentages = $star_percentages;
+                // end
 	 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -1423,11 +1448,6 @@ class UserBusinessOwnerInfoCo extends Controller
         $data = [
             'user_info' => $user,
             'businessOwnerInfo' => $businessOwnerInfo,
-        ];
-
-        $data = [
-            'user_info' => $user,
-	   'businessOwnerInfo' => $businessOwnerInfo,
         ];
 
         return response()->json(['success' => 'success', 'message' => 'User Details:','data'=>$data]);
