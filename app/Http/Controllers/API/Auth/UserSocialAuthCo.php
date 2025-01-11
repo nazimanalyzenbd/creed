@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
-// use Laravel\Socialite\Two\GoogleProvider;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Two\AppleProvider;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Http\Requests\Auth\UserRequest;
@@ -32,9 +32,8 @@ class UserSocialAuthCo extends Controller
         $admin = User::select('id','email','password','account_type','name','first_name','last_name')->where('email', $credentials['email'])->first();
 
         if ($admin && Hash::check($request->password, $admin->password)){ 
-        // if (Auth::attempt($credentials)) {
+  
             $user = $admin; 
-            // $user = Auth::user();
             $token = $user->createToken('API Token')->plainTextToken;
             $user['token'] = $token;
 
@@ -59,47 +58,49 @@ class UserSocialAuthCo extends Controller
 
     public function manualsignUp(UserRequest $request)
     {
-    
-        $request->validated();
-
         try {
-           
-            $input = $request->only(['email', 'password']);
-            $input['password'] = Hash::make($input['password']);
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:8',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
             if($request->business_page == 1){
                 $user['account_type'] = 'GB';
             }
-            
-            $user = User::create($input);
+    
+            $user = User::create([
+                'email' => $request->email,
+                'password' => Hash::make($request->password), 
+            ]);
 
-            // Generate the token
             $token = $user->createToken('manual-auth-token')->plainTextToken;
             $user['token'] = $token;
-
-            // Return the response with reduced data
+    
             return response()->json([
                 'status' => 'success',
                 'message' => 'Signup successful.',
-                'user' => $user->makeHidden(['id','created_at','updated_at']),
+                'user' => $user->makeHidden(['id','created_at','updated_at','deleted_at']),
             ], 201);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'There were validation errors.',
-                'errors' => $e->errors()
-            ], 422);
-
+    
         } catch (\Exception $e) {
-            \Log::error('Signup failed: ' . $e->getMessage());
+
+            \Log::error('Signup failed.: ' . $e->getMessage());
+    
             return response()->json([
                 'status' => 'error',
-                'message' => 'Signup failed. Please try again later.'
+                'message' => 'Signup failed. Please try again later.',
+                'errors' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     public function redirectToGoogle()
     {
@@ -133,7 +134,7 @@ class UserSocialAuthCo extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Signup Successful.',
-                    'user' => $user->makeHidden(['id','created_at','updated_at']),
+                    'user' => $user->makeHidden(['id','created_at','updated_at','deleted_at']),
                 ]);
 
             }else{
@@ -144,7 +145,7 @@ class UserSocialAuthCo extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'SignIn Successful.',
-                    'user' => $users->makeHidden(['created_at','updated_at']),
+                    'user' => $users->makeHidden(['created_at','updated_at','deleted_at']),
                 ]);
             }
             
