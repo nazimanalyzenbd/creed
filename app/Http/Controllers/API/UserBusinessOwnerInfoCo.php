@@ -42,7 +42,6 @@ class UserBusinessOwnerInfoCo extends Controller
     public function businessOwnerInfoStore(Request $request){
 
         try{
-
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required|string',
                 'last_name' => 'required|string',
@@ -115,7 +114,7 @@ class UserBusinessOwnerInfoCo extends Controller
 
         $validator = Validator::make($request->all(), [
             
-            'owner_id' => 'required',
+            'owner_id' => 'required|integer',
             'business_name' => 'required|string',
             'business_type_id' => 'required',
             'business_category_id' => 'required',
@@ -134,9 +133,13 @@ class UserBusinessOwnerInfoCo extends Controller
         ]);
 
         if ($validator->fails()) {
-            return withErrors($validator)->withInput();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
         }
-  
+
         try{
 
            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status','>=',1)->get()->first();
@@ -166,7 +169,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $businessData = TBusiness::find($businessOwnerId->business_id);
                 $businessData->business_owner_id = $businessOwnerId->id;
                 $businessData->business_name = $request->business_name;
-	        $businessData->business_type_id = json_encode($request->business_type_id);
+	            $businessData->business_type_id = json_encode($request->business_type_id);
                 $businessData->business_category_id = $request->business_category_id;
                 $businessData->business_subcategory_id = $request->business_subcategory_id;
                 $businessData->address = $request->address;
@@ -186,7 +189,7 @@ class UserBusinessOwnerInfoCo extends Controller
                
                 $tUserBusinessOwnerInfo = TBusinessOwnerInfo::find($businessOwnerId->id);
     	
-	 }else{
+	        }else{
           
                 $businessData = New TBusiness();
                 $businessData->business_owner_id = $businessOwnerId->id;
@@ -223,23 +226,17 @@ class UserBusinessOwnerInfoCo extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
-                'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at']),
-                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
-            ],200);
+                'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at','deleted']),
+                'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at','deleted_at'])
+            ],201);
 
-        } catch (QueryException $e) {
-            $errorMessage = "Database error: Unable to submit data.!";
-            return response()->json([
-                'status' => 'failed',
-                'message' => $errorMessage,
-            ],500);
-            return redirect()->back()->with('error', '');
         } catch (\Exception $e) {
-         
+            \Log::error('Database error: ' . $e->getMessage());
             return response()->json([
-                'status' => 'failed',
-                'errors' => $e->errors(),
-            ],422);
+                'status' => 'error',
+                'message' => 'Database error: Unable to submit data!',
+                'errors' => $e->getMessage(),
+            ], 500);
         }
 
     }
