@@ -39,14 +39,31 @@ use DB;
 class UserBusinessOwnerInfoCo extends Controller
 {
     // Business Owner info page
-    public function businessOwnerInfoStore(TBusinessOwnerInfoRequest $request){
+    public function businessOwnerInfoStore(Request $request){
 
-        $validator = $request->validated();
-        
         try{
+
+            $validator = Validator::make($request->all(), [
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'email' => 'required|email',
+                'country_code' => 'nullable|string',
+                'phone_number' => 'required|string',
+                'address' => 'required|string',
+                'owner_id' => 'nullable',
+            ]);
+    
+            if ($validator->fails()) {
+                $errors = collect($validator->errors()->toArray())->map(fn($messages) => $messages[0]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed.',
+                    'errors' => $errors,
+                ], 422);
+            }
+
             if($request->owner_id=='null')
             {
-                $input = $request->all();
                 $tUserTBusinessOwnerInfo = new TBusinessOwnerInfo();
                 $tUserTBusinessOwnerInfo->user_id = $request->user()->id;
                 $tUserTBusinessOwnerInfo->first_name = $request->first_name;
@@ -78,24 +95,19 @@ class UserBusinessOwnerInfoCo extends Controller
             return response()->json([
                 'status' => 'success',
                 'message'=> 'Owner info successfully saved.',
-                'tUserTBusinessOwnerInfo' => $tUserTBusinessOwnerInfo
-            ],200);
+                'tUserTBusinessOwnerInfo' => $tUserTBusinessOwnerInfo->makeHidden(['created_at','updated_at','deleted_at']),
+            ],201);
 
-        } catch (QueryException $e) {
-            $errorMessage = "Database error: Unable to submit data.!";
-            return response()->json([
-                'status' => 'failed',
-                'message' => $errorMessage,
-            ],500);
-            
         } catch (\Exception $e) {
-         
-            return response()->json([
-                'status' => 'failed',
-                'errors' => $validator->errors(),
-            ],422);
-        }
 
+            \Log::error('Database error: ' . $e->getMessage());
+    
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Database error: Unable to submit data!',
+                'errors' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     // Business info store step 1

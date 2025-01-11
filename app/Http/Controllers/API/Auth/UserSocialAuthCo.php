@@ -92,7 +92,7 @@ class UserSocialAuthCo extends Controller
     
         } catch (\Exception $e) {
 
-            \Log::error('Signup failed.: ' . $e->getMessage());
+            \Log::error('Signup failed: ' . $e->getMessage());
     
             return response()->json([
                 'status' => 'error',
