@@ -153,17 +153,23 @@ class UserBusinessOwnerInfoCo extends Controller
            }
 
             $array = $request->affiliation_id;
-            $storedTexts = [];
+            
+            if($array!=null){
+                
+                $storedTexts = [];
 
-            $array = array_map(function ($item) use (&$storedTexts) {
-                if (!ctype_digit($item)) {
-                    $storedTexts[] = $item; 
-                    $newId = TAdminAffiliation::firstOrCreate(['name' => $item])->id;
-                    return $newId; 
-                }
-                return ((string)$item);
-            }, $array);
-
+                $array = array_map(function ($item) use (&$storedTexts) {
+                    if (!ctype_digit($item)) {
+                        $storedTexts[] = $item; 
+                        $newId = TAdminAffiliation::firstOrCreate(['name' => $item])->id;
+                        return $newId; 
+                    }
+                    return ((string)$item);
+                }, $array);
+            }else{
+                $array = '';
+            }
+            
            if($businessOwnerId->business_id!=''){
 
                 $businessData = TBusiness::find($businessOwnerId->business_id);
@@ -222,11 +228,17 @@ class UserBusinessOwnerInfoCo extends Controller
                 $tUsers->save();
             }
 
+            $data = json_decode($businessData, true);
+
+            $data['business_type_id'] = json_decode($data['business_type_id']);
+            $data['affiliation_id'] = json_decode($data['affiliation_id']);
+            // $businessData = json_encode($data, JSON_PRETTY_PRINT);
+
             $message = "Business information step 1 successfully saved.";
             return response()->json([
                 'status' => 'success',
                 'message' => $message,
-                'userBusinessInfo' => $businessData->makeHidden(['created_at','updated_at','deleted']),
+                'userBusinessInfo' => $data,
                 'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at','deleted_at'])
             ],201);
 
@@ -243,9 +255,25 @@ class UserBusinessOwnerInfoCo extends Controller
 
     // Business info store step 2
     public function businessInfoStore2(Request $request){
- 
+        
+        $validator = Validator::make($request->all(), [
+            'owner_id' => 'required|integer',
+            'description' => 'required|string',
+            'service_area' => 'nullable',
+            'hotline_country_code' => 'nullable',
+            'customer_hotline' => 'nullable',
+            'customer_email_leads' => 'nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
        try{
-            
             $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status','>=', 2)->get()->first();
 
             if(empty($businessOwnerId->id)){
@@ -276,11 +304,12 @@ class UserBusinessOwnerInfoCo extends Controller
 	
             $galleryCheck = TBusinessGallery::where('business_id', $businessData->id)->get();    
           
-	 if(!empty($galleryCheck)){
+	    if(!empty($galleryCheck)){
             foreach($galleryCheck as $value){
                 $galleryData = TBusinessGallery::find($value->id);
                 $galleryData->delete();
-            }}
+            }
+        }
 
        if ($request->hasFile('business_gallery_image')) {
 
@@ -332,28 +361,36 @@ class UserBusinessOwnerInfoCo extends Controller
                 'operationHours' => $operationHours,
             ],200);
 
-       } catch (QueryException $e) {
-           $errorMessage = "Database error: Unable to submit data.!";
-           return response()->json([
-               'status' => 'failed',
-               'message' => $errorMessage,
-           ],500);
-           return redirect()->back()->with('error', '');
-       } catch (\Throwable $e) {
-         
-           return response()->json([
-               'status' => 'failed',
-               'errors' => $e->errors(),
-           ],422);
-       }
+        } catch (\Exception $e) {
+            \Log::error('Database error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Database error: Unable to submit data!',
+                'errors' => $e->getMessage(),
+            ], 500);
+        }
 
     }
 
     // Business info store step 3
     public function businessInfoStore3(Request $request){
 
-        try{
+        $validator = Validator::make($request->all(), [
+            'owner_id' => 'required|integer',
+            'creed_tags_id' => 'nullable',
+            'restaurant_id' => 'nullable',
+            'handcut_text' => 'nullable',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try{
             $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status','>=', 3)->get()->first();
            
            if(empty($businessOwnerId->id)){
@@ -403,25 +440,34 @@ class UserBusinessOwnerInfoCo extends Controller
                 'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
             ],200);
 
-        } catch (QueryException $e) {
-            $errorMessage = "Database error: Unable to submit data.!";
-            return response()->json([
-                'status' => 'failed',
-                'message' => $errorMessage,
-            ],500);
-            return redirect()->back()->with('error', '');
         } catch (\Exception $e) {
-         
+            \Log::error('Database error: ' . $e->getMessage());
             return response()->json([
-                'status' => 'failed',
-                'errors' => $e->errors(),
-            ],422);
+                'status' => 'error',
+                'message' => 'Database error: Unable to submit data!',
+                'errors' => $e->getMessage(),
+            ], 500);
         }
 
     }
 
     // Business info store step 4
     public function businessInfoStore4(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'owner_id' => 'required|integer',
+            'creed_tags_id' => 'nullable',
+            'restaurant_id' => 'nullable',
+            'handcut_text' => 'nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
    
         try{
 
@@ -453,19 +499,13 @@ class UserBusinessOwnerInfoCo extends Controller
                 'userBusinessOwnerInfo' => $tUserBusinessOwnerInfo->makeHidden(['created_at','updated_at'])
             ],200);
 
-        } catch (QueryException $e) {
-            $errorMessage = "Database error: Unable to submit data.!";
-            return response()->json([
-                'status' => 'failed',
-                'message' => $errorMessage,
-            ],500);
-            return redirect()->back()->with('error', '');
         } catch (\Exception $e) {
-         
+            \Log::error('Database error: ' . $e->getMessage());
             return response()->json([
-                'status' => 'failed',
-                'errors' => $e->errors(),
-            ],422);
+                'status' => 'error',
+                'message' => 'Database error: Unable to submit data!',
+                'errors' => $e->getMessage(),
+            ], 500);
         }
 
     }
@@ -817,11 +857,11 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->average_rating = round((double) $business->averageRating(),2) ?? '';
 		$business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
                 
-		// each star count and make percentage start
+		        // each star count and make percentage start
                 $totalRatings = TBusinessRating::where('business_id', $business->id)->count();
                 $eachRatingsPercentage = TBusinessRating::select(DB::raw('rating_star, COUNT(*) as count'))->where('business_id', $business->id)->groupBy('rating_star')->pluck('count', 'rating_star'); // [5 => 20, 4 => 10, ...]
                 $star_percentages = [];
-                foreach (range(1, 5) as $star) {
+                foreach (range(5, 1) as $star) {
                     $count = $eachRatingsPercentage[$star] ?? 0; 
                     $star_percentages[$star] = $totalRatings > 0 ? round(($count / $totalRatings) * 100, 2) : 0;
                 }
@@ -1399,11 +1439,11 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->average_rating = round((double)$business->averageRating(),2) ?? '';
                 $business->rating_count = TBusinessRating::where('business_id', $business->id)->count('id');
 	 	
-		// each star count and make percentage start
+		       // each star count and make percentage start
                 $totalRatings = TBusinessRating::where('business_id', $business->id)->count();
                 $eachRatingsPercentage = TBusinessRating::select(DB::raw('rating_star, COUNT(*) as count'))->where('business_id', $business->id)->groupBy('rating_star')->pluck('count', 'rating_star'); // [5 => 20, 4 => 10, ...]
                 $star_percentages = [];
-                foreach (range(1, 5) as $star) {
+                foreach (range(5, 1) as $star) {
                     $count = $eachRatingsPercentage[$star] ?? 0; 
                     $star_percentages[$star] = $totalRatings > 0 ? round(($count / $totalRatings) * 100, 2) : 0;
                 }
@@ -1451,12 +1491,39 @@ class UserBusinessOwnerInfoCo extends Controller
             
             $user ='';
             $businessOwnerInfo = TBusinessOwnerInfo::with('business','business.galleryData','business.operationData','business.ratings')->find($request->business_owner_id);
+          
+            $data1 = json_decode($businessOwnerInfo->business, true);
+            
+            $data1['business_type_id'] = json_decode($data1['business_type_id']);
+            $data1['affiliation_id'] = json_decode($data1['affiliation_id']);
+            $data1['creed_tags_id'] = json_decode($data1['creed_tags_id']);   
+            $data1['restaurant_id'] = json_decode($data1['restaurant_id']);   
+            $data1['service_area'] = json_decode($data1['service_area']);   
+            $businessOwnerInfo['businessess'] =  $data1;
+            unset($businessOwnerInfo->business);
+    
         }else{
 
             $user = User::find($request->user()->id);
 
-            foreach($user->businessOwnerInfos as $value){
-                $businessOwnerInfo = TBusinessOwnerInfo::with('business','business.galleryData','business.operationData','business.ratings')->find($value->id);
+            if(!empty($user->businessOwnerInfo)){
+                // $user = User::find($request->user()->id);
+                foreach($user->businessOwnerInfos as $value){
+                    $businessOwnerInfo = TBusinessOwnerInfo::with('business','business.galleryData','business.operationData','business.ratings')->find($value->id);
+                    
+                    $data1 = json_decode($businessOwnerInfo->business, true);
+                    $data1['business_type_id'] = json_decode($data1['business_type_id']);
+                    $data1['affiliation_id'] = json_decode($data1['affiliation_id']);
+                    $data1['creed_tags_id'] = json_decode($data1['creed_tags_id']);   
+                    $data1['restaurant_id'] = json_decode($data1['restaurant_id']);   
+                    $data1['service_area'] = json_decode($data1['service_area']);
+                    $businessOwnerInfo['businessess'] =  $data1;
+                    unset($businessOwnerInfo->business);
+                }
+            }else{
+
+                $user = null;
+                $businessOwnerInfo = null;
             }
 
         }
