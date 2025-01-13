@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('t_payments', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('business_id');
+            $table->string('payment_type', 191)->nullable();
+            $table->string('payment_card_brand', 191)->nullable();
             $table->string('payment_method', 100)->nullable();
             $table->string('card_number', 100);
             $table->string('expire_date', 100);
@@ -23,14 +25,15 @@ return new class extends Migration
             $table->double('payable_amount', 10,2)->unsigned()->default(0);
             $table->double('paid_amount', 10,2)->unsigned()->default(0);
             $table->string('currency', 100)->nullable();
-            $table->string('trx_id')->nullable();
+            $table->string('description')->nullable();
             $table->string('expand', 100)->nullable();
+            $table->string('receipt_url', 255)->nullable();
             $table->boolean('status')->default(0)->comment('1=Payment Successful, 0=Payment Failed');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('Stores the creation time of the record');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('Stores the last update time of the record');
             $table->softDeletes();
             // Foreign_key
-            $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('cascade');
+            // $table->foreign('business_id')->references('id')->on('t_businesses')->onDelete('cascade');
 
             // Indexes
             $table->index('business_id');
