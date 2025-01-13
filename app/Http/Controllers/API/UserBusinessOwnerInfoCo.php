@@ -13,6 +13,7 @@ use App\Models\Admin\TAboutUs;
 use App\Models\Admin\TAppTermsAndConditions;
 use App\Models\Api\TBusinessOwnerInfo;
 use App\Models\Api\TBusiness;
+use App\Models\Api\TPayment;
 use App\Models\Admin\TDays;
 use App\Models\Api\TBusinessRating;
 use App\Models\Api\TBusinessGallery;
@@ -33,6 +34,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\RedirectResponse;
+use Stripe\Stripe;
 use Auth;
 use DB;
 
@@ -162,9 +164,9 @@ class UserBusinessOwnerInfoCo extends Controller
                     if (!ctype_digit($item)) {
                         $storedTexts[] = $item; 
                         $newId = TAdminAffiliation::firstOrCreate(['name' => $item])->id;
-                        return $newId; 
+                        return ((string)$newId); 
                     }
-                    return ((string)$item);
+                    return $item;
                 }, $array);
             }else{
                 $array = '';
@@ -304,12 +306,12 @@ class UserBusinessOwnerInfoCo extends Controller
 	
             $galleryCheck = TBusinessGallery::where('business_id', $businessData->id)->get();    
           
-	    if(!empty($galleryCheck)){
-            foreach($galleryCheck as $value){
-                $galleryData = TBusinessGallery::find($value->id);
-                $galleryData->delete();
-            }
-        }
+	    // if(!empty($galleryCheck)){
+        //     foreach($galleryCheck as $value){
+        //         $galleryData = TBusinessGallery::find($value->id);
+        //         $galleryData->delete();
+        //     }
+        // }
 
        if ($request->hasFile('business_gallery_image')) {
 
@@ -319,10 +321,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     $image->move(public_path('images/business/gallery'), $imageName);
                     $imagePaths = 'images/business/gallery/' . $imageName;
 
-            
-                 
-                        $galleryData = new TBusinessGallery();
-                    
+                    $galleryData = new TBusinessGallery();
                     $galleryData->business_id = $businessData->id;
                     $galleryData->business_gallery_image = $imagePaths;
                     $galleryData->save();
@@ -625,7 +624,7 @@ class UserBusinessOwnerInfoCo extends Controller
         if ($perm == 0) {
             $latitude = '41.850033';         //'40.12150192260742';
             $longitude = '-87.6500523';      //'-100.45039367675781';
-            $data = TBusiness::with('operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
+            $data = TBusiness::with('operationData:id,business_id,day,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
                 'id',
                 'business_name',
                 'business_profile_image',
@@ -664,8 +663,9 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
-                $business->average_rating = $business->averageRating() ?? '';
-                
+                $business->average_rating = round((double) $business->averageRating(),2) ?? '';
+                $business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
+
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
                 unset($business->countryName);
@@ -678,7 +678,7 @@ class UserBusinessOwnerInfoCo extends Controller
         }
 
         // Haversine formula to calculate distance between two points
-        $data = TBusiness::with('operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
+        $data = TBusiness::with('operationData:id,business_id,day,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
             'id',
             'business_name',
             'business_profile_image',
@@ -716,7 +716,9 @@ class UserBusinessOwnerInfoCo extends Controller
             $business->country_name = $business->countryName->name ?? '';
             $business->state_name = $business->stateName->name ?? '';
             $business->city_name = $business->cityName->name ?? '';
-            $business->average_rating = $business->averageRating() ?? '';
+            $business->average_rating = round((double) $business->averageRating(),2) ?? '';
+            $business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
+            // $business->average_rating = number_format($business->average_rating, 2, '.', '');
             
             unset($business->businessCategory);
             unset($business->businessSubCategory);
@@ -748,7 +750,7 @@ class UserBusinessOwnerInfoCo extends Controller
         $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
 
         // Convert degrees to radians for calculations
-        $multiBusinesses = TBusiness::with('operationData:id,business_id,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
+        $multiBusinesses = TBusiness::with('operationData:id,business_id,day,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->select(
                 'id',
                 'business_name',
                 'business_profile_image',
@@ -790,7 +792,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
-                $business->average_rating = $business->averageRating() ?? '';
+                $business->average_rating = round((double) $business->averageRating(),2) ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -855,7 +857,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
                 $business->average_rating = round((double) $business->averageRating(),2) ?? '';
-		$business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
+		        $business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
                 
 		        // each star count and make percentage start
                 $totalRatings = TBusinessRating::where('business_id', $business->id)->count();
@@ -954,7 +956,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     $business->country_name = $business->countryName->name ?? '';
                     $business->state_name = $business->stateName->name ?? '';
                     $business->city_name = $business->cityName->name ?? '';
-                    $business->average_rating = $business->averageRating() ?? '';
+                    $business->average_rating = round((double) $business->averageRating(),2) ?? '';
                     
                     unset($business->businessCategory);
                     unset($business->businessSubCategory);
@@ -1001,7 +1003,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     $business->country_name = $business->countryName->name ?? '';
                     $business->state_name = $business->stateName->name ?? '';
                     $business->city_name = $business->cityName->name ?? '';
-                    $business->average_rating = $business->averageRating() ?? '';
+                    $business->average_rating = round((double) $business->averageRating(),2) ?? '';
                     
                     unset($business->businessCategory);
                     unset($business->businessSubCategory);
@@ -1072,7 +1074,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
-                $business->average_rating = $business->averageRating() ?? '';
+                $business->average_rating = round((double) $business->averageRating(),2) ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -1189,7 +1191,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $business->country_name = $business->countryName->name ?? '';
                 $business->state_name = $business->stateName->name ?? '';
                 $business->city_name = $business->cityName->name ?? '';
-                $business->average_rating = $business->averageRating() ?? '';
+                $business->average_rating = round((double) $business->averageRating(),2) ?? '';
                 
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
@@ -1247,7 +1249,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     $business->country_name = $business->countryName->name ?? '';
                     $business->state_name = $business->stateName->name ?? '';
                     $business->city_name = $business->cityName->name ?? '';
-                    $business->average_rating = $business->averageRating() ?? '';
+                    $business->average_rating = round((double) $business->averageRating(),2) ?? '';
                     
                     unset($business->businessCategory);
                     unset($business->businessSubCategory);
@@ -1311,37 +1313,43 @@ class UserBusinessOwnerInfoCo extends Controller
         $users = User::find($request->user()->id);
         $businessList = json_decode($users->save_business_list); 
         $businessDetails = [];
-        foreach($businessList as $value){
 
-            $data = \App\Models\Api\TBusiness::where('id', $value)->get()
-            ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
+        if($businessList){
+            foreach($businessList as $value){
 
-            $data = $data->map(function ($business) {
+                $data = \App\Models\Api\TBusiness::with('operationData:id,business_id,day,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->where('id', $value)->get()
+                ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
 
-                $business->business_type_name = $business->businessTypeName ?? '';
-                $business->business_category_name = $business->businessCategory->name ?? '';
-                $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
-                $business->business_creed_name = $business->creedTagsName ?? '';
-                $business->affiliation_name = $business->affiliationName ?? '';
-                $business->country_name = $business->countryName->name ?? '';
-                $business->state_name = $business->stateName->name ?? '';
-                $business->city_name = $business->cityName->name ?? '';
-                
-                unset($business->businessCategory);
-                unset($business->businessSubCategory);
-                unset($business->countryName);
-                unset($business->stateName);
-                unset($business->cityName);
-                return $business;
-            });
+                $data = $data->map(function ($business) {
 
-            $businessDetails[] = $data;
+                    $business->business_type_name = $business->businessTypeName ?? '';
+                    $business->business_category_name = $business->businessCategory->name ?? '';
+                    $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+                    $business->business_creed_name = $business->creedTagsName ?? '';
+                    $business->affiliation_name = $business->affiliationName ?? '';
+                    $business->country_name = $business->countryName->name ?? '';
+                    $business->state_name = $business->stateName->name ?? '';
+                    $business->city_name = $business->cityName->name ?? '';
+                    $business->average_rating = round((double) $business->averageRating(),2) ?? '';
+                    $business->rating_count= TBusinessRating::where('business_id', $business->id)->count('id');
+                    
+                    unset($business->businessCategory);
+                    unset($business->businessSubCategory);
+                    unset($business->countryName);
+                    unset($business->stateName);
+                    unset($business->cityName);
+                    return $business;
+                });
 
+                $businessDetails[] = $data;
+
+            }
         }
 
         $data = [
             'businessList' => $businessDetails,
         ];
+
         return response()->json(['success' => 'success', 'message' => 'Business Save List.', 'data' => $data]);
     }
 
@@ -1355,16 +1363,16 @@ class UserBusinessOwnerInfoCo extends Controller
             // 'image' => 'nullable|mimes:jpeg,jpg,png',
         ]);
 	
-	$imgePath = [];
+	    $imgePath = [];
 
         if ($request->file('image')) {
-	   foreach ($request->file('image') as $key=>$images) {
-             // $file = $request->file('image'); 
-                $ratingImage = ++$key.time() . '.' . $images->getClientOriginalExtension();
-                $images->move(public_path('images/business/rating'), $ratingImage);
-            $imagePath[] = 'images/business/rating/' .$ratingImage;
-       	   }
-	}
+            foreach ($request->file('image') as $key=>$images) {
+                // $file = $request->file('image'); 
+                    $ratingImage = ++$key.time() . '.' . $images->getClientOriginalExtension();
+                    $images->move(public_path('images/business/rating'), $ratingImage);
+                $imagePath[] = 'images/business/rating/' .$ratingImage;
+            }
+	    }
 
         $ratingData = TBusinessRating::where('user_id', auth()->id())->where('business_id', $request->business_id)->get()->first();
 
@@ -1388,7 +1396,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $rating->save();
         }
 
-        $business_profile = TBusiness::with(['businessOwnerInfos','operationData:id,business_id,open_time,closed_time','ratings','ratings.user:id,name,first_name,last_name,avatar','galleryData:id,business_id,business_gallery_image'])->select(['id',
+        $business_profile = TBusiness::with(['businessOwnerInfos','operationData:id,business_id,day,open_time,closed_time','ratings','ratings.user:id,name,first_name,last_name,avatar','galleryData:id,business_id,business_gallery_image'])->select(['id',
                 'business_name',
                 'business_profile_image',
                 'business_type_id',
@@ -1491,40 +1499,25 @@ class UserBusinessOwnerInfoCo extends Controller
             
             $user ='';
             $businessOwnerInfo = TBusinessOwnerInfo::with('business','business.galleryData','business.operationData','business.ratings')->find($request->business_owner_id);
-          
-            $data1 = json_decode($businessOwnerInfo->business, true);
             
-            $data1['business_type_id'] = json_decode($data1['business_type_id']);
-            $data1['affiliation_id'] = json_decode($data1['affiliation_id']);
-            $data1['creed_tags_id'] = json_decode($data1['creed_tags_id']);   
-            $data1['restaurant_id'] = json_decode($data1['restaurant_id']);   
-            $data1['service_area'] = json_decode($data1['service_area']);   
-            $businessOwnerInfo['businessess'] =  $data1;
-            unset($businessOwnerInfo->business);
+            if($businessOwnerInfo->business){
+
+                $data1 = json_decode($businessOwnerInfo->business, true);
+                $data1['business_type_id'] = json_decode($data1['business_type_id']);
+                $data1['affiliation_id'] = json_decode($data1['affiliation_id']);
+                $data1['creed_tags_id'] = json_decode($data1['creed_tags_id']);   
+                $data1['restaurant_id'] = json_decode($data1['restaurant_id']);   
+                $data1['service_area'] = json_decode($data1['service_area']);   
+                $data1['country_name'] = $businessOwnerInfo->business->countryName->name ?? '';   
+                $businessOwnerInfo['businessess'] =  $data1;
+                unset($businessOwnerInfo->business);
+
+            }
     
         }else{
 
-            $user = User::find($request->user()->id);
-
-            if(!empty($user->businessOwnerInfo)){
-                // $user = User::find($request->user()->id);
-                foreach($user->businessOwnerInfos as $value){
-                    $businessOwnerInfo = TBusinessOwnerInfo::with('business','business.galleryData','business.operationData','business.ratings')->find($value->id);
-                    
-                    $data1 = json_decode($businessOwnerInfo->business, true);
-                    $data1['business_type_id'] = json_decode($data1['business_type_id']);
-                    $data1['affiliation_id'] = json_decode($data1['affiliation_id']);
-                    $data1['creed_tags_id'] = json_decode($data1['creed_tags_id']);   
-                    $data1['restaurant_id'] = json_decode($data1['restaurant_id']);   
-                    $data1['service_area'] = json_decode($data1['service_area']);
-                    $businessOwnerInfo['businessess'] =  $data1;
-                    unset($businessOwnerInfo->business);
-                }
-            }else{
-
-                $user = null;
-                $businessOwnerInfo = null;
-            }
+            $user = null;
+            $businessOwnerInfo = null;
 
         }
         
@@ -1534,5 +1527,66 @@ class UserBusinessOwnerInfoCo extends Controller
         ];
 
         return response()->json(['success' => 'success', 'message' => 'User Details:','data'=>$data]);
+    }
+
+    // Gallery Image Delete
+    public function imageDelete(Request $request){
+
+        $id = TBusinessGallery::where('business_id', $request->business_id)->where('business_gallery_image', $request->business_gallery_image)->get()->pluck('id')->first();
+        
+        if($id){
+            $galleryData = TBusinessGallery::find($id);
+            $galleryData->delete();
+            return response()->json(['success' => 'success', 'message' => 'Selected Image Deleted Successful']);
+        }else{
+            return response()->json(['success' => 'failed', 'message' => 'Delete Failed']);
+        }
+
+    }
+
+    public function checkout(Request $request){
+
+        try {
+
+            // Stripe::setApiKey(config('services.stripe.secret'));
+            $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET_KEY"));
+
+            $charge = $stripe->charges->create([
+                'amount' => $request->amount * 100,
+                'currency' => 'usd',
+                'source' => 'tok_visa',
+            ]);
+
+            if($charge->status == "succeeded"){
+                $paymentIntent = TPayment::create([
+                    'payable_amount' => $request->amount,
+                    'paid_amount' => $request->amount,
+                    'currency' => 'usd', 
+                    'payment_type' => $charge->payment_method_details->type,
+                    'payment_card_brand' => $charge->payment_method_details->card->brand,
+                    'product' => $request->product,
+                    'subscription_plan_name' => $request->subscription_plan_name,
+                    'business_id' => $request->business_id,
+                    'card_number' => $request->card_number,
+                    'expire_date' => $request->expire_date,
+                    'cvc_number' => $request->cvc_number,
+                    'description' => $charge->id,
+                    'payment_method' => $charge->payment_method,
+                    'receipt_url' => $charge->receipt_url,
+                    'status' => 1,
+                ]);
+            }
+
+            return response()->json([
+                'success' => 'success',
+                'message' => 'Payment Success.',
+                'paymentIntent' => $paymentIntent,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 'failed',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }

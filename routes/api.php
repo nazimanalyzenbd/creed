@@ -31,6 +31,7 @@ Route::post('/business-info/store/step1',[UserBusinessOwnerInfoCo::class, 'busin
 Route::post('/business-info/store/step2',[UserBusinessOwnerInfoCo::class, 'businessInfoStore2'])->name('businessInfo.store.step2')->middleware('auth:sanctum');
 Route::post('/business-info/store/step3',[UserBusinessOwnerInfoCo::class, 'businessInfoStore3'])->name('businessInfo.store.step3')->middleware('auth:sanctum');
 Route::post('/business-info/store/step4',[UserBusinessOwnerInfoCo::class, 'businessInfoStore4'])->name('businessInfo.store.step4')->middleware('auth:sanctum');
+Route::post('/business-info/checkout', [UserBusinessOwnerInfoCo::class, 'checkout'])->name('businessInfo.checkout')->middleware('auth:sanctum');
 Route::get('/business/all-dropDown-list', [UserBusinessOwnerInfoCo::class, 'allDropDown'])->name('business.all_dropDown_list');
 Route::get('/business/creed-tags', [UserBusinessOwnerInfoCo::class, 'creedTags'])->name('creed.tags');
 Route::get('/business-type', [UserBusinessOwnerInfoCo::class, 'businessType'])->name('business.type');
@@ -80,3 +81,6 @@ Route::get('/business-rating/delete', [UserBusinessOwnerInfoCo::class, 'ratingDe
 Route::get('/business-rating-view', [UserBusinessOwnerInfoCo::class, 'ratingView'])->name('business.rating.view')->middleware('auth:sanctum');
 
 Route::get('/user-details', [UserBusinessOwnerInfoCo::class, 'userDetails'])->name('user.profile.details')->middleware('auth:sanctum');
+
+
+Route::post('/business-info/image-delete', [UserBusinessOwnerInfoCo::class, 'imageDelete'])->name('business-info.image-delete')->middleware('auth:sanctum');

@@ -15,48 +15,18 @@ class TBusinessTypeSeeder extends Seeder
     {
         $tBusinessType = TBusinessType::insert([
             [
-                'name' => 'Information Technology Services', 
-                'description' => 'IT Related Service',
+                'name' => 'Online (Virtual) Store', 
+                'description' => 'You sell products from a virtual store.',
                 'created_by' => '1',
             ],
             [
-                'name' => 'Dentist Dental Surgeon', 
-                'description' => 'Dental Related Service',
+                'name' => 'Local (Physical) Store', 
+                'description' => 'You have a physical or retail storefront',
                 'created_by' => '1',
             ],
             [
-                'name' => 'Muslim Legal Services Family Law', 
-                'description' => 'Family Law Related Legal Service',
-                'created_by' => '1',
-            ],
-            [
-                'name' => 'Event planning party planning', 
-                'description' => 'Event Planning Related Service',
-                'created_by' => '1',
-            ],
-            [
-                'name' => 'Halal Yemeni Restaurant', 
-                'description' => 'Restaurant Related Service',
-                'created_by' => '1',
-            ],
-            [
-                'name' => 'Halal italian restaurant', 
-                'description' => 'Italian Restaurant Related Service',
-                'created_by' => '1',
-            ],
-            [
-                'name' => 'Online Retail', 
-                'description' => 'Online Retail Description',
-                'created_by' => '1',
-            ],
-            [
-                'name' => 'Local Store', 
-                'description' => 'Local Store Description',
-                'created_by' => '1',
-            ],
-            [
-                'name' => 'Others', 
-                'description' => 'Others Description',
+                'name' => 'Service Business', 
+                'description' => 'You provide services at customer’s location.',
                 'created_by' => '1',
             ],
         ]);

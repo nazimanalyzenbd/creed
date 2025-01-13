@@ -22,6 +22,15 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Description</label>
+                                        <div class="col-sm-10">
+                                            <textarea name="description" id="description" value="{{old('description')}}" class="form-control" placeholder=""></textarea>
+                                            @error('description')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <div class="col-sm-2">Status</div>
                                         <div class="col-sm-10">
                                             <div class="form-check">
