@@ -84,3 +84,5 @@ Route::get('/user-details', [UserBusinessOwnerInfoCo::class, 'userDetails'])->na
 
 
 Route::post('/business-info/image-delete', [UserBusinessOwnerInfoCo::class, 'imageDelete'])->name('business-info.image-delete')->middleware('auth:sanctum');
+
+Route::get('/personal-profile', [UserBusinessOwnerInfoCo::class, 'personalProfile'])->name('user.personal-profile')->middleware('auth:sanctum');

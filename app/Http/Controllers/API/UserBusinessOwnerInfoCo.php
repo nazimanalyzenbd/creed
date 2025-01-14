@@ -14,6 +14,7 @@ use App\Models\Admin\TAppTermsAndConditions;
 use App\Models\Api\TBusinessOwnerInfo;
 use App\Models\Api\TBusiness;
 use App\Models\Api\TPayment;
+use App\Models\Api\TSaveBusiness;
 use App\Models\Admin\TDays;
 use App\Models\Api\TBusinessRating;
 use App\Models\Api\TBusinessGallery;
@@ -34,6 +35,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\RedirectResponse;
+use Carbon\Carbon;
 use Stripe\Stripe;
 use Auth;
 use DB;
@@ -292,6 +294,8 @@ class UserBusinessOwnerInfoCo extends Controller
                 $profile = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images/business/profile'), $profile);
                 $imagePath = 'images/business/profile/' .$profile;
+            }else{
+                $imagePath = TBusiness::where('business_owner_id', $request->owner_id)->get()->pluck('business_profile_image')->first();
             }
 
             $businessData = TBusiness::find($businessOwnerId->business_id);
@@ -304,7 +308,7 @@ class UserBusinessOwnerInfoCo extends Controller
             $businessData->status = 3;
             $businessData->save();
 	
-            $galleryCheck = TBusinessGallery::where('business_id', $businessData->id)->get();    
+        // $galleryCheck = TBusinessGallery::where('business_id', $businessData->id)->get();    
           
 	    // if(!empty($galleryCheck)){
         //     foreach($galleryCheck as $value){
@@ -406,7 +410,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $file->move(public_path('images/business/halal_certificate'), $halal_certificate);
                 $imagePath = 'images/business/halal_certificate/' . $halal_certificate;
             }else{
-                $imagePath = '';
+                $imagePath = TBusiness::where('business_owner_id', $request->owner_id)->get()->pluck('halal_certificate')->first();
             }
 
             if ($request->hasFile('handcut_certificate')) { 
@@ -415,7 +419,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $file->move(public_path('images/business/handcut_certificate'), $handcut_certificate);
                 $imagePaths = 'images/business/handcut_certificate/' . $handcut_certificate;
             }else{
-                $imagePaths = '';
+                $imagePaths = TBusiness::where('business_owner_id', $request->owner_id)->get()->pluck('handcut_certificate')->first();
             }
 
             $businessData = TBusiness::find($businessOwnerId->business_id);          
@@ -455,9 +459,8 @@ class UserBusinessOwnerInfoCo extends Controller
 
         $validator = Validator::make($request->all(), [
             'owner_id' => 'required|integer',
-            'creed_tags_id' => 'nullable',
-            'restaurant_id' => 'nullable',
-            'handcut_text' => 'nullable',
+            'discount_code_description' => 'nullable',
+            'discount_code' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -470,7 +473,7 @@ class UserBusinessOwnerInfoCo extends Controller
    
         try{
 
-            $businessOwnerId = TBusinessOwnerInfo::where('user_id', $request->user()->id)->where('status', '>=', 4)->get()->first();
+            $businessOwnerId = TBusinessOwnerInfo::where('id', $request->owner_id)->where('user_id', $request->user()->id)->where('status', '>=', 4)->get()->first();
             
            if(empty($businessOwnerId->id)){
                $message = "Please first fillup Business information step 3.";
@@ -807,6 +810,8 @@ class UserBusinessOwnerInfoCo extends Controller
 
     public function getBusinessProfile(Request $request){
 
+        $userId = $request->user_id;
+
         $business_profile = TBusiness::with(['businessOwnerInfos','operationData:id,business_id,day,open_time,closed_time','ratings:id,user_id,business_id,rating_star,description,image,created_at','ratings.user:id,name,first_name,last_name,avatar','galleryData:id,business_id,business_gallery_image'])->select(['id',
                 'business_name',
                 'business_profile_image',
@@ -844,9 +849,17 @@ class UserBusinessOwnerInfoCo extends Controller
 
                 ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at']);
                 
-                
 
-            $business_profile = $business_profile->map(function ($business) {
+            $business_profile = $business_profile->map(function ($business)  use ($userId) {
+
+                $business['save_business'] = 0; 
+                if ($userId) {
+                    $saveBusiness = TSaveBusiness::where('user_id', $userId)
+                        ->where('business_id', $business->id)
+                        ->first();
+
+                    $business['save_business'] = $saveBusiness ? 1 : 0;
+                }
 
                 $business->business_type_name = $business->businessTypeName ?? '';
                 $business->business_category_name = $business->businessCategory->name ?? '';
@@ -869,7 +882,6 @@ class UserBusinessOwnerInfoCo extends Controller
                 }
                 $business->each_star_percentages = $star_percentages;
                 // end
-
                 unset($business->businessCategory);
                 unset($business->businessSubCategory);
                 unset($business->countryName);
@@ -877,7 +889,18 @@ class UserBusinessOwnerInfoCo extends Controller
                 unset($business->cityName);
                 return $business;
             });
-        
+
+            // $business['save_business'] = $userId;
+            //     if($userId){
+            //         $saveBusiness = TSaveBusiness::where('user_id', $userId)->where('business_id', $business->id)->get()->first();
+            //         if($saveBusiness!=''){
+            //             $business->save_business = 1;
+            //         }else{
+            //             $business->save_business = 0;
+            //         }
+            //     }
+            //     $business->save_business = 0;
+            
             return response()->json(['status' => 'success', 'message'=>'Business Profile Data Showing Success', 'data' => $business_profile,], 200);
     }
 
@@ -1269,34 +1292,35 @@ class UserBusinessOwnerInfoCo extends Controller
         $userId = $request->user()->id;
         $business_id = $request->business_id;
 
-        $users = User::find($userId);
+        $saveList = TSaveBusiness::where('user_id', $userId)->get();
 
-        if($users->save_business_list==''){
-            $users->save_business_list = json_encode($business_id);
-            $users->save();
-        }else{
-            $storeArray = json_decode($users->save_business_list, true);
-            $matches = array_intersect($storeArray, $request->business_id);
+        if(count($saveList) != 0){
 
-            if(!$matches){
-                $dataArray = array_merge($storeArray, $request->business_id);
-                $users->save_business_list = $dataArray;
-                $users->save();
+            if ($saveList->contains('business_id',  $business_id)) {
+                
+                $saveList = TSaveBusiness::where('user_id', $userId)->where('business_id', $business_id)->get()->first();
+                $saveList = TSaveBusiness::find($saveList->id);
+                $saveList->forceDelete();
 
                 $data = [
-                    'userId' => $users->id,
-                    'business_id' => $users->save_business_list
+                    'userId' => $userId,
+                    'business_id' => $business_id
                 ];
 
-                return response()->json(['success' => 'success', 'message' => 'Save Business List Succesful.', 'data' => $data]);
-            }
+                return response()->json(['success' => 'success', 'message' => 'This Business unsaved for this user successful.', 'data' => $data]);
 
-            $data = [
-                'userId' => $userId,
-                'business_id' => $business_id
-            ];
-    
-            return response()->json(['success' => 'success', 'message' => 'This Business already listed for this user.', 'data' => $data]);
+            } else {
+
+                $saveList = new TSaveBusiness();
+                $saveList->user_id = $request->user()->id;
+                $saveList->business_id = $business_id;
+                $saveList->save();
+            }
+        }else{
+            $saveList = new TSaveBusiness();
+            $saveList->user_id = $request->user()->id;
+            $saveList->business_id = $business_id;
+            $saveList->save();
         }
 
         $data = [
@@ -1309,15 +1333,14 @@ class UserBusinessOwnerInfoCo extends Controller
 
     // show saved business list for user wise 
     public function saveBusinessListShow(Request $request){
-
-        $users = User::find($request->user()->id);
-        $businessList = json_decode($users->save_business_list); 
+        
+        $businessList = TSaveBusiness::where('user_id', $request->user()->id)->get(); 
         $businessDetails = [];
 
         if($businessList){
             foreach($businessList as $value){
 
-                $data = \App\Models\Api\TBusiness::with('operationData:id,business_id,day,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->where('id', $value)->get()
+                $data = \App\Models\Api\TBusiness::with('operationData:id,business_id,day,open_time,closed_time','ratings','galleryData:id,business_id,business_gallery_image')->where('id', $value->business_id)->get()
                 ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city']);
 
                 $data = $data->map(function ($business) {
@@ -1529,15 +1552,46 @@ class UserBusinessOwnerInfoCo extends Controller
         return response()->json(['success' => 'success', 'message' => 'User Details:','data'=>$data]);
     }
 
-    // Gallery Image Delete
+    // Gallery Image/File Delete
     public function imageDelete(Request $request){
 
-        $id = TBusinessGallery::where('business_id', $request->business_id)->where('business_gallery_image', $request->business_gallery_image)->get()->pluck('id')->first();
-        
-        if($id){
+        if($request->business_profile_image!=''){
+
+            $id = TBusiness::where('id', $request->business_id)->where('halal_certificate', $request->business_profile_image)->get()->pluck('id')->first();
+
+            $tBusiness = TBusiness::find($id);
+            $tBusiness->halal_certificate = NULL;
+            $tBusiness->save();
+                
+            return response()->json(['success' => 'success', 'message' => 'Halal Certificate File Deleted Successful']);
+
+        }elseif($request->business_gallery_image!=''){
+            
+            $id = TBusinessGallery::where('business_id', $request->business_id)->where('business_gallery_image', $request->business_gallery_image)->get()->pluck('id')->first();
             $galleryData = TBusinessGallery::find($id);
             $galleryData->delete();
+            
             return response()->json(['success' => 'success', 'message' => 'Selected Image Deleted Successful']);
+
+        }elseif($request->halal_certificate!=''){
+
+            $id = TBusiness::where('id', $request->business_id)->where('halal_certificate', $request->halal_certificate)->get()->pluck('id')->first();
+
+            $tBusiness = TBusiness::find($id);
+            $tBusiness->halal_certificate = NULL;
+            $tBusiness->save();
+                
+            return response()->json(['success' => 'success', 'message' => 'Halal Certificate File Deleted Successful']);
+
+        }elseif($request->handcut_certificate!=''){
+            
+            $id = TBusiness::where('id', $request->business_id)->where('handcut_certificate', $request->handcut_certificate)->get()->pluck('id')->first();
+
+            $tBusiness = TBusiness::find($id);
+            $tBusiness->handcut_certificate = NULL;
+            $tBusiness->save();
+            return response()->json(['success' => 'success', 'message' => 'Handcut Certificate File Deleted Successful']);
+            
         }else{
             return response()->json(['success' => 'failed', 'message' => 'Delete Failed']);
         }
@@ -1588,5 +1642,32 @@ class UserBusinessOwnerInfoCo extends Controller
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function personalProfile(Request $request){
+
+        // return $request->user()->id;
+        $today = Carbon::today();
+        $$saveList = TSaveBusiness::where('user_id', $request->user()->id)->get();
+    
+        // Filter the list to count entries created today
+        $todaysSaveListCount = collect($saveList)
+            ->filter(function ($item) use ($today) {
+                return isset($item['created_at']) && Carbon::parse($item['created_at'])->isSameDay($today);
+            })->count();
+        
+        $reviews = TBusinessRating::where('user_id', $request->user()->id)->get();
+
+        $todaysReviewsCount = collect($saveList)
+            ->filter(function ($item) use ($today) {
+                return isset($item['created_at']) && Carbon::parse($item['created_at'])->isSameDay($today);
+            })->count();
+        
+        $data = [
+            'saveList' => $todaysSaveListCount,
+            'reviews' => $todaysReviewsCount,
+        ];
+        return response()->json(['success' => 'success', 'message' => 'Personal Profile Data Load:', 'data'=>$data]);
+
     }
 }

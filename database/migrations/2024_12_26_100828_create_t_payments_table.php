@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('t_payments', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('business_id');
+            $table->string('product', 191)->nullable();
             $table->string('payment_type', 191)->nullable();
             $table->string('payment_card_brand', 191)->nullable();
             $table->string('payment_method', 100)->nullable();
