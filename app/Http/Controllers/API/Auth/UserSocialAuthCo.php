@@ -32,8 +32,9 @@ class UserSocialAuthCo extends Controller
         $admin = User::select('id','email','password','account_type','name','first_name','last_name')->where('email', $credentials['email'])->first();
 
         if ($admin && Hash::check($request->password, $admin->password)){ 
-  
+            
             $user = $admin; 
+            $user->tokens()->delete();
             $token = $user->createToken('API Token')->plainTextToken;
             $user['token'] = $token;
 
@@ -134,11 +135,12 @@ class UserSocialAuthCo extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Signup Successful.',
-                    'user' => $user->makeHidden(['id','created_at','updated_at','deleted_at']),
+                    'user' => $user->makeHidden(['created_at','updated_at','deleted_at']),
                 ]);
 
             }else{
 
+                $user->tokens()->delete();
                 $token = $users->createToken('google-auth-token')->plainTextToken;
                 $users['token'] = $token;
 
@@ -299,6 +301,16 @@ class UserSocialAuthCo extends Controller
             return response()->json(['message' => 'Invalid Password or Email.'], 400);
         }
         
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully',
+        ], 200);
     }
 
 }

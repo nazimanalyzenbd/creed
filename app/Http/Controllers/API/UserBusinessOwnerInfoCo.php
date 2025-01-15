@@ -12,9 +12,13 @@ use App\Models\Admin\TCreedTags;
 use App\Models\Admin\TAboutUs;
 use App\Models\Admin\TAppTermsAndConditions;
 use App\Models\Api\TBusinessOwnerInfo;
+use App\Models\Api\TCallMe;
+use App\Models\Api\TQuote;
 use App\Models\Api\TBusiness;
 use App\Models\Api\TPayment;
 use App\Models\Api\TSaveBusiness;
+use App\Models\Api\TCreedVisitor;
+use App\Models\Api\TBusinessProfileVisitor;
 use App\Models\Admin\TDays;
 use App\Models\Api\TBusinessRating;
 use App\Models\Api\TBusinessGallery;
@@ -513,7 +517,51 @@ class UserBusinessOwnerInfoCo extends Controller
     }
 
     // checkout-page
-    // public function checkout(){}
+    public function checkout(Request $request){
+
+        try {
+
+            // Stripe::setApiKey(config('services.stripe.secret'));
+            $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET_KEY"));
+
+            $charge = $stripe->charges->create([
+                'amount' => $request->amount * 100,
+                'currency' => 'usd',
+                'source' => 'tok_visa',
+            ]);
+
+            if($charge->status == "succeeded"){
+                $paymentIntent = TPayment::create([
+                    'payable_amount' => $request->amount,
+                    'paid_amount' => $request->amount,
+                    'currency' => 'usd', 
+                    'payment_type' => $charge->payment_method_details->type,
+                    'payment_card_brand' => $charge->payment_method_details->card->brand,
+                    'product' => $request->product,
+                    'subscription_plan_name' => $request->subscription_plan_name,
+                    'business_id' => $request->business_id,
+                    'card_number' => $request->card_number,
+                    'expire_date' => $request->expire_date,
+                    'cvc_number' => $request->cvc_number,
+                    'description' => $charge->id,
+                    'payment_method' => $charge->payment_method,
+                    'receipt_url' => $charge->receipt_url,
+                    'status' => 1,
+                ]);
+            }
+
+            return response()->json([
+                'success' => 'success',
+                'message' => 'Payment Success.',
+                'paymentIntent' => $paymentIntent,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 'failed',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
 
     // business type, category, subcategory, affiliations, creedtags, restaurant list.
     public function allDropDown(){
@@ -650,6 +698,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
             )
             ->having('distance', '<=', $radius)
+            ->where('status','>=', 4)
             ->orderBy('distance', 'asc')
             
             ->get()
@@ -704,6 +753,7 @@ class UserBusinessOwnerInfoCo extends Controller
             DB::raw("(6371 * acos(cos(radians($latitude)) * cos(radians(lat)) * cos(radians(`long`) - radians($longitude)) + sin(radians($latitude)) * sin(radians(lat)))) AS distance")
         )
         ->having('distance', '<=', $radius)
+        ->where('status','>=', 4)
         ->orderBy('distance', 'asc')
         ->get()
 
@@ -964,6 +1014,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     }
                 })
                 ->having('distance', '<=', $radius)
+                ->where('status','>=', 4)
                 ->orderBy('distance', 'asc')
                 ->get()
 
@@ -1011,6 +1062,7 @@ class UserBusinessOwnerInfoCo extends Controller
                     ) AS distance")
                 )
                 ->having('distance', '<=', $radius)
+                ->where('status','>=', 4)
                 ->orderBy('distance', 'asc')
                 ->get()
 
@@ -1082,6 +1134,7 @@ class UserBusinessOwnerInfoCo extends Controller
             ->orWhereHas('businessSubCategory', function($query) use ($catSubCat) {
                 $query->where('name', $catSubCat);})
             ->having('distance', '<=', $radius)
+            ->where('status','>=', 4)
             ->orderBy('distance', 'asc')
             ->get()
 
@@ -1200,6 +1253,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 )
                 ->where('business_name', $business_name)
                 ->having('distance', '<=', $radius)
+                ->where('status','>=', 4)
                 ->orderBy('distance', 'asc')
                 ->get()
                 ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','created_at','updated_at','deleted_at','ratings']);
@@ -1257,6 +1311,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 ->orWhereHas('businessSubCategory', function($query) use ($catSubCat) {
                     $query->where('name', $catSubCat);})
                 ->having('distance', '<=', $radius)
+                ->where('status','>=', 4)
                 ->orderBy('distance', 'asc')
                 ->get()
 
@@ -1598,76 +1653,330 @@ class UserBusinessOwnerInfoCo extends Controller
 
     }
 
-    public function checkout(Request $request){
-
-        try {
-
-            // Stripe::setApiKey(config('services.stripe.secret'));
-            $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET_KEY"));
-
-            $charge = $stripe->charges->create([
-                'amount' => $request->amount * 100,
-                'currency' => 'usd',
-                'source' => 'tok_visa',
-            ]);
-
-            if($charge->status == "succeeded"){
-                $paymentIntent = TPayment::create([
-                    'payable_amount' => $request->amount,
-                    'paid_amount' => $request->amount,
-                    'currency' => 'usd', 
-                    'payment_type' => $charge->payment_method_details->type,
-                    'payment_card_brand' => $charge->payment_method_details->card->brand,
-                    'product' => $request->product,
-                    'subscription_plan_name' => $request->subscription_plan_name,
-                    'business_id' => $request->business_id,
-                    'card_number' => $request->card_number,
-                    'expire_date' => $request->expire_date,
-                    'cvc_number' => $request->cvc_number,
-                    'description' => $charge->id,
-                    'payment_method' => $charge->payment_method,
-                    'receipt_url' => $charge->receipt_url,
-                    'status' => 1,
-                ]);
-            }
-
-            return response()->json([
-                'success' => 'success',
-                'message' => 'Payment Success.',
-                'paymentIntent' => $paymentIntent,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 'failed',
-                'message' => $e->getMessage(),
-            ]);
-        }
-    }
-
     public function personalProfile(Request $request){
 
-        // return $request->user()->id;
-        $today = Carbon::today();
-        $$saveList = TSaveBusiness::where('user_id', $request->user()->id)->get();
-    
-        // Filter the list to count entries created today
-        $todaysSaveListCount = collect($saveList)
-            ->filter(function ($item) use ($today) {
-                return isset($item['created_at']) && Carbon::parse($item['created_at'])->isSameDay($today);
-            })->count();
-        
-        $reviews = TBusinessRating::where('user_id', $request->user()->id)->get();
+        $userId = $request->user()->id;
 
-        $todaysReviewsCount = collect($saveList)
-            ->filter(function ($item) use ($today) {
-                return isset($item['created_at']) && Carbon::parse($item['created_at'])->isSameDay($today);
+        // Define time ranges
+        $now = Carbon::now();
+        $startOfDay = $now->copy()->startOfDay();
+        $startOfWeek = $now->copy()->startOfWeek();
+        $startOfMonth = $now->copy()->startOfMonth();
+        $startOfYear = $now->copy()->startOfYear();
+
+        $saveList = TSaveBusiness::where('user_id', $userId)->get();
+        $reviews = TBusinessrating::where('user_id', $userId)->get();
+
+        $countInRange = function ($list, $startTime) {
+            return collect($list)->filter(function ($item) use ($startTime) {
+                return isset($item['created_at']) && Carbon::parse($item['created_at'])->gte($startTime);
             })->count();
-        
-        $data = [
-            'saveList' => $todaysSaveListCount,
-            'reviews' => $todaysReviewsCount,
+        };
+    
+        // Calculate counts for saveList
+        $saveListCounts = [
+            [
+                "day" => "1d",
+                "count" => $countInRange($saveList, $startOfDay),
+            ],
+            [
+                "day" => "1w",
+                "count" => $countInRange($saveList, $startOfWeek),
+            ],
+            [
+                "day" => "1m",
+                "count" => $countInRange($saveList, $startOfMonth),
+            ],
+            [
+                "day" => "1y",
+                "count" => $countInRange($saveList, $startOfYear),
+            ],
         ];
+    
+        // Calculate counts for reviews
+        $reviewCounts = [
+            [
+                "day" => "1d",
+                "count" => $countInRange($reviews, $startOfDay),
+            ],
+            [
+                "day" => "1w",
+                "count" => $countInRange($reviews, $startOfWeek),
+            ],
+            [
+                "day" => "1m",
+                "count" => $countInRange($reviews, $startOfMonth),
+            ],
+            [
+                "day" => "1y",
+                "count" => $countInRange($reviews, $startOfYear),
+            ],
+        ];
+
+        $data = [
+            'saveList' => $saveListCounts,
+            'reviews' => $reviewCounts,
+        ];
+
         return response()->json(['success' => 'success', 'message' => 'Personal Profile Data Load:', 'data'=>$data]);
 
     }
+
+    public function businessProfile(Request $request){
+
+        $userId = $request->user()->id;
+        $businessId = TBusinessOwnerInfo::where('user_id', $userId)->get()->pluck('business_id')->first();
+        // Define time ranges
+        $now = Carbon::now();
+        $startOfDay = $now->copy()->startOfDay();
+        $startOfWeek = $now->copy()->startOfWeek();
+        $startOfMonth = $now->copy()->startOfMonth();
+        $startOfYear = $now->copy()->startOfYear();
+
+        $creedVisitorList = TCreedVisitor::get();
+        $businessProfileVisitorList = TBusinessProfileVisitor::where('business_id', $businessId)->get();
+
+        $countInRange = function ($list, $startTime) {
+            return collect($list)->filter(function ($item) use ($startTime) {
+                return isset($item['created_at']) && Carbon::parse($item['created_at'])->gte($startTime);
+            })->count();
+        };
+    
+        // Calculate counts for creedVisitorList
+        $creedVisitorListCounts = [
+            [
+                "day" => "1d",
+                "count" => $countInRange($creedVisitorList, $startOfDay),
+            ],
+            [
+                "day" => "1w",
+                "count" => $countInRange($creedVisitorList, $startOfWeek),
+            ],
+            [
+                "day" => "1m",
+                "count" => $countInRange($creedVisitorList, $startOfMonth),
+            ],
+            [
+                "day" => "1y",
+                "count" => $countInRange($creedVisitorList, $startOfYear),
+            ],
+        ];
+    
+        // Calculate counts for businessProfileVisitorList
+        $businessProfileVisitorListCounts = [
+            [
+                "day" => "1d",
+                "count" => $countInRange($businessProfileVisitorList, $startOfDay),
+            ],
+            [
+                "day" => "1w",
+                "count" => $countInRange($businessProfileVisitorList, $startOfWeek),
+            ],
+            [
+                "day" => "1m",
+                "count" => $countInRange($businessProfileVisitorList, $startOfMonth),
+            ],
+            [
+                "day" => "1y",
+                "count" => $countInRange($businessProfileVisitorList, $startOfYear),
+            ],
+        ];
+
+        $data = [
+            'creedVisitorListCounts' => $creedVisitorListCounts,
+            'businessProfileVisitorListCounts' => $businessProfileVisitorListCounts,
+        ];
+
+        return response()->json(['success' => 'success', 'message' => 'Business Profile Data Load:', 'data'=>$data]);
+    }
+
+    public function callMe(Request $request){
+
+        try{
+            $validator = Validator::make($request->all(), [
+                
+                'user_id' => 'nullable',
+                'name' => 'nullable|string',
+                'email' => 'required|email',
+                'country_code' => 'nullable|string',
+                'phone_number' => 'nullable|string',
+            ]);
+    
+            if ($validator->fails()) {
+                $errors = collect($validator->errors()->toArray())->map(fn($messages) => $messages[0]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed.',
+                    'errors' => $errors,
+                ], 422);
+            }
+
+            $tcallMeData = new TCallMe();
+            $tcallMeData->name = $request->name;
+            $tcallMeData->email = $request->email;
+            $tcallMeData->country_code = $request->country_code;
+            $tcallMeData->phone_number = $request->phone_number;
+            $tcallMeData->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message'=> 'Call Me data successfully saved.',
+                'tcallMeData' => $tcallMeData->makeHidden(['status','created_at','updated_at','deleted_at']),
+            ],201);
+
+        } catch (\Exception $e) {
+
+            \Log::error('Database error: ' . $e->getMessage());
+    
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Database error: Unable to submit data!',
+                'errors' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function quote(Request $request){
+
+        try{
+            $validator = Validator::make($request->all(), [
+                
+                'user_id' => 'nullable',
+                'name' => 'nullable|string',
+                'email' => 'required|email',
+                'country_code' => 'nullable|string',
+                'phone_number' => 'nullable|string',
+                'address' => 'nullable|string',
+                'lat' => 'nullable',
+                'long' => 'nullable',
+            ]);
+    
+            if ($validator->fails()) {
+                $errors = collect($validator->errors()->toArray())->map(fn($messages) => $messages[0]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed.',
+                    'errors' => $errors,
+                ], 422);
+            }
+
+            $tQuoteData = new TQuote();
+            $tQuoteData->name = $request->name;
+            $tQuoteData->email = $request->email;
+            $tQuoteData->country_code = $request->country_code;
+            $tQuoteData->phone_number = $request->phone_number;
+            $tQuoteData->address = $request->address;
+            $tQuoteData->lat = $request->lat;
+            $tQuoteData->long = $request->long;
+            $tQuoteData->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message'=> 'Quote data successfully saved.',
+                'tQuoteData' => $tQuoteData->makeHidden(['status','created_at','updated_at','deleted_at']),
+            ],201);
+
+        } catch (\Exception $e) {
+
+            \Log::error('Database error: ' . $e->getMessage());
+    
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Database error: Unable to submit data!',
+                'errors' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function filterScreen(Request $request){
+
+        $validated = $request->validate([
+            'lat' => 'nullable|string',
+            'long' => 'nullable|string',
+        ]);
+
+        $latitude = $validated['lat'];
+        $longitude = $validated['long'];
+
+        $radius = (100*1.60934); // Radius in kilometers (100 miles to kilometers)
+        
+        $query = TBusiness::query();
+
+        // Filter by creed_tags_id
+        if ($request->has('creed_tags_id') && is_array($request->creed_tags_id)) {
+            $query->whereIn('creed_tags_id', $request->creed_tags_id);
+        }
+
+        // Filter by restaurant_id
+        if ($request->has('restaurant_id') && is_array($request->restaurant_id)) {
+            $query->whereIn('restaurant_id', $request->restaurant_id);
+        }
+
+        // Filter by ratings
+        if ($request->has('ratings') && is_array($request->ratings)) {
+            $query->whereHas('ratings', function ($subQuery) use ($request) {
+                $subQuery->whereIn('rating_star', $request->ratings);
+            });
+        }
+
+        // Fetch filtered data
+        $filterBusinesses = TBusiness::$query->with(['businessOwnerInfos','businessCategory:id,name','businessSubCategory:id,name','galleryData:id,business_id,business_gallery_image','operationData:id,business_id,day,open_time,closed_time','ratings'])->select(
+            'id',
+            'business_name',
+            'business_type_id',
+            'business_category_id',
+            'business_subcategory_id',
+            'creed_tags_id',
+            'lat',
+            'long',
+            DB::raw("(
+                6371 * acos(
+                    cos(radians($latitude)) *
+                    cos(radians(lat)) *
+                    cos(radians(`long`) - radians($longitude)) +
+                    sin(radians($latitude)) *
+                    sin(radians(lat))
+                )
+            ) AS distance")
+        )
+
+        ->where(function ($query) use ($creed_id) {
+            foreach ($creed_id as $id) {
+                $query->orWhereJsonContains('creed_tags_id', $id);
+            }
+        })
+        ->having('distance', '<=', $radius)
+        ->where('status','>=', 4)
+        ->orderBy('distance', 'asc')
+        ->get()
+
+        ->makeHidden(['business_type_id','business_category_id','business_subcategory_id','creed_tags_id','affiliation_id','country','state','city','ratings','created_at','updated_at','deleted_at']);
+
+        $filterBusinesses = $filterBusinesses->map(function ($business) {
+
+            $business->business_type_name = $business->businessTypeName ?? '';
+            $business->business_category_name = $business->businessCategory->name ?? '';
+            $business->business_subcategory_name = $business->businessSubCategory->name ?? '';
+            $business->business_creed_name = $business->creedTagsName ?? '';
+            $business->affiliation_name = $business->affiliationName ?? '';
+            $business->country_name = $business->countryName->name ?? '';
+            $business->state_name = $business->stateName->name ?? '';
+            $business->city_name = $business->cityName->name ?? '';
+            $business->average_rating = round((double) $business->averageRating(),2) ?? '';
+            
+            unset($business->businessCategory);
+            unset($business->businessSubCategory);
+            unset($business->countryName);
+            unset($business->stateName);
+            unset($business->cityName);
+            return $business;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Filtered Business Info Retrieved',
+            'data' => $businesses,
+        ]);
+    }
+
 }

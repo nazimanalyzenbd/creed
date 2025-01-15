@@ -84,6 +84,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'email' => 'azam.hh@gmail.com', 
                 'phone_number' => '4086930134', 
                 'address' => '21329 Gosier Way',
+                'status' => 4,
             ],
             [
                 'user_id' => 2,
@@ -92,6 +93,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'email' => 'azam.hh@gmail.com', 
                 'phone_number' => '1234567890', 
                 'address' => '20423 US-441 Suite F18', 
+                'status' => 4,
             ],
             [
                 'user_id' => 3,
@@ -100,6 +102,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'email' => 'Mikaeel@gmail.com', 
                 'phone_number' => '2345678901', 
                 'address' => '8185 Via Ancho Rd',
+                'status' => 4,
             ],
             [
                 'user_id' => 4,
@@ -108,6 +111,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'email' => 'Sana@gmail.com', 
                 'phone_number' => '4444444444', 
                 'address' => '2005 Greenbriar Blvd',
+                'status' => 4,
             ],
             [
                 'user_id' => 5,
@@ -116,6 +120,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'email' => 'azam.hh@gmail.com', 
                 'phone_number' => '5557890345', 
                 'address' => '19196 Natures View Ct',
+                'status' => 4,
             ],
             [
                 'user_id' => 6,
@@ -124,6 +129,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'email' => 'Hal@gmail.com', 
                 'phone_number' => '8888888888', 
                 'address' => '7501 Harwin Dr. #101e',
+                'status' => 4,
             ],
             [
                 'user_id' => 7,
@@ -132,6 +138,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'email' => 'nazim11121@gamil.com',
                 'phone_number' => '01778213921', 
                 'address' => 'Level 1, House 1A, Road No. 16/A, Gulshan 1, Dhaka 1212',
+                'status' => 4,
             ],
         ]);
         $tBusiness = TBusiness::insert([
@@ -154,6 +161,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'city' => '112494',
                 'zip_code' => '33428',
                 'description' => 'app development information technology consulting',
+                'status' => 4,
             ],
             [
                 'business_owner_id' => 2,
@@ -174,6 +182,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'city' => '112494',
                 'zip_code' => '33498', 
                 'description' => 'Dental Surgeon Dentist Dental Hygeine',
+                'status' => 4,
             ],
             [
                 'business_owner_id' => 3,
@@ -194,6 +203,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'city' => '112494',
                 'zip_code' => '33488', 
                 'description' => 'Lawyer Family Law Probate Custody Divorce',
+                'status' => 4,
             ],
             [
                 'business_owner_id' => 4,
@@ -214,6 +224,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'city' => '128776',
                 'zip_code' => '33414',
                 'description' => 'event planning parties corporate events birthday planner wedding fun outdoor florida event planner',
+                'status' => 4,
             ],
             [
                 'business_owner_id' => 5,
@@ -234,6 +245,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'city' => '112494',
                 'zip_code' => '33498',
                 'description' => 'halal yemeni arab restaurant',
+                'status' => 4,
             ],
             [
                 'business_owner_id' => 6,
@@ -254,6 +266,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'city' => '118703',
                 'zip_code' => '77036',  
                 'description' => 'Halal Italian Restaurant pizza pasta',
+                'status' => 4,
             ],
             [
                 'business_owner_id' => 7,
@@ -274,6 +287,7 @@ class TBusinessOwnerSeeder extends Seeder
                 'city' => '153863',
                 'zip_code' => '1212',
                 'description' => 'web & app development information technology consulting',
+                'status' => 4,
             ],
         ]);
     }

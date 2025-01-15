@@ -24,6 +24,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/send-otp', [UserSocialAuthCo::class, 'sendOtp']);
     Route::post('/verify-otp', [UserSocialAuthCo::class, 'verifyOtp']);
     Route::post('/reset-password', [UserSocialAuthCo::class, 'resetPassword']);
+    Route::post('/logout', [UserSocialAuthCo::class, 'logout'])->middleware('auth:sanctum');
 });
 
 Route::post('/business-owner-info/store',[UserBusinessOwnerInfoCo::class, 'businessOwnerInfoStore'])->name('businessOwnerInfo.store')->middleware('auth:sanctum');
@@ -86,3 +87,9 @@ Route::get('/user-details', [UserBusinessOwnerInfoCo::class, 'userDetails'])->na
 Route::post('/business-info/image-delete', [UserBusinessOwnerInfoCo::class, 'imageDelete'])->name('business-info.image-delete')->middleware('auth:sanctum');
 
 Route::get('/personal-profile', [UserBusinessOwnerInfoCo::class, 'personalProfile'])->name('user.personal-profile')->middleware('auth:sanctum');
+Route::get('/business-profile', [UserBusinessOwnerInfoCo::class, 'businessProfile'])->name('user.business-profile')->middleware('auth:sanctum');
+
+Route::post('/business/filter-screen', [UserBusinessOwnerInfoCo::class, 'filterScreen'])->name('business.filter-screen');
+
+Route::post('/business/call-me', [UserBusinessOwnerInfoCo::class, 'callMe'])->name('business.call-me');
+Route::post('/business/quote', [UserBusinessOwnerInfoCo::class, 'quote'])->name('business.quote');
