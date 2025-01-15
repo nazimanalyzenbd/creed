@@ -95,6 +95,7 @@ class UserBusinessOwnerInfoCo extends Controller
                 $tUserTBusinessOwnerInfo->first_name = $request->first_name;
                 $tUserTBusinessOwnerInfo->last_name = $request->last_name;
                 $tUserTBusinessOwnerInfo->email = $request->email;
+                $tUserTBusinessOwnerInfo->country_code = $request->country_code;
                 $tUserTBusinessOwnerInfo->phone_number = $request->phone_number;
                 $tUserTBusinessOwnerInfo->address = $request->address;
                 $tUserTBusinessOwnerInfo->save();
@@ -1886,6 +1887,28 @@ class UserBusinessOwnerInfoCo extends Controller
                 'errors' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    // Direction button api
+    public function getBusinessDirection($id){
+
+        $business = TBusiness::find($id);
+
+        if (!$business) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Business not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'lat' => $business->lat,
+                'long' => $business->long,
+                'address' => $business->address,
+            ],
+        ], 200);
     }
 
     public function filterScreen(Request $request){

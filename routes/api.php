@@ -93,3 +93,5 @@ Route::post('/business/filter-screen', [UserBusinessOwnerInfoCo::class, 'filterS
 
 Route::post('/business/call-me', [UserBusinessOwnerInfoCo::class, 'callMe'])->name('business.call-me');
 Route::post('/business/quote', [UserBusinessOwnerInfoCo::class, 'quote'])->name('business.quote');
+
+Route::get('/business/direction/{id}', [UserBusinessOwnerInfoCo::class, 'getBusinessDirection'])->name('business.direction');
